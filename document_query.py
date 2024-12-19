@@ -72,7 +72,7 @@ def fetch_documents_by_case_id(case_id, db, collection_name="Document"):
 
         # Fetch all matching documents, sorted by DocumentReceiptTime in descending order
         print(f"Querying documents for EntityValue (case_id): {case_id}")
-        documents = collection.find(query).sort("DocumentReceiptTime", -1)  # Sort descending
+        documents = collection.find(query).sort("DocumentReceiptTime", 1)  # Sort descending
 
         matching_documents = list(documents)  # Convert cursor to list
 
