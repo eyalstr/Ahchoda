@@ -29,7 +29,20 @@ def connect_to_mongodb(mongo_connection, db_name="CaseManagement"):
         print(f"Error connecting to MongoDB: {e}")
         return None, None
 
-
+def display_menu():
+    """
+    Display a menu of options for the user and return their choice.
+    """
+    print("\nMenu:")
+    print("1. Analyze Process State")
+    print("2. Exit")
+    try:
+        choice = int(input("Enter your choice: "))
+        return choice
+    except ValueError:
+        print("Invalid input. Please enter a number.")
+        return None
+    
 if __name__ == "__main__":
     try:
         mongo_client, db = connect_to_mongodb(mongo_connection_string)
@@ -37,14 +50,24 @@ if __name__ == "__main__":
             print("Failed to connect to MongoDB. Exiting.")
             exit()
 
-        case_id = int(input("Enter Case ID (_id): "))
-        process_ids = fetch_process_ids_by_case_id_sorted(case_id, db)
+        #case_id = int(input("Enter Case ID (_id): "))
 
-        if not process_ids:
-            print("No process IDs found. Exiting.")
-        else:
-            execute_sql_queries(server_name, database_name, user_name, password, process_ids)
+        while True:
+            choice = display_menu()
 
+            if choice == 1:
+                case_id = int(input("Enter Case ID (_id): "))
+                process_ids = fetch_process_ids_by_case_id_sorted(case_id, db)
+
+                if not process_ids:
+                    print("No process IDs found. Exiting.")
+                else:
+                    execute_sql_queries(server_name, database_name, user_name, password, process_ids)
+            elif choice == 2:
+                print("Exiting application.")
+                break
+            else:
+                print("Invalid choice. Please select a valid option.")
     except ValueError:
         print("Invalid input. Please enter a numeric Case ID.")
     except Exception as e:
