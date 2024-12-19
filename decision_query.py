@@ -58,7 +58,7 @@ def normalize_hebrew(text):
 def fetch_decisions_by_case_id(case_id, db):
     """
     Fetch Decisions from MongoDB for a given Case ID (_id).
-    Store the Decisions[] information.
+    Store the Decisions[] information, sorted by DecisionDate, and display sub-decisions line by line.
     """
     decisions_list = []
 
@@ -88,18 +88,66 @@ def fetch_decisions_by_case_id(case_id, db):
                 "UpdateDate": decision.get("UpdateDate"),
                 "ProcessId": decision.get("ProcessId"),
                 "IsActive": decision.get("IsActive"),
-                "DecisionJudges": decision.get("DecisionJudges", []),
+                "DecisionJudges": [
+                    {
+                        "JudgeFullName": normalize_hebrew(judge.get("JudgeFullName", ""))
+                    } for judge in decision.get("DecisionJudges", [])
+                ],
                 "DecisionRequests": decision.get("DecisionRequests", []),
                 "Classifications": decision.get("Classifications", []),
             }
+
+            sub_decisions = decision.get("SubDecisions", [])
+            decision_data["SubDecisions"] = [
+                {
+                    "SubDecisionId": sub_decision.get("SubDecisionId"),
+                    "SubDecisionDate": sub_decision.get("SubDecisionDate"),
+                    "Description": normalize_hebrew(sub_decision.get("Description", ""))
+                } for sub_decision in sub_decisions
+            ]
+
             decisions_list.append(decision_data)
+
+        # Sort the decisions by DecisionDate
+        decisions_list.sort(key=lambda x: x.get("DecisionDate", ""))
 
         if decisions_list:
             log_and_print(f"Fetched {len(decisions_list)} decisions for Case ID {case_id}.", "info", ansi_format=BOLD_GREEN)
             for idx, decision in enumerate(decisions_list, start=1):
                 log_and_print(f"Decision #{idx}:", "info", ansi_format=BOLD_YELLOW)
                 for key, value in decision.items():
-                    if isinstance(value, str) and key in ["MojId", "CreateUser"]:
+                    if key == "DecisionJudges":
+                        log_and_print("  DecisionJudges:", "info", ansi_format=BOLD_YELLOW)
+                        for judge in value:
+                            judge_name = normalize_hebrew(judge.get("JudgeFullName", ""))
+                            log_and_print(f"    JudgeFullName: {judge_name}", "info", BOLD_GREEN, is_hebrew=True)
+                    elif key == "DecisionRequests":
+                        log_and_print("  DecisionRequests:", "info", ansi_format=BOLD_YELLOW)
+                        for req_idx, request in enumerate(value, start=1):
+                            log_and_print(f"    Request #{req_idx}:", "info", ansi_format=BOLD_YELLOW)
+                            for req_key, req_value in request.items():
+                                if req_key == "SubDecisions":
+                                    log_and_print(f"      {req_key}:", "info", ansi_format=BOLD_YELLOW)
+                                    for sub_idx, sub_decision in enumerate(req_value, start=1):
+                                        log_and_print(f"        SubDecision #{sub_idx}:", "info", ansi_format=BOLD_YELLOW)
+                                        for sub_key, sub_value in sub_decision.items():
+                                            log_and_print(f"          {sub_key}: {sub_value}")
+                                else:
+                                    log_and_print(f"      {req_key}: {req_value}")
+                    elif key == "Classifications":
+                        log_and_print("  Classifications:", "info", ansi_format=BOLD_YELLOW)
+                        if value:
+                            for class_idx, classification in enumerate(value, start=1):
+                                log_and_print(f"    Classification #{class_idx}: {classification}")
+                        else:
+                            log_and_print("    No Classifications.", "info", ansi_format=BOLD_YELLOW)
+                    elif key == "SubDecisions":
+                        log_and_print("  SubDecisions:", "info", ansi_format=BOLD_YELLOW)
+                        for sub_idx, sub_decision in enumerate(value, start=1):
+                            log_and_print(f"    SubDecision #{sub_idx}:", "info", ansi_format=BOLD_YELLOW)
+                            for sub_key, sub_value in sub_decision.items():
+                                log_and_print(f"      {sub_key}: {sub_value}", is_hebrew=(sub_key == "Description"))
+                    elif isinstance(value, str) and key in ["MojId", "CreateUser"]:
                         log_and_print(f"  {key}: {value}", is_hebrew=True)
                     else:
                         log_and_print(f"  {key}: {value}")

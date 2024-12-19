@@ -5,8 +5,7 @@ from bidi.algorithm import get_display
 import unicodedata
 import os
 from colorama import init, Fore, Style
-from document_type_mapping import DOCUMENT_TYPE_MAPPING  # Import the mapping table
-from document_category_mapping import DOCUMENT_CATEGORY_MAPPING
+from doc_header_map import DOCUMENT_TYPE_MAPPING, DOCUMENT_CATEGORY_MAPPING # Import the mapping table
 
 # Initialize colorama for Windows console ANSI escape code support
 init(autoreset=True)
