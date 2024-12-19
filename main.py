@@ -2,6 +2,7 @@ from pymongo import MongoClient
 from dotenv import load_dotenv
 from process_query import execute_sql_process_queries, fetch_process_ids_by_case_id_sorted
 from document_query import fetch_documents_by_case_id
+from decision_query import fetch_decisions_by_case_id
 import os
 
 # Load environment variables
@@ -38,7 +39,8 @@ def display_menu():
     print("1. Analyze Process State")
     print("2. Analyze Decisions")
     print("3. Query Documents")
-    print("4. Exit")
+    print("4. Query Decisions")
+    print("5. Exit")
 
     try:
         choice = int(input("Enter your choice: "))
@@ -74,6 +76,9 @@ if __name__ == "__main__":
                 case_id = int(input("Enter Case ID (_id): "))
                 fetch_documents_by_case_id(case_id, db)
             elif choice == 4:
+                case_id = int(input("Enter Case ID (_id): "))
+                fetch_decisions_by_case_id(case_id, db)
+            elif choice == 5:
                 print("Exiting application.")
                 break
             else:

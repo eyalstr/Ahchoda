@@ -1,94 +1,17 @@
-Connecting to SQL Server...
-Connection to SQL Server established successfully.
-
-  Querying SQL for ProcessId: 910753c4-0ea9-493a-8ae0-c3d7eb95f998
-  ProcessID = 910753c4-0ea9-493a-8ae0-c3d7eb95f998
-  ProcessTypeName = תגובת צד ב'
-  Results from query (Fetched 1 rows):
-
-********* Step=1 *************
-
-  ProcessStepID = 20561
-  ProcessID = 910753c4-0ea9-493a-8ae0-c3d7eb95f998
-  ProcessTypeName = תגובת צד ב'
-  ActivityTypeName = מטלה לתגובת צד ב
-  Information for ProcessStepID 20561...
-  Results for ProcessStepID 20561 (Fetched 2 rows):
-  ProcessStepStatusID = 49799
-  Description_Heb = חדש
-  ProcessStepStatusID = 49800
-  Description_Heb = בהמתנה (עבור מטלה)
-
-  Querying SQL for ProcessId: e29c866c-ea0e-432f-896e-e99df139785e
-  ProcessID = e29c866c-ea0e-432f-896e-e99df139785e
-  ProcessTypeName = תהליך קליטת תיק בביה"ד חרבות ברזל
-  Results from query (Fetched 4 rows):
-
-********* Step=2 *************
-
-  ProcessStepID = 20489
-  ProcessID = e29c866c-ea0e-432f-896e-e99df139785e
-  ProcessTypeName = תהליך קליטת תיק בביה"ד חרבות ברזל
-  ActivityTypeName = בדיקת מזכירות
-  Information for ProcessStepID 20489...
-  Results for ProcessStepID 20489 (Fetched 4 rows):
-  ProcessStepStatusID = 49614
-  Description_Heb = חדש
-  ProcessStepStatusID = 49615
-  Description_Heb = הופעל
-  ProcessStepStatusID = 49616
-  Description_Heb = הורם אירוע
-  ProcessStepStatusID = 49617
-  Description_Heb = סיום טיפול/בוצע
-
-********* Step=3 *************
-
-  ProcessStepID = 20492
-  ProcessID = e29c866c-ea0e-432f-896e-e99df139785e
-  ProcessTypeName = תהליך קליטת תיק בביה"ד חרבות ברזל
-  ActivityTypeName = ניתוב לדיין
-  Information for ProcessStepID 20492...
-  Results for ProcessStepID 20492 (Fetched 4 rows):
-  ProcessStepStatusID = 49622
-  Description_Heb = חדש
-  ProcessStepStatusID = 49624
-  Description_Heb = הופעל
-  ProcessStepStatusID = 49629
-  Description_Heb = הורם אירוע
-  ProcessStepStatusID = 49630
-  Description_Heb = סיום טיפול/בוצע
-
-********* Step=4 *************
-
-  ProcessStepID = 20493
-  ProcessID = e29c866c-ea0e-432f-896e-e99df139785e
-  ProcessTypeName = תהליך קליטת תיק בביה"ד חרבות ברזל
-  ActivityTypeName = הפצה - פתיחת תיק
-  Information for ProcessStepID 20493...
-  Results for ProcessStepID 20493 (Fetched 4 rows):
-  ProcessStepStatusID = 49623
-  Description_Heb = חדש
-  ProcessStepStatusID = 49625
-  Description_Heb = הופעל
-  ProcessStepStatusID = 49626
-  Description_Heb = הורם אירוע
-  ProcessStepStatusID = 49627
-  Description_Heb = סיום טיפול/בוצע
-
-********* Step=5 *************
-
-  ProcessStepID = 20495
-  ProcessID = e29c866c-ea0e-432f-896e-e99df139785e
-  ProcessTypeName = תהליך קליטת תיק בביה"ד חרבות ברזל
-  ActivityTypeName = עיון והחלטה
-  Information for ProcessStepID 20495...
-  Results for ProcessStepID 20495 (Fetched 4 rows):
-  ProcessStepStatusID = 49631
-  Description_Heb = חדש
-  ProcessStepStatusID = 49632
-  Description_Heb = הופעל
-  ProcessStepStatusID = 49792
-  Description_Heb = הורם אירוע
-  ProcessStepStatusID = 49803
-  Description_Heb = סיום טיפול/בוצע
-SQL Server connection closed.
+Fetched 1 decisions for Case ID 3002309.
+Decision #1:
+  DecisionId: 581
+  DecisionDate: 2024-12-18 14:20:57.430000
+  DecisionStatusTypeId: 3
+  IsForPublication: False
+  PublishDate: None
+  MojId: 289-2024-00109843
+  CreateUser: JUSTICE\EyalSt
+  CreateDate: 2024-12-18 14:20:58.395000
+  UpdateUser: None
+  UpdateDate: 2024-12-18 14:21:09.803000
+  ProcessId: 86875946-faf6-4995-8342-b34dffcc398f
+  IsActive: True
+  DecisionJudges: [{'UserName': 'justice\\eyalst', 'JudgeFullName': 'איל שטראוס', 'AppointmentStartDate': None, 'AppointmentEndDate': None, 'MojId': None, 'EndReasonTypeId': None, 'IsActive': None, 'CreateBy': None, 'CreateByFullName': None, 'EndBy': None, 'EndByFullName': None}]
+  DecisionRequests: [{'SubDecisions': [{'SubDecisionId': 617, 'DecisionTypeToCourtId': 30, 'ContinuedProcessId': '910753c4-0ea9-493a-8ae0-c3d7eb95f998', 'IsFunctionSucceeded': False, 'Days': 3, 'DecisionEssenceId': 4, 'Note': '', 'UnitedCases': []}], 'RequestId': 2371, 'IsFromTask': True}]
+  Classifications: []
