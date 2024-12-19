@@ -1,6 +1,6 @@
 from pymongo import MongoClient
 from dotenv import load_dotenv
-from process_query import execute_sql_queries, fetch_process_ids_by_case_id_sorted
+from process_query import execute_sql_process_queries, fetch_process_ids_by_case_id_sorted
 import os
 
 # Load environment variables
@@ -62,7 +62,7 @@ if __name__ == "__main__":
                 if not process_ids:
                     print("No process IDs found. Exiting.")
                 else:
-                    execute_sql_queries(server_name, database_name, user_name, password, process_ids)
+                    execute_sql_process_queries(server_name, database_name, user_name, password, process_ids)
             elif choice == 2:
                 print("Exiting application.")
                 break

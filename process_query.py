@@ -93,7 +93,7 @@ def fetch_process_ids_by_case_id_sorted(case_id, db):
         print(f"Error processing case document: {e}")
         return []
 
-def execute_sql_queries(server_name, database_name, user_name, password, process_ids):
+def execute_sql_process_queries(server_name, database_name, user_name, password, process_ids):
     """Execute SQL queries for each Process ID."""
     if not process_ids:
         log_and_print("No Process IDs provided. Exiting.", "warning")
