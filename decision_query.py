@@ -75,10 +75,13 @@ def fetch_decisions_by_case_id(case_id, db):
 
         decisions = document.get("Decisions", [])
         for decision in decisions:
+            decision_status = decision.get("DecisionStatusTypeId")
+            decision_status_desc = "טיוטת החלטה" if decision_status == 1 else "החלטה מאושרת" if decision_status == 3 else "Unknown"
+
             decision_data = {
                 "DecisionId": decision.get("DecisionId"),
                 "DecisionDate": decision.get("DecisionDate"),
-                "DecisionStatusTypeId": decision.get("DecisionStatusTypeId"),
+                "DecisionStatusTypeId": normalize_hebrew(decision_status_desc),
                 "IsForPublication": decision.get("IsForPublication"),
                 "PublishDate": decision.get("PublishDate"),
                 "MojId": decision.get("MojId"),
