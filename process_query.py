@@ -56,6 +56,43 @@ def normalize_hebrew(text):
         return text
     return get_display(unicodedata.normalize("NFKC", text.strip()))
 
+
+def fetch_process_ids_by_case_id_sorted(case_id, db):
+    """
+    Fetch Process IDs from MongoDB for a given Case ID (_id), sorted by LastPublishDate.
+    """
+    process_list = []
+
+    try:
+        collection = db["Case"]
+        document = collection.find_one(
+            {"_id": case_id},
+            {"Requests.Processes.ProcessId": 1, "Requests.Processes.LastPublishDate": 1, "_id": 1}
+        )
+
+        if not document:
+            print(f"No document found for Case ID {case_id}.")
+            return []
+
+        requests = document.get("Requests", [])
+        for request in requests:
+            processes = request.get("Processes", [])
+            for process in processes:
+                process_id = process.get("ProcessId")
+                last_publish_date = process.get("LastPublishDate")
+                if process_id and last_publish_date:
+                    process_list.append((last_publish_date, process_id))
+
+        process_list.sort(key=lambda x: x[0])
+        sorted_process_ids = [process[1] for process in process_list]
+
+        print(f"Sorted Process IDs for Case ID {case_id}: {sorted_process_ids}")
+        return sorted_process_ids
+
+    except Exception as e:
+        print(f"Error processing case document: {e}")
+        return []
+
 def execute_sql_queries(server_name, database_name, user_name, password, process_ids):
     """Execute SQL queries for each Process ID."""
     if not process_ids:
