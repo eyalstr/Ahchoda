@@ -123,7 +123,8 @@ def fetch_decisions_by_case_id(case_id, db):
                         log_and_print("  DecisionJudges:", "info", ansi_format=BOLD_YELLOW)
                         for judge in value:
                             judge_name = normalize_hebrew(judge.get("JudgeFullName", ""))
-                            log_and_print(f"    JudgeFullName: {judge_name}", "info", BOLD_GREEN, is_hebrew=True)
+                            #log_and_print(f"    JudgeFullName: {judge_name}", "info", BOLD_GREEN, is_hebrew=True)
+                            log_and_print(f"JudgeFullName: {judge_name}", "info", is_hebrew=True)                            
                     elif key == "DecisionRequests":
                         log_and_print("  DecisionRequests:", "info", ansi_format=BOLD_YELLOW)
                         for req_idx, request in enumerate(value, start=1):
