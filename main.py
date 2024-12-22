@@ -49,15 +49,13 @@ def display_menu():
     except ValueError:
         print("Invalid input. Please enter a number.")
         return None
-    
+
 if __name__ == "__main__":
     try:
         mongo_client, db = connect_to_mongodb(mongo_connection_string)
         if db is None:
             print("Failed to connect to MongoDB. Exiting.")
             exit()
-
-        #case_id = int(input("Enter Case ID (_id): "))
 
         while True:
             choice = display_menu()
@@ -72,12 +70,19 @@ if __name__ == "__main__":
                     execute_sql_process_queries(server_name, database_name, user_name, password, process_ids)
             elif choice == 2:
                 case_id = int(input("Enter Case ID (_id): "))
-                #analyze_decisions(case_id, db)
+                print("Analyzing decisions and associated documents...\n")
+                results = fetch_decisions_and_documents_by_case_id(case_id, db)
+                if results:
+                    print(f"\nAnalysis complete for Case ID: {case_id}.")
+                else:
+                    print("No decisions or documents found.")
             elif choice == 3:
                 case_id = int(input("Enter Case ID (_id): "))
+                print("Querying documents...\n")
                 fetch_documents_by_case_id(case_id, db)
             elif choice == 4:
                 case_id = int(input("Enter Case ID (_id): "))
+                print("Querying decisions...\n")
                 results = fetch_decisions_and_documents_by_case_id(case_id, db)
             elif choice == 5:
                 print("Exiting application.")
