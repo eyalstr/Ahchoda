@@ -53,7 +53,7 @@ def fetch_decisions_and_documents_by_case_id(case_id: str, db) -> List[Dict[str,
                 if field == "DecisionStatusTypeId":
                     decisionType = value
                     status_description = get_decision_status_description(value)
-                    log_and_print(f"{field.ljust(20)}: {status_description}", ansi_format=BOLD_GREEN, indent=2,is_hebrew=True)
+                    log_and_print(f"{field.ljust(20)}: {status_description}", ansi_format=BOLD_GREEN, indent=2, is_hebrew=True)
                 else:
                     log_and_print(f"{field.ljust(20)}: {value}", indent=2)
 
@@ -76,58 +76,44 @@ def fetch_decisions_and_documents_by_case_id(case_id: str, db) -> List[Dict[str,
                 }))
 
                 # Log associated documents
-                log_and_print(f"{"מסמכים בתיק"}", ansi_format=BOLD_YELLOW, indent=6, is_hebrew=True)
+                log_and_print(f"מסמכי החלטה בתיק", ansi_format=BOLD_YELLOW, indent=6, is_hebrew=True)
                 if documents:
-                    #log_and_print(f"Documents matching all criteria:", ansi_format=BOLD_GREEN, indent=8)
                     for doc in documents:
-                        log_and_print(f"{doc.get('_id')}, {"מסמך"}: {doc.get('FileName')}", indent=10, is_hebrew=True)
-                        # Print full document content
-                        log_and_print(f"{"תוכן המסמך"}", ansi_format=BOLD_YELLOW, indent=10, is_hebrew=True)
+                        log_and_print(f"DocumentId: {doc.get('_id')}, FileName: {doc.get('FileName')}", indent=10, is_hebrew=True)
+                        log_and_print(f"תוכן המסמך", ansi_format=BOLD_YELLOW, indent=10, is_hebrew=True)
                         for key, value in doc.items():
-                            # Normalize and print Hebrew text properly if needed
-                            #if isinstance(value, str) and is_hebrew_text(value):
-                            #    value = normalize_hebrew(value)
                             if key == 'DocumentTypeId' and isinstance(value, int):
                                 description = DOCUMENT_TYPE_MAPPING.get(value, f"Unknown ({value})")
                                 log_and_print(f"{key}: {description}({value})", indent=12, ansi_format=BOLD_GREEN)
-                            else:    
+                            else:
                                 log_and_print(f"{key}: {value}", indent=12, is_hebrew=True)
                 else:
-                    log_and_print(f"{"אין מסמכים בתיק"}", ansi_format=BOLD_RED, indent=8, is_hebrew=True)
+                    log_and_print(f"אין מסמכים בתיק", ansi_format=BOLD_RED, indent=8, is_hebrew=True)
+
                     if decisionType == 1:
-                        # Find documents matching a single criteria
-                        documents = list(document_collection.find({
+                        # Find documents matching "מסמכים בהחלטה בלבד"
+                        decision_only_docs = list(document_collection.find({
                             "Entities": {
-                                "$all": [
-                                    {"$elemMatch": {"EntityTypeId": 5, "EntityValue": decision_id}}                                    
-                                ]
+                                "$elemMatch": {"EntityTypeId": 5, "EntityValue": decision_id}
                             }
                         }))
 
-                        # Log associated documents
-                        log_and_print(f"{"מסמכים בהחלטה בלבד"}", ansi_format=BOLD_YELLOW, indent=6, is_hebrew=True)
-                        if documents:
-                           # log_and_print(f"Documents matching criteria:", ansi_format=BOLD_GREEN, indent=8)
-                            for doc in documents:
+                        log_and_print(f"מסמכי החלטה בלבד", ansi_format=BOLD_YELLOW, indent=6, is_hebrew=True)
+                        if decision_only_docs:
+                            for doc in decision_only_docs:
                                 log_and_print(f"DocumentId: {doc.get('_id')}, FileName: {doc.get('FileName')}", indent=10, is_hebrew=True)
-                                # Print full document content
-                                log_and_print(f"{"תוכן המסמך"}", ansi_format=BOLD_YELLOW, indent=10, is_hebrew=True)
+                                log_and_print(f"תוכן המסמך", ansi_format=BOLD_YELLOW, indent=10, is_hebrew=True)
                                 for key, value in doc.items():
-                                    # Normalize and print Hebrew text properly if needed
-                                    #if isinstance(value, str) and is_hebrew_text(value):
-                                    #    value = normalize_hebrew(value)
                                     if key == 'DocumentTypeId' and isinstance(value, int):
                                         description = DOCUMENT_TYPE_MAPPING.get(value, f"Unknown ({value})")
                                         log_and_print(f"{key}: {description}({value})", indent=12, ansi_format=BOLD_GREEN)
-                                    else:    
+                                    else:
                                         log_and_print(f"{key}: {value}", indent=12, is_hebrew=True)
                         else:
-                            log_and_print(f"{"אין מסמכים בתיק"}", ansi_format=BOLD_RED, indent=8, is_hebrew=True)
-
+                            log_and_print(f"אין מסמכים בהחלטה בלבד", ansi_format=BOLD_RED, indent=8, is_hebrew=True)
 
         return decisions
 
     except Exception as e:
         log_and_print(f"Error processing case document for Case ID {case_id}: {e}", "error", ansi_format=BOLD_RED)
         return []
-
