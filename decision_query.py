@@ -53,7 +53,7 @@ def fetch_decisions_and_documents_by_case_id(case_id: str, db) -> List[Dict[str,
                 if field == "DecisionStatusTypeId":
                     decisionType = value
                     status_description = get_decision_status_description(value)
-                    log_and_print(f"{field.ljust(20)}: {normalize_hebrew(status_description)}", ansi_format=BOLD_GREEN, indent=2)
+                    log_and_print(f"{field.ljust(20)}: {status_description}", ansi_format=BOLD_GREEN, indent=2,is_hebrew=True)
                 else:
                     log_and_print(f"{field.ljust(20)}: {value}", indent=2)
 
