@@ -49,10 +49,9 @@ def display_menu():
     """
     print(f"\n{BOLD_YELLOW}Menu:{RESET}")
     print(f"1. {BOLD_GREEN}{normalize_hebrew('תהליכים בתיק')}{RESET}")
-    print(f"2. {BOLD_GREEN}Analyze Decisions{RESET}")
-    print(f"3. {BOLD_GREEN}{normalize_hebrew('מסמכים בתיק')}{RESET}")
-    print(f"4. {BOLD_GREEN}{normalize_hebrew('החלטות')}{RESET}")
-    print(f"5. {BOLD_RED}Exit{RESET}")
+    print(f"2. {BOLD_GREEN}{normalize_hebrew('מסמכים בתיק')}{RESET}")
+    print(f"3. {BOLD_GREEN}{normalize_hebrew('החלטות')}{RESET}")
+    print(f"4. {BOLD_GREEN}{normalize_hebrew('יציאה')}{RESET}")
 
     try:
         choice = int(input(f"{BOLD_YELLOW}Enter your choice: {RESET}"))
@@ -82,24 +81,18 @@ if __name__ == "__main__":
                     print(f"{BOLD_RED}No process IDs found. Exiting.{RESET}")
                 else:
                     execute_sql_process_queries(server_name, database_name, user_name, password, process_ids)
+            
             elif choice == 2:
-                print(f"{BOLD_GREEN}Analyzing decisions and associated documents...{RESET}\n")
-                results = fetch_decisions_and_documents_by_case_id(case_id, db)
-                if results:
-                    print(f"\n{BOLD_GREEN}Analysis complete for Case ID: {case_id}.{RESET}")
-                else:
-                    print(f"{BOLD_RED}No decisions or documents found.{RESET}")
-            elif choice == 3:
-                print(f"{BOLD_GREEN}Querying documents...{RESET}\n")
+                print(f"{BOLD_GREEN}{normalize_hebrew('מסמכים בתיק...')}{RESET}\n")
                 fetch_documents_by_case_id(case_id, db)
-            elif choice == 4:
+            elif choice == 3:
                 print(f"{BOLD_GREEN}{normalize_hebrew('שאילתת החלטות בתיק...')}{RESET}\n")
                 results = fetch_decisions_and_documents_by_case_id(case_id, db)
                 if results:
                     print(f"\n{BOLD_GREEN}{normalize_hebrew('ניתוח החלטות הושלם.')}{RESET}")
                 else:
                     print(f"{BOLD_RED}{normalize_hebrew('לא נמצאו החלטות או מסמכים.')}{RESET}")
-            elif choice == 5:
+            elif choice == 4:
                 print(f"{BOLD_RED}Exiting application.{RESET}")
                 break
             else:

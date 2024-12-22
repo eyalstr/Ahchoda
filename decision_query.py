@@ -4,6 +4,7 @@ import unicodedata
 from typing import List, Dict, Any, Optional
 from logging_utils import log_and_print, normalize_hebrew, logger
 from logging_utils import BOLD_YELLOW, BOLD_GREEN, BOLD_RED
+from doc_header_map import DOCUMENT_TYPE_MAPPING, DOCUMENT_CATEGORY_MAPPING # Import the mapping table
 
 # Decision status descriptions
 DECISION_STATUS_DESCRIPTIONS = {
@@ -18,9 +19,10 @@ def get_decision_status_description(status_id: Optional[int]) -> str:
 def fetch_decisions_and_documents_by_case_id(case_id: str, db) -> List[Dict[str, Any]]:
     """
     Fetch Decisions from MongoDB for a given Case ID (_id).
-    For each SubDecision, identify associated documents categorized as:
-    - "מסמך בהחלטה בלבד" (EntityTypeId=5, EntityValue=SubDecisionId)
-    - "החלטה בתיק" (EntityTypeId=1, EntityValue=case_id)
+    Identify documents fulfilling all these conditions:
+    - {'EntityTypeId': 5, 'EntityValue': Decisions[].DecisionId}
+    - {'EntityTypeId': 1, 'EntityValue': case_id}
+    - {'EntityTypeId': 2, 'EntityValue': DecisionRequests[].RequestId}
     """
     decisions_list = []
 
@@ -28,10 +30,10 @@ def fetch_decisions_and_documents_by_case_id(case_id: str, db) -> List[Dict[str,
         case_collection = db["Case"]
         document_collection = db["Document"]
 
-        # Fetch case document
+        # Fetch the case document with decisions and requests
         case_document = case_collection.find_one(
             {"_id": case_id},
-            {"Decisions": 1, "_id": 1}
+            {"Decisions": 1, "Requests": 1, "_id": 1}
         )
 
         if not case_document:
@@ -40,87 +42,92 @@ def fetch_decisions_and_documents_by_case_id(case_id: str, db) -> List[Dict[str,
 
         decisions = case_document.get("Decisions", [])
         for idx, decision in enumerate(decisions, start=1):
-            log_and_print(f"Decision #{idx}:", ansi_format=BOLD_YELLOW, indent=0)
+            decision_id = decision.get("DecisionId")
 
-            # Top-level decision fields
-            top_fields = [
-                ("DecisionId", decision.get("DecisionId")),
-                ("DecisionDate", decision.get("DecisionDate")),
-                #("DecisionStatusTypeId", normalize_hebrew(get_decision_status_description(decision.get("DecisionStatusTypeId")))),
-                ("DecisionStatusTypeId", get_decision_status_description(decision.get("DecisionStatusTypeId"))),
-                ("IsForPublication", decision.get("IsForPublication")),
-                ("PublishDate", decision.get("PublishDate")),
-                ("MojId", decision.get("MojId")),
-                ("CreateUser", decision.get("CreateUser")),
-                ("CreateDate", decision.get("CreateDate")),
-                ("UpdateUser", decision.get("UpdateUser")),
-                ("UpdateDate", decision.get("UpdateDate")),
-                ("ProcessId", decision.get("ProcessId")),
-                ("IsActive", decision.get("IsActive"))
-            ]
-            for field, value in top_fields:
-                if field == 'DecisionStatusTypeId':
-                    log_and_print(f"{field.ljust(20)}: {value}", ansi_format=BOLD_GREEN, indent=2,is_hebrew=True)
-                else:    
+            log_and_print(f"*************************************", ansi_format=BOLD_GREEN)
+            log_and_print(f"Decision #{idx}:", ansi_format=BOLD_YELLOW)
+            log_and_print(f"*************************************", ansi_format=BOLD_GREEN)
+
+            # Log top-level fields
+            for field, value in decision.items():
+                if field == "DecisionStatusTypeId":
+                    decisionType = value
+                    status_description = get_decision_status_description(value)
+                    log_and_print(f"{field.ljust(20)}: {normalize_hebrew(status_description)}", ansi_format=BOLD_GREEN, indent=2)
+                else:
                     log_and_print(f"{field.ljust(20)}: {value}", indent=2)
 
-            # Process DecisionRequests
-            decision_requests = decision.get("DecisionRequests", [])
-            if decision_requests:
-                log_and_print("DecisionRequests:", ansi_format=BOLD_YELLOW, indent=2)
-                for req_idx, request in enumerate(decision_requests, start=1):
-                    log_and_print(f"Request #{req_idx}:", ansi_format=BOLD_YELLOW, indent=4)
-                    log_and_print(f"RequestId           : {request.get('RequestId')}", indent=6)
+            # Process DecisionRequests and check documents
+            for req_idx, request in enumerate(decision.get("DecisionRequests", []), start=1):
+                request_id = request.get("RequestId")
 
-                    # Process SubDecisions inside each request
-                    sub_decisions = request.get("SubDecisions", [])
-                    if sub_decisions:
-                        log_and_print("SubDecisions:", ansi_format=BOLD_YELLOW, indent=6)
-                        for sub_idx, sub_decision in enumerate(sub_decisions, start=1):
-                            sub_decision_id = sub_decision.get("SubDecisionId")
-                            log_and_print(f"SubDecision #{sub_idx}:", ansi_format=BOLD_YELLOW, indent=8)
-                            log_and_print(f"SubDecisionId       : {sub_decision_id}", indent=10)
-                            log_and_print(f"SubDecisionDate     : {sub_decision.get('SubDecisionDate')}", indent=10)
-                            log_and_print(f"Description         : {normalize_hebrew(sub_decision.get('Description', ''))}", indent=10)
+                log_and_print(f"Request #{req_idx}:", ansi_format=BOLD_YELLOW, indent=4)
+                log_and_print(f"  RequestId: {request_id}", indent=6)
 
-                            # Check associated documents
-                            decision_only_docs = list(document_collection.find({
-                                "Entities": {
-                                    "$elemMatch": {
-                                        "EntityTypeId": 5,
-                                        "EntityValue": sub_decision_id
-                                    }
-                                }
-                            }))
+                # Find documents matching all three criteria
+                documents = list(document_collection.find({
+                    "Entities": {
+                        "$all": [
+                            {"$elemMatch": {"EntityTypeId": 5, "EntityValue": decision_id}},
+                            {"$elemMatch": {"EntityTypeId": 1, "EntityValue": case_id}},
+                            {"$elemMatch": {"EntityTypeId": 2, "EntityValue": request_id}}
+                        ]
+                    }
+                }))
 
-                            case_decision_docs = list(document_collection.find({
-                                "Entities": {
-                                    "$elemMatch": {
-                                        "EntityTypeId": 1,
-                                        "EntityValue": case_id
-                                    }
-                                }
-                            }))
+                # Log associated documents
+                log_and_print(f"{"מסמכים בתיק"}", ansi_format=BOLD_YELLOW, indent=6, is_hebrew=True)
+                if documents:
+                    #log_and_print(f"Documents matching all criteria:", ansi_format=BOLD_GREEN, indent=8)
+                    for doc in documents:
+                        log_and_print(f"{doc.get('_id')}, {"מסמך"}: {doc.get('FileName')}", indent=10, is_hebrew=True)
+                        # Print full document content
+                        log_and_print(f"{"תוכן המסמך"}", ansi_format=BOLD_YELLOW, indent=10, is_hebrew=True)
+                        for key, value in doc.items():
+                            # Normalize and print Hebrew text properly if needed
+                            #if isinstance(value, str) and is_hebrew_text(value):
+                            #    value = normalize_hebrew(value)
+                            if key == 'DocumentTypeId' and isinstance(value, int):
+                                description = DOCUMENT_TYPE_MAPPING.get(value, f"Unknown ({value})")
+                                log_and_print(f"{key}: {description}({value})", indent=12, ansi_format=BOLD_GREEN)
+                            else:    
+                                log_and_print(f"{key}: {value}", indent=12, is_hebrew=True)
+                else:
+                    log_and_print(f"{"אין מסמכים בתיק"}", ansi_format=BOLD_RED, indent=8, is_hebrew=True)
+                    if decisionType == 1:
+                        # Find documents matching a single criteria
+                        documents = list(document_collection.find({
+                            "Entities": {
+                                "$all": [
+                                    {"$elemMatch": {"EntityTypeId": 5, "EntityValue": decision_id}}                                    
+                                ]
+                            }
+                        }))
 
-                            # Log associated documents
-                            log_and_print("Associated Documents:", ansi_format=BOLD_YELLOW, indent=10)
+                        # Log associated documents
+                        log_and_print(f"{"מסמכים בהחלטה בלבד"}", ansi_format=BOLD_YELLOW, indent=6, is_hebrew=True)
+                        if documents:
+                           # log_and_print(f"Documents matching criteria:", ansi_format=BOLD_GREEN, indent=8)
+                            for doc in documents:
+                                log_and_print(f"DocumentId: {doc.get('_id')}, FileName: {doc.get('FileName')}", indent=10, is_hebrew=True)
+                                # Print full document content
+                                log_and_print(f"{"תוכן המסמך"}", ansi_format=BOLD_YELLOW, indent=10, is_hebrew=True)
+                                for key, value in doc.items():
+                                    # Normalize and print Hebrew text properly if needed
+                                    #if isinstance(value, str) and is_hebrew_text(value):
+                                    #    value = normalize_hebrew(value)
+                                    if key == 'DocumentTypeId' and isinstance(value, int):
+                                        description = DOCUMENT_TYPE_MAPPING.get(value, f"Unknown ({value})")
+                                        log_and_print(f"{key}: {description}({value})", indent=12, ansi_format=BOLD_GREEN)
+                                    else:    
+                                        log_and_print(f"{key}: {value}", indent=12, is_hebrew=True)
+                        else:
+                            log_and_print(f"{"אין מסמכים בתיק"}", ansi_format=BOLD_RED, indent=8, is_hebrew=True)
 
-                            if decision_only_docs:
-                                log_and_print(f"Documents tagged as {'מסמך בהחלטה בלבד'}:", ansi_format=BOLD_GREEN, indent=12,is_hebrew=True)
-                                for doc in decision_only_docs:
-                                    log_and_print(f"DocumentId: {doc.get('_id')}, FileName: {doc.get('FileName')}", indent=14,is_hebrew=True)
-                            else:
-                                log_and_print(f"None found for {'מסמך בהחלטה בלבד'}", ansi_format=BOLD_RED, indent=12,is_hebrew=True)
-
-                            if case_decision_docs:
-                                log_and_print(f"Documents tagged as {'החלטה בתיק'}:", ansi_format=BOLD_GREEN, indent=12, is_hebrew=True)
-                                for doc in case_decision_docs:
-                                    log_and_print(f"DocumentId: {doc.get('_id')}, FileName: {doc.get('FileName')}", indent=14,is_hebrew=True)
-                            else:
-                                log_and_print(f"None found for 'החלטה בתיק'.", ansi_format=BOLD_RED, indent=12, is_hebrew=True)
 
         return decisions
 
     except Exception as e:
-        log_and_print(f"Error processing case document for decisions: {e}", "error", ansi_format=BOLD_RED)
+        log_and_print(f"Error processing case document for Case ID {case_id}: {e}", "error", ansi_format=BOLD_RED)
         return []
+
