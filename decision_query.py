@@ -41,6 +41,8 @@ def fetch_decisions_and_documents_by_case_id(case_id: str, db) -> List[Dict[str,
             return []
 
         decisions = case_document.get("Decisions", [])
+        
+        log_and_print(f"\n", ansi_format=BOLD_YELLOW)
         for idx, decision in enumerate(decisions, start=1):
             decision_id = decision.get("DecisionId")
 
@@ -76,7 +78,7 @@ def fetch_decisions_and_documents_by_case_id(case_id: str, db) -> List[Dict[str,
                 }))
 
                 # Log associated documents
-                log_and_print(f"מסמכי החלטה בתיק", ansi_format=BOLD_YELLOW, indent=6, is_hebrew=True)
+                log_and_print(f"\nמסמכי החלטה בתיק", ansi_format=BOLD_YELLOW, indent=6, is_hebrew=True)
                 if documents:
                     for doc in documents:
                         log_and_print(f"DocumentId: {doc.get('_id')}, FileName: {doc.get('FileName')}", indent=10, is_hebrew=True)
@@ -98,7 +100,7 @@ def fetch_decisions_and_documents_by_case_id(case_id: str, db) -> List[Dict[str,
                             }
                         }))
 
-                        log_and_print(f"מסמכי החלטה בלבד", ansi_format=BOLD_YELLOW, indent=6, is_hebrew=True)
+                        log_and_print(f"\nמסמכי החלטה בלבד", ansi_format=BOLD_YELLOW, indent=6, is_hebrew=True)
                         if decision_only_docs:
                             for doc in decision_only_docs:
                                 log_and_print(f"DocumentId: {doc.get('_id')}, FileName: {doc.get('FileName')}", indent=10, is_hebrew=True)
