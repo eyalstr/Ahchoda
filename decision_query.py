@@ -2,56 +2,14 @@ import logging
 from bidi.algorithm import get_display
 import unicodedata
 from typing import List, Dict, Any, Optional
-
-# ANSI escape codes for bold and colored formatting
-BOLD_YELLOW = '\033[1;33m'
-BOLD_GREEN = '\033[1;32m'
-BOLD_RED = '\033[1;31m'
-RESET = '\033[0m'
+from logging_utils import log_and_print, normalize_hebrew, logger
+from logging_utils import BOLD_YELLOW, BOLD_GREEN, BOLD_RED
 
 # Decision status descriptions
 DECISION_STATUS_DESCRIPTIONS = {
     1: "טיוטת החלטה",
     3: "החלטה מאושרת"
 }
-
-# Configure logging
-logging.basicConfig(
-    filename='decision_analyzer.log',
-    filemode='w',
-    level=logging.INFO,
-    format='%(message)s',  # Only log the message itself
-    encoding='utf-8'
-)
-
-logger = logging.getLogger()
-
-def log_and_print(message: str, level: str = "info", ansi_format: Optional[str] = None, is_hebrew: bool = False, indent: int = 0):
-    """
-    Log a message and print it with optional ANSI formatting.
-    If the message contains Hebrew, apply RTL normalization for console output only.
-    """
-    # Normalize Hebrew text for console, but keep original for log
-    console_message = normalize_hebrew(message) if is_hebrew else message
-    log_message = message
-
-    # Apply ANSI formatting to the console output
-    if ansi_format:
-        console_message = f"{ansi_format}{console_message}{RESET}"
-
-    # Apply indentation
-    console_message = f"{' ' * indent}{console_message}"
-
-    # Print to the console
-    print(console_message)
-
-    # Log to the file without ANSI formatting or alignment
-    log_method = getattr(logger, level.lower(), logger.info)
-    log_method(log_message)
-
-def normalize_hebrew(text: str) -> str:
-    """Normalize and format Hebrew text for proper RTL display."""
-    return get_display(unicodedata.normalize("NFKC", text.strip())) if text else text
 
 def get_decision_status_description(status_id: Optional[int]) -> str:
     """Fetch the description for a given DecisionStatusTypeId."""
@@ -88,7 +46,8 @@ def fetch_decisions_and_documents_by_case_id(case_id: str, db) -> List[Dict[str,
             top_fields = [
                 ("DecisionId", decision.get("DecisionId")),
                 ("DecisionDate", decision.get("DecisionDate")),
-                ("DecisionStatusTypeId", normalize_hebrew(get_decision_status_description(decision.get("DecisionStatusTypeId")))),
+                #("DecisionStatusTypeId", normalize_hebrew(get_decision_status_description(decision.get("DecisionStatusTypeId")))),
+                ("DecisionStatusTypeId", get_decision_status_description(decision.get("DecisionStatusTypeId"))),
                 ("IsForPublication", decision.get("IsForPublication")),
                 ("PublishDate", decision.get("PublishDate")),
                 ("MojId", decision.get("MojId")),
@@ -100,7 +59,10 @@ def fetch_decisions_and_documents_by_case_id(case_id: str, db) -> List[Dict[str,
                 ("IsActive", decision.get("IsActive"))
             ]
             for field, value in top_fields:
-                log_and_print(f"{field.ljust(20)}: {value}", indent=2)
+                if field == 'DecisionStatusTypeId':
+                    log_and_print(f"{field.ljust(20)}: {value}", ansi_format=BOLD_GREEN, indent=2,is_hebrew=True)
+                else:    
+                    log_and_print(f"{field.ljust(20)}: {value}", indent=2)
 
             # Process DecisionRequests
             decision_requests = decision.get("DecisionRequests", [])
@@ -144,18 +106,18 @@ def fetch_decisions_and_documents_by_case_id(case_id: str, db) -> List[Dict[str,
                             log_and_print("Associated Documents:", ansi_format=BOLD_YELLOW, indent=10)
 
                             if decision_only_docs:
-                                log_and_print(f"Documents tagged as {normalize_hebrew('מסמך בהחלטה בלבד')}:", ansi_format=BOLD_GREEN, indent=12)
+                                log_and_print(f"Documents tagged as {'מסמך בהחלטה בלבד'}:", ansi_format=BOLD_GREEN, indent=12,is_hebrew=True)
                                 for doc in decision_only_docs:
-                                    log_and_print(f"DocumentId: {normalize_hebrew(doc.get('_id'))}, FileName: {doc.get('FileName')}", indent=14)
+                                    log_and_print(f"DocumentId: {doc.get('_id')}, FileName: {doc.get('FileName')}", indent=14,is_hebrew=True)
                             else:
-                                log_and_print(f"None found for {normalize_hebrew('מסמך בהחלטה בלבד')}", ansi_format=BOLD_RED, indent=12)
+                                log_and_print(f"None found for {'מסמך בהחלטה בלבד'}", ansi_format=BOLD_RED, indent=12,is_hebrew=True)
 
                             if case_decision_docs:
-                                log_and_print(f"Documents tagged as {normalize_hebrew('החלטה בתיק')}:", ansi_format=BOLD_GREEN, indent=12)
+                                log_and_print(f"Documents tagged as {'החלטה בתיק'}:", ansi_format=BOLD_GREEN, indent=12, is_hebrew=True)
                                 for doc in case_decision_docs:
-                                    log_and_print(f"DocumentId: {doc.get('_id')}, FileName: {normalize_hebrew(doc.get('FileName'))}", indent=14)
+                                    log_and_print(f"DocumentId: {doc.get('_id')}, FileName: {doc.get('FileName')}", indent=14,is_hebrew=True)
                             else:
-                                log_and_print(f"None found for {normalize_hebrew('החלטה בתיק')}", ansi_format=BOLD_RED, indent=12)
+                                log_and_print(f"None found for 'החלטה בתיק'.", ansi_format=BOLD_RED, indent=12, is_hebrew=True)
 
         return decisions
 

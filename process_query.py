@@ -1,7 +1,5 @@
 import logging
 import pyodbc
-from bidi.algorithm import get_display
-import unicodedata
 
 from logging_utils import log_and_print, normalize_hebrew, logger
 from logging_utils import BOLD_YELLOW, BOLD_GREEN, BOLD_RED
