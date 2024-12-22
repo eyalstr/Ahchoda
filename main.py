@@ -2,7 +2,8 @@ from pymongo import MongoClient
 from dotenv import load_dotenv
 from process_query import execute_sql_process_queries, fetch_process_ids_by_case_id_sorted
 from document_query import fetch_documents_by_case_id
-from decision_query import fetch_decisions_by_case_id
+from decision_query import fetch_decisions_and_documents_by_case_id
+
 import os
 
 # Load environment variables
@@ -77,7 +78,7 @@ if __name__ == "__main__":
                 fetch_documents_by_case_id(case_id, db)
             elif choice == 4:
                 case_id = int(input("Enter Case ID (_id): "))
-                fetch_decisions_by_case_id(case_id, db)
+                results = fetch_decisions_and_documents_by_case_id(case_id, db)
             elif choice == 5:
                 print("Exiting application.")
                 break

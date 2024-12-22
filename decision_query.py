@@ -57,25 +57,30 @@ def get_decision_status_description(status_id: Optional[int]) -> str:
     """Fetch the description for a given DecisionStatusTypeId."""
     return DECISION_STATUS_DESCRIPTIONS.get(status_id, "Unknown")
 
-def fetch_decisions_by_case_id(case_id: str, db) -> List[Dict[str, Any]]:
+def fetch_decisions_and_documents_by_case_id(case_id: str, db) -> List[Dict[str, Any]]:
     """
     Fetch Decisions from MongoDB for a given Case ID (_id).
-    Store the Decisions[] information, sorted by DecisionDate, and display nested fields like DecisionRequests, SubDecisions, DecisionJudges, and Classifications.
+    For each SubDecision, identify associated documents categorized as:
+    - "מסמך בהחלטה בלבד" (EntityTypeId=5, EntityValue=SubDecisionId)
+    - "החלטה בתיק" (EntityTypeId=1, EntityValue=case_id)
     """
     decisions_list = []
 
     try:
-        collection = db["Case"]
-        document = collection.find_one(
+        case_collection = db["Case"]
+        document_collection = db["Document"]
+
+        # Fetch case document
+        case_document = case_collection.find_one(
             {"_id": case_id},
             {"Decisions": 1, "_id": 1}
         )
 
-        if not document:
+        if not case_document:
             log_and_print(f"No document found for Case ID {case_id}.", "warning", ansi_format=BOLD_RED)
             return []
 
-        decisions = document.get("Decisions", [])
+        decisions = case_document.get("Decisions", [])
         for idx, decision in enumerate(decisions, start=1):
             log_and_print(f"Decision #{idx}:", ansi_format=BOLD_YELLOW, indent=0)
 
@@ -97,15 +102,7 @@ def fetch_decisions_by_case_id(case_id: str, db) -> List[Dict[str, Any]]:
             for field, value in top_fields:
                 log_and_print(f"{field.ljust(20)}: {value}", indent=2)
 
-            # DecisionJudges
-            decision_judges = decision.get("DecisionJudges", [])
-            if decision_judges:
-                log_and_print("DecisionJudges:", ansi_format=BOLD_YELLOW, indent=2)
-                for judge_idx, judge in enumerate(decision_judges, start=1):
-                    log_and_print(f"Judge #{judge_idx}:", ansi_format=BOLD_YELLOW, indent=4)
-                    log_and_print(f"JudgeFullName       : {normalize_hebrew(judge.get('JudgeFullName', ''))}", indent=6)
-
-            # DecisionRequests
+            # Process DecisionRequests
             decision_requests = decision.get("DecisionRequests", [])
             if decision_requests:
                 log_and_print("DecisionRequests:", ansi_format=BOLD_YELLOW, indent=2)
@@ -113,24 +110,52 @@ def fetch_decisions_by_case_id(case_id: str, db) -> List[Dict[str, Any]]:
                     log_and_print(f"Request #{req_idx}:", ansi_format=BOLD_YELLOW, indent=4)
                     log_and_print(f"RequestId           : {request.get('RequestId')}", indent=6)
 
-                    # SubDecisions inside DecisionRequests
+                    # Process SubDecisions inside each request
                     sub_decisions = request.get("SubDecisions", [])
                     if sub_decisions:
                         log_and_print("SubDecisions:", ansi_format=BOLD_YELLOW, indent=6)
                         for sub_idx, sub_decision in enumerate(sub_decisions, start=1):
+                            sub_decision_id = sub_decision.get("SubDecisionId")
                             log_and_print(f"SubDecision #{sub_idx}:", ansi_format=BOLD_YELLOW, indent=8)
-                            log_and_print(f"SubDecisionId       : {sub_decision.get('SubDecisionId')}", indent=10)
+                            log_and_print(f"SubDecisionId       : {sub_decision_id}", indent=10)
                             log_and_print(f"SubDecisionDate     : {sub_decision.get('SubDecisionDate')}", indent=10)
                             log_and_print(f"Description         : {normalize_hebrew(sub_decision.get('Description', ''))}", indent=10)
 
-            # Classifications
-            classifications = decision.get("Classifications", [])
-            if classifications:
-                log_and_print("Classifications:", ansi_format=BOLD_YELLOW, indent=2)
-                for class_idx, classification in enumerate(classifications, start=1):
-                    log_and_print(f"Classification #{class_idx}: {classification}", indent=4)
-            else:
-                log_and_print("Classifications: None", ansi_format=BOLD_YELLOW, indent=2)
+                            # Check associated documents
+                            decision_only_docs = list(document_collection.find({
+                                "Entities": {
+                                    "$elemMatch": {
+                                        "EntityTypeId": 5,
+                                        "EntityValue": sub_decision_id
+                                    }
+                                }
+                            }))
+
+                            case_decision_docs = list(document_collection.find({
+                                "Entities": {
+                                    "$elemMatch": {
+                                        "EntityTypeId": 1,
+                                        "EntityValue": case_id
+                                    }
+                                }
+                            }))
+
+                            # Log associated documents
+                            log_and_print("Associated Documents:", ansi_format=BOLD_YELLOW, indent=10)
+
+                            if decision_only_docs:
+                                log_and_print(f"Documents tagged as {normalize_hebrew('מסמך בהחלטה בלבד')}:", ansi_format=BOLD_GREEN, indent=12)
+                                for doc in decision_only_docs:
+                                    log_and_print(f"DocumentId: {normalize_hebrew(doc.get('_id'))}, FileName: {doc.get('FileName')}", indent=14)
+                            else:
+                                log_and_print(f"None found for {normalize_hebrew('מסמך בהחלטה בלבד')}", ansi_format=BOLD_RED, indent=12)
+
+                            if case_decision_docs:
+                                log_and_print(f"Documents tagged as {normalize_hebrew('החלטה בתיק')}:", ansi_format=BOLD_GREEN, indent=12)
+                                for doc in case_decision_docs:
+                                    log_and_print(f"DocumentId: {doc.get('_id')}, FileName: {normalize_hebrew(doc.get('FileName'))}", indent=14)
+                            else:
+                                log_and_print(f"None found for {normalize_hebrew('החלטה בתיק')}", ansi_format=BOLD_RED, indent=12)
 
         return decisions
 
