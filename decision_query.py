@@ -84,7 +84,7 @@ def fetch_decisions_and_documents_by_case_id(case_id: str, db) -> List[Dict[str,
                         for key, value in doc.items():
                             if key == 'DocumentTypeId' and isinstance(value, int):
                                 description = DOCUMENT_TYPE_MAPPING.get(value, f"Unknown ({value})")
-                                log_and_print(f"{key}: {description}({value})", indent=12, ansi_format=BOLD_GREEN)
+                                log_and_print(f"{key}: {description}({value})", indent=12, ansi_format=BOLD_GREEN, is_hebrew=True)
                             else:
                                 log_and_print(f"{key}: {value}", indent=12, is_hebrew=True)
                 else:
