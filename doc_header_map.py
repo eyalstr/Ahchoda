@@ -8,7 +8,7 @@ def normalize_hebrew(text):
     return get_display(unicodedata.normalize("NFKC", text.strip()))
 
 DOCUMENT_TYPE_MAPPING = {
-      1: normalize_hebrew("אגרה"),
+    1: normalize_hebrew("אגרה"),
     2: normalize_hebrew("אישור תשלום שירות פרסום"),
     3: normalize_hebrew("שובר תשלום פקדון"),
     4: normalize_hebrew("אגרת הליך ביניים"),
@@ -80,6 +80,8 @@ DOCUMENT_TYPE_MAPPING = {
     226: normalize_hebrew("החלטה סופית לערעור"),
     277: normalize_hebrew("החלטת דחייה"),
     283: normalize_hebrew("זימון דיון"),
+    412: normalize_hebrew("בקשה לעיכוב ביצוע החלטה"),
+    431: normalize_hebrew("פרוטוקול דיו"),    
     869: normalize_hebrew("נימוקי הערר"),
     870: normalize_hebrew("החלטת רשות המיסים בהשגה"),
     871: normalize_hebrew("הצהרת העורר"),       

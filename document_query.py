@@ -36,9 +36,9 @@ def fetch_documents_by_case_id(case_id, db, collection_name="Document"):
                 log_and_print(f"\nDocument #{index}:", ansi_format=BOLD_YELLOW)
                 for key, value in document.items():
                     if key == "DocumentTypeId" and isinstance(value, int):
-                        description = DOCUMENT_TYPE_MAPPING.get(value, f"Unknown ({value})")
+                        description = normalize_hebrew(DOCUMENT_TYPE_MAPPING.get(value, f"Unknown ({value})"))
                         log_and_print(f"{key}: {description} ({value})", indent=2, ansi_format=BOLD_GREEN)
-                    else:
+                    elif key == "MojId" or key == "DocumentTypeId" or key == "DocumentCategoryId" or key== "FileName" or key == 'IsLeadingDocument' or key == 'Entities':
                         log_and_print(f"{key}: {value}", indent=2, is_hebrew=True)
 
         return matching_documents

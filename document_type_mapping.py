@@ -79,6 +79,7 @@ DOCUMENT_TYPE_MAPPING = {
     277: normalize_hebrew("החלטת דחייה"),
     283: normalize_hebrew("זימון דיון"),
     412: normalize_hebrew("בקשה לעיכוב ביצוע החלטה"),
+    431: normalize_hebrew("פרוטוקול דיו"),    
     869: normalize_hebrew("נימוקי הערר"),
     870: normalize_hebrew("החלטת רשות המיסים בהשגה"),
     871: normalize_hebrew("הצהרת העורר"),       

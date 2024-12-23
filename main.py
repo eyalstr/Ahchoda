@@ -51,7 +51,8 @@ def display_menu():
     print(f"1. {BOLD_GREEN}{normalize_hebrew('תהליכים בתיק')}{RESET}")
     print(f"2. {BOLD_GREEN}{normalize_hebrew('מסמכים בתיק')}{RESET}")
     print(f"3. {BOLD_GREEN}{normalize_hebrew('החלטות')}{RESET}")
-    print(f"4. {BOLD_GREEN}{normalize_hebrew('יציאה')}{RESET}")
+    print(f"4. {BOLD_GREEN}{normalize_hebrew('בקשות בתיק')}{RESET}")
+    print(f"5. {BOLD_GREEN}{normalize_hebrew('יציאה')}{RESET}")
 
     try:
         choice = int(input(f"{BOLD_YELLOW}Enter your choice: {RESET}"))
@@ -93,6 +94,13 @@ if __name__ == "__main__":
                 else:
                     print(f"{BOLD_RED}{normalize_hebrew('לא נמצאו החלטות או מסמכים.')}{RESET}")
             elif choice == 4:
+                print(f"{BOLD_GREEN}{normalize_hebrew(' בקשות בתיק')}{RESET}\n")
+                results = fetch_decisions_and_documents_by_case_id(case_id, db)
+                if results:
+                    print(f"\n{BOLD_GREEN}{normalize_hebrew('ניתוח בקשות הושלם.')}{RESET}")
+                else:
+                    print(f"{BOLD_RED}{normalize_hebrew('לא נמצאו בקשות.')}{RESET}")
+            elif choice == 5:
                 print(f"{BOLD_RED}Exiting application.{RESET}")
                 break
             else:
