@@ -1,7 +1,7 @@
 from typing import List
 from pymongo.database import Database
 from logging_utils import log_and_print, BOLD_YELLOW, BOLD_GREEN, BOLD_RED, normalize_hebrew, logger  # Importing from your logging utility
-from request_status_mapping import request_status_mapping  # Import the mapping
+from request_status_mapping import request_status_mapping,request_type_mapping  # Import the mapping
 
 def parse_requests_by_case_id(case_id: str, db: Database) -> None:
     """
@@ -32,14 +32,15 @@ def parse_requests_by_case_id(case_id: str, db: Database) -> None:
         for index, request in enumerate(requests, start=1):
             request_id = request.get("RequestId")
             request_type_id = request.get("RequestTypeId")
+            des_request_heb = normalize_hebrew(request_type_mapping.get(request_type_id, "Unknown Status"))
             leading_statuses = request.get("RequestLeadingStatuses", [])
 
             log_and_print(f"\nRequest #{index}:", "info", BOLD_RED, indent=2)
             log_and_print(f"RequestId: {request_id}", "info", BOLD_GREEN, indent=4)
-            log_and_print(f"RequestTypeId: {request_type_id}", "info", BOLD_GREEN, is_hebrew=True, indent=4)
+            log_and_print(f"{des_request_heb}({request_type_id})", "info", BOLD_GREEN, is_hebrew=True, indent=4)
 
             if leading_statuses and isinstance(leading_statuses, list):
-                log_and_print("RequestLeadingStatuses:", "info", BOLD_YELLOW, is_hebrew=True, indent=4)
+                log_and_print("\nRequestLeadingStatuses:", "info", BOLD_YELLOW, is_hebrew=True, indent=4)
                 for status_index, status in enumerate(leading_statuses, start=1):
                     request_status_type_id = status.get("RequestStatusTypeId")
                     description_heb =  normalize_hebrew(request_status_mapping.get(request_status_type_id, "Unknown Status"))
