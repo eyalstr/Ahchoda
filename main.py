@@ -3,6 +3,7 @@ from dotenv import load_dotenv
 from process_query import execute_sql_process_queries, fetch_process_ids_by_case_id_sorted
 from document_query import fetch_documents_by_case_id
 from decision_query import fetch_decisions_and_documents_by_case_id
+from requests_query import parse_requests_by_case_id
 from bidi.algorithm import get_display
 import unicodedata
 import os
@@ -95,7 +96,7 @@ if __name__ == "__main__":
                     print(f"{BOLD_RED}{normalize_hebrew('לא נמצאו החלטות או מסמכים.')}{RESET}")
             elif choice == 4:
                 print(f"{BOLD_GREEN}{normalize_hebrew(' בקשות בתיק')}{RESET}\n")
-                results = fetch_decisions_and_documents_by_case_id(case_id, db)
+                results = parse_requests_by_case_id(case_id, db)
                 if results:
                     print(f"\n{BOLD_GREEN}{normalize_hebrew('ניתוח בקשות הושלם.')}{RESET}")
                 else:
