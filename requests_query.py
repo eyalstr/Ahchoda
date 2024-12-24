@@ -27,7 +27,8 @@ def parse_requests_by_case_id(case_id: str, db: Database) -> None:
             log_and_print(f"Invalid 'Requests' field format for Case ID {case_id}.", "info", BOLD_RED, is_hebrew=True)
             return
 
-        log_and_print(f"Total number of requests: {len(requests)}", "info", BOLD_YELLOW, is_hebrew=True)
+        log_and_print(f"\n******({len(requests)}) בקשות בתיק ******", "info", BOLD_GREEN)
+        #log_and_print(f"Total number of requests: {len(requests)}", "info", BOLD_YELLOW, is_hebrew=True)
 
         for index, request in enumerate(requests, start=1):
             request_id = request.get("RequestId")
@@ -35,12 +36,13 @@ def parse_requests_by_case_id(case_id: str, db: Database) -> None:
             des_request_heb = normalize_hebrew(request_type_mapping.get(request_type_id, "Unknown Status"))
             leading_statuses = request.get("RequestLeadingStatuses", [])
 
-            log_and_print(f"\nRequest #{index}:", "info", BOLD_RED, indent=2)
+            #log_and_print(f"\nRequest #{index}:", "info", BOLD_RED, indent=2)
+            log_and_print(f"בקשה #{index}:", ansi_format=BOLD_YELLOW,indent=2, is_hebrew=True)
             log_and_print(f"RequestId: {request_id}", "info", BOLD_GREEN, indent=4)
             log_and_print(f"{des_request_heb}({request_type_id})", "info", BOLD_GREEN, is_hebrew=True, indent=4)
 
             if leading_statuses and isinstance(leading_statuses, list):
-                log_and_print("\nRequestLeadingStatuses:", "info", BOLD_YELLOW, is_hebrew=True, indent=4)
+                log_and_print(f"\nשלבים בבקשה: {len(leading_statuses)}", "info", BOLD_YELLOW, is_hebrew=True, indent=4)
                 for status_index, status in enumerate(leading_statuses, start=1):
                     request_status_type_id = status.get("RequestStatusTypeId")
                     description_heb =  normalize_hebrew(request_status_mapping.get(request_status_type_id, "Unknown Status"))
@@ -48,7 +50,7 @@ def parse_requests_by_case_id(case_id: str, db: Database) -> None:
                     end_date = status.get("EndDate")
                     is_main_request = status.get("IsMainRequest", False)
 
-                    log_and_print(f"\nStatus Type #{status_index}:", "info", BOLD_GREEN, is_hebrew=True, indent=6)
+                    log_and_print(f"\nשלב #{status_index}:", "info", BOLD_GREEN, is_hebrew=True, indent=6)
                     log_and_print(f"{description_heb} ({request_status_type_id})", "info", BOLD_GREEN, is_hebrew=True, indent=8)
                     #log_and_print(f"Description (Hebrew): {description_heb}", "info", BOLD_GREEN, is_hebrew=True, indent=8)
                     log_and_print(f"StartDate: {start_date}", "info", indent=8)
