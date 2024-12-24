@@ -43,11 +43,11 @@ def fetch_process_ids_by_case_id_sorted(case_id, db):
 def execute_sql_process_queries(server_name, database_name, user_name, password, process_ids):
     """Execute SQL queries for each Process ID."""
     if not process_ids:
-        log_and_print("No Process IDs provided. Exiting.", "warning")
+        log_and_print("\nNo Process IDs provided. Exiting.", "warning")
         return
 
     try:
-        log_and_print("Connecting to SQL Server...", "info")
+        log_and_print("\n Connecting to SQL Server...", "info")
         connection = pyodbc.connect(
             f"DRIVER={{ODBC Driver 17 for SQL Server}};"
             f"SERVER={server_name};"
@@ -57,7 +57,7 @@ def execute_sql_process_queries(server_name, database_name, user_name, password,
             f"Trusted_Connection=yes;"
         )
         cursor = connection.cursor()
-        log_and_print("Connection to SQL Server established successfully.", "info", BOLD_GREEN)
+        log_and_print(" Connection to SQL Server established successfully.", "info", BOLD_GREEN)
 
         query_2_counter = 0  # Counter for the second query
 
@@ -108,21 +108,21 @@ def execute_sql_process_queries(server_name, database_name, user_name, password,
                 log_and_print(f"No results found for ProcessID {process_id}.", "warning")
                 continue
 
-            log_and_print(f"  Results from query (Fetched {len(rows_2)} rows):", "info", BOLD_GREEN)
+            #log_and_print(f"  Results from query (Fetched {len(rows_2)} rows):", "info", BOLD_GREEN)
             for row in rows_2:
                 query_2_counter += 1   
 
-                log_and_print(f"\n********* Step={query_2_counter} *************\n", "info", BOLD_GREEN, is_hebrew=True)            
+                log_and_print(f"\n********* שלב={query_2_counter} *************\n", "info", BOLD_GREEN, is_hebrew=True)            
 
                 try:
                     process_step_id = row[0]
-                    log_and_print(f"  ProcessStepID = {row[0]}")
-                    log_and_print(f"  ProcessID = {row[1]}")
-                    log_and_print(f"  ProcessTypeName = {row[2]}", "info", BOLD_GREEN, is_hebrew=True)
-                    log_and_print(f"  ActivityTypeName = {row[3]}", "info", BOLD_GREEN, is_hebrew=True)
+                    #log_and_print(f"  ProcessStepID = {row[0]}")
+                    #log_and_print(f"  ProcessID = {row[1]}")
+                    log_and_print(f"  {row[2]}", "info", BOLD_GREEN, is_hebrew=True)
+                    log_and_print(f"  {row[3]}", "info", BOLD_GREEN, is_hebrew=True)
 
                     # SQL Query 3
-                    log_and_print(f"  Information for ProcessStepID {process_step_id}...", "info", BOLD_YELLOW)
+                    #log_and_print(f"  Information for ProcessStepID {process_step_id}...", "info", BOLD_YELLOW)
                     sql_query_3 = """
                     SELECT TOP (1000) p.[ProcessStepStatusID],
                            p.[ProcessStepID],
@@ -136,12 +136,12 @@ def execute_sql_process_queries(server_name, database_name, user_name, password,
                     rows_3 = cursor.fetchall()
 
                     if not rows_3:
-                        log_and_print(f"No results found for ProcessStepID {process_step_id}.", "warning")
+                        log_and_print(f"\nאין תת תהליכים פעילים בתהליך {process_step_id}.", "warning")
                     else:
-                        log_and_print(f"  Results for ProcessStepID {process_step_id} (Fetched {len(rows_3)} rows):", "info", BOLD_GREEN)
+                        log_and_print(f"\nתת תהליכים פעילים בתהליך {process_step_id} ({len(rows_3)}):", "info", BOLD_GREEN)
                         for row in rows_3:
-                            log_and_print(f"  ProcessStepStatusID = {row[0]}")
-                            log_and_print(f"  Description_Heb = {row[2]}", "info", BOLD_RED, is_hebrew=True)
+                            #log_and_print(f"  ProcessStepStatusID = {row[0]}")
+                            log_and_print(f"  מצב = {row[2]}", "info", BOLD_RED, is_hebrew=True)
 
                 except Exception as e:
                     log_and_print(f"Error processing ProcessStepID {row[0]}: {e}", "error", BOLD_RED)
@@ -151,4 +151,4 @@ def execute_sql_process_queries(server_name, database_name, user_name, password,
     finally:
         if 'connection' in locals():
             connection.close()
-            log_and_print("SQL Server connection closed.", "info", BOLD_GREEN)
+            log_and_print("\nSQL Server connection closed.", "info", BOLD_GREEN)
