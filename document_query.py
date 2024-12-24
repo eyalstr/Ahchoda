@@ -23,17 +23,18 @@ def fetch_documents_by_case_id(case_id, db, collection_name="Document"):
         }
 
         # Fetch all matching documents, sorted by DocumentReceiptTime in ascending order
-        log_and_print(f"Querying documents for EntityValue (case_id): {case_id}", ansi_format=BOLD_YELLOW)
+        #log_and_print(f"Querying documents for EntityValue (case_id): {case_id}", ansi_format=BOLD_YELLOW)
         documents = collection.find(query).sort("DocumentReceiptTime", 1)  # Sort ascending
 
         matching_documents = list(documents)  # Convert cursor to list
 
         if not matching_documents:
-            log_and_print(f"No documents found matching the case_id: {case_id}", ansi_format=BOLD_RED)
+            log_and_print(f"\nאין מסמכים בתיק : {case_id}", ansi_format=BOLD_RED, is_hebrew=True)
         else:
-            log_and_print(f"\nFound {len(matching_documents)} matching documents:", ansi_format=BOLD_GREEN)
+            log_and_print(f"{len(matching_documents)}: מסמכים בתיק", ansi_format=BOLD_GREEN, is_hebrew=True)
+            
             for index, document in enumerate(matching_documents, start=1):  # Add numbering
-                log_and_print(f"\nDocument #{index}:", ansi_format=BOLD_YELLOW)
+                log_and_print(f"\nמסמך #{index}:", ansi_format=BOLD_YELLOW,is_hebrew=True)
                 for key, value in document.items():
                     if key == "DocumentTypeId" and isinstance(value, int):
                         description = normalize_hebrew(DOCUMENT_TYPE_MAPPING.get(value, f"Unknown ({value})"))

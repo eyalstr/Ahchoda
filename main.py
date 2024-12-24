@@ -103,8 +103,8 @@ if __name__ == "__main__":
             elif choice == 5:
                 print(f"{BOLD_RED}Exiting application.{RESET}")
                 break
-            else:
-                print(f"{BOLD_RED}Invalid choice. Please select a valid option.{RESET}")
+          
+               
     except ValueError:
         print(f"{BOLD_RED}Invalid input. Please enter a numeric Case ID.{RESET}")
     except Exception as e:
