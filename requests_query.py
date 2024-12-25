@@ -27,7 +27,7 @@ def parse_requests_by_case_id(case_id: str, db: Database) -> None:
             log_and_print(f"Invalid 'Requests' field format for Case ID {case_id}.", "info", BOLD_RED, is_hebrew=True)
             return
 
-        log_and_print(f"\n******({len(requests)}) בקשות בתיק ******", "info", BOLD_GREEN)
+        log_and_print(f"\n******({len(requests)}) סהכ בקשות בתיק *****\n", "info", BOLD_GREEN)
         #log_and_print(f"Total number of requests: {len(requests)}", "info", BOLD_YELLOW, is_hebrew=True)
 
         for index, request in enumerate(requests, start=1):
@@ -37,7 +37,7 @@ def parse_requests_by_case_id(case_id: str, db: Database) -> None:
             leading_statuses = request.get("RequestLeadingStatuses", [])
 
             #log_and_print(f"\nRequest #{index}:", "info", BOLD_RED, indent=2)
-            log_and_print(f"בקשה #{index}:", ansi_format=BOLD_YELLOW,indent=2, is_hebrew=True)
+            log_and_print(f"\n###### {index} בקשה ######\n", ansi_format=BOLD_YELLOW,indent=2, is_hebrew=True)
             log_and_print(f"RequestId: {request_id}", "info", BOLD_GREEN, indent=4)
             log_and_print(f"{des_request_heb}({request_type_id})", "info", BOLD_GREEN, is_hebrew=True, indent=4)
 
@@ -50,7 +50,7 @@ def parse_requests_by_case_id(case_id: str, db: Database) -> None:
                     end_date = status.get("EndDate")
                     is_main_request = status.get("IsMainRequest", False)
 
-                    log_and_print(f"\nשלב #{status_index}:", "info", BOLD_GREEN, is_hebrew=True, indent=6)
+                    log_and_print(f"\n #{status_index}:", "info", BOLD_GREEN, is_hebrew=True, indent=6)
                     log_and_print(f"{description_heb} ({request_status_type_id})", "info", BOLD_GREEN, is_hebrew=True, indent=8)
                     #log_and_print(f"Description (Hebrew): {description_heb}", "info", BOLD_GREEN, is_hebrew=True, indent=8)
                     log_and_print(f"StartDate: {start_date}", "info", indent=8)
