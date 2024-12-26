@@ -41,7 +41,7 @@ def fetch_decisions_and_documents_by_case_id(case_id: str, db) -> List[Dict[str,
 
         decisions = case_document.get("Decisions", [])
         
-        log_and_print(f"\n", ansi_format=BOLD_YELLOW)
+        #log_and_print(f"\n", ansi_format=BOLD_YELLOW)
         from datetime import datetime
 
 # Sort decisions by PublishDate descending
