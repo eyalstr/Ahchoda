@@ -70,7 +70,7 @@ if __name__ == "__main__":
         # Request Case ID once before the loop
         try:
             #case_id = int(input("Enter Case ID (_id): "))
-            case_id = 3002378
+            case_id = 3002385
         except ValueError:
             log_and_print("Invalid input. Please enter a numeric Case ID.", "error", ansi_format=BOLD_RED)
             exit()
