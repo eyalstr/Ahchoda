@@ -34,7 +34,7 @@ def fetch_documents_by_case_id(case_id, db, collection_name="Document"):
         if not matching_documents:
             log_and_print(f"\nאין מסמכים בתיק : {case_id}", ansi_format=BOLD_RED, is_hebrew=True)
         else:
-            log_and_print(f"\nמסמכים בתיק : {len(matching_documents)}", ansi_format=BOLD_GREEN, is_hebrew=True)
+            log_and_print(f"\nמסמכים בתיק:{len(matching_documents)}", ansi_format=BOLD_GREEN, is_hebrew=True)
             
             for index, document in enumerate(matching_documents, start=1):
                 log_and_print(f"\nמסמך #{index}:", ansi_format=BOLD_YELLOW, is_hebrew=True)

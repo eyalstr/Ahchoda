@@ -47,7 +47,7 @@ def execute_sql_process_queries(server_name, database_name, user_name, password,
         return
 
     try:
-        log_and_print("\n Connecting to SQL Server...", "info")
+        log_and_print("\nConnecting to SQL Server...", "info")
         connection = pyodbc.connect(
             f"DRIVER={{ODBC Driver 17 for SQL Server}};"
             f"SERVER={server_name};"
@@ -57,12 +57,12 @@ def execute_sql_process_queries(server_name, database_name, user_name, password,
             f"Trusted_Connection=yes;"
         )
         cursor = connection.cursor()
-        log_and_print(" Connection to SQL Server established successfully.", "info", BOLD_GREEN)
+        log_and_print("Connection to SQL Server established successfully.", "info", BOLD_GREEN)
 
         query_2_counter = 0  # Counter for the second query
 
         for process_id in process_ids:
-            log_and_print(f"\n  Querying SQL for ProcessId: {process_id}", "info", BOLD_YELLOW)
+            log_and_print(f"\nQuerying SQL for ProcessId: {process_id}", "info", BOLD_YELLOW)
 
             # SQL Query 1
             sql_query_1 = """

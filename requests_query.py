@@ -37,25 +37,44 @@ def parse_requests_by_case_id(case_id: str, db: Database) -> None:
             leading_statuses = request.get("RequestLeadingStatuses", [])
 
             #log_and_print(f"\nRequest #{index}:", "info", BOLD_RED, indent=2)
-            log_and_print(f"\n###### {index} בקשה ######\n", ansi_format=BOLD_YELLOW,indent=2, is_hebrew=True)
+            log_and_print(f"\n###### {index} בקשה ######", ansi_format=BOLD_YELLOW,indent=2, is_hebrew=True)
             log_and_print(f"RequestId: {request_id}", "info", BOLD_GREEN, indent=4)
             log_and_print(f"{des_request_heb}({request_type_id})", "info", BOLD_GREEN, is_hebrew=True, indent=4)
 
             if leading_statuses and isinstance(leading_statuses, list):
-                log_and_print(f"\nשלבים בבקשה: {len(leading_statuses)}", "info", BOLD_YELLOW, is_hebrew=True, indent=4)
+                statuses_with_null_end_date = []  # Collect statuses where EndDate is None
+
+                # First pass: Collect statuses with EndDate as None
                 for status_index, status in enumerate(leading_statuses, start=1):
                     request_status_type_id = status.get("RequestStatusTypeId")
-                    description_heb =  normalize_hebrew(request_status_mapping.get(request_status_type_id, "Unknown Status"))
+                    description_heb = normalize_hebrew(request_status_mapping.get(request_status_type_id, "Unknown Status"))
+                    end_date = status.get("EndDate")
+
+                    # Collect statuses where EndDate is None
+                    if end_date is None:
+                        statuses_with_null_end_date.append((status_index, description_heb))
+
+                # Determine the main status
+                if statuses_with_null_end_date:
+                    # Assuming the first status with null EndDate is the main status
+                    main_status_index, main_status = statuses_with_null_end_date[0]
+                    log_and_print(f"*****סטטוס בבקשה : {main_status}*****", "info", BOLD_GREEN, is_hebrew=True, indent=4)
+                else:
+                    log_and_print("No Main Status Identified (No EndDate is null)", "info", BOLD_RED, is_hebrew=True, indent=4)
+
+                # Second pass: Log all status details
+                log_and_print(f"\n***הסטוריה בבקשה***", "info", BOLD_YELLOW, is_hebrew=True, indent=4)
+                for status_index, status in enumerate(leading_statuses, start=1):
+                    request_status_type_id = status.get("RequestStatusTypeId")
+                    description_heb = normalize_hebrew(request_status_mapping.get(request_status_type_id, "Unknown Status"))
                     start_date = status.get("StartDate")
                     end_date = status.get("EndDate")
-                    is_main_request = status.get("IsMainRequest", False)
 
-                    log_and_print(f"\n #{status_index}:", "info", BOLD_GREEN, is_hebrew=True, indent=6)
+                    # Log the status details
                     log_and_print(f"{description_heb} ({request_status_type_id})", "info", BOLD_GREEN, is_hebrew=True, indent=8)
-                    #log_and_print(f"Description (Hebrew): {description_heb}", "info", BOLD_GREEN, is_hebrew=True, indent=8)
-                    log_and_print(f"StartDate: {start_date}", "info", indent=8)
-                    log_and_print(f"EndDate: {end_date}", "info", indent=8)
-                    log_and_print(f"IsMainRequest: {is_main_request}", "info", BOLD_GREEN, indent=8)
+                    #log_and_print(f"StartDate: {start_date}", "info", indent=8)
+                    #log_and_print(f"EndDate: {end_date}", "info", indent=8)
+                                
             else:
                 log_and_print("RequestLeadingStatuses: None or invalid format", "info", BOLD_RED, is_hebrew=True, indent=4)
 

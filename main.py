@@ -4,9 +4,15 @@ from process_query import execute_sql_process_queries, fetch_process_ids_by_case
 from document_query import fetch_documents_by_case_id
 from decision_query import fetch_decisions_and_documents_by_case_id
 from requests_query import parse_requests_by_case_id
-from bidi.algorithm import get_display
-import unicodedata
+from logging_utils import log_and_print, normalize_hebrew, BOLD_YELLOW, BOLD_GREEN, BOLD_RED
 import os
+
+# ANSI escape codes for bold and colored formatting
+BOLD_YELLOW = '\033[1;33m'
+BOLD_GREEN = '\033[1;32m'
+BOLD_RED = '\033[1;31m'
+RESET = '\033[0m'
+
 
 # Load environment variables
 load_dotenv()
@@ -20,28 +26,18 @@ database_name = os.getenv("DB_NAME")
 user_name = os.getenv("DB_USER")
 password = os.getenv("DB_PASS")
 
-# ANSI escape codes for bold and colored formatting
-BOLD_YELLOW = '\033[1;33m'
-BOLD_GREEN = '\033[1;32m'
-BOLD_RED = '\033[1;31m'
-RESET = '\033[0m'
-
-def normalize_hebrew(text: str) -> str:
-    """Normalize and format Hebrew text for proper RTL display."""
-    return get_display(unicodedata.normalize("NFKC", text.strip())) if text else text
-
 def connect_to_mongodb(mongo_connection, db_name="CaseManagement"):
     """
     Establish a connection to MongoDB and return the client and database object.
     """
     try:
-        print("Connecting to MongoDB...")
+        log_and_print("Connecting to MongoDB...", ansi_format=BOLD_YELLOW)
         mongo_client = MongoClient(mongo_connection)
         db = mongo_client[db_name]
-        print("Connected to MongoDB successfully.")
+        log_and_print("Connected to MongoDB successfully.\n", ansi_format=BOLD_GREEN)
         return mongo_client, db
     except Exception as e:
-        print(f"Error connecting to MongoDB: {e}")
+        log_and_print(f"Error connecting to MongoDB: {e}", "error", ansi_format=BOLD_RED)
         return None, None
 
 def display_menu():
@@ -55,11 +51,12 @@ def display_menu():
     print(f"4. {BOLD_GREEN}{normalize_hebrew('בקשות בתיק')}{RESET}")
     print(f"5. {BOLD_GREEN}{normalize_hebrew('יציאה')}{RESET}")
 
+
     try:
-        choice = int(input(f"{BOLD_YELLOW}Enter your choice: {RESET}"))
+        choice = int(input(f"Enter your choice: "))
         return choice
     except ValueError:
-        print(f"{BOLD_RED}Invalid input. Please enter a number.{RESET}")
+        log_and_print("Invalid input. Please enter a number.", "error", ansi_format=BOLD_RED)
         return None
 
 if __name__ == "__main__":
@@ -67,11 +64,16 @@ if __name__ == "__main__":
         # Connect to MongoDB
         mongo_client, db = connect_to_mongodb(mongo_connection_string)
         if db is None:
-            print(f"{BOLD_RED}Failed to connect to MongoDB. Exiting.{RESET}")
+            log_and_print("Failed to connect to MongoDB. Exiting.", "error", ansi_format=BOLD_RED)
             exit()
 
         # Request Case ID once before the loop
-        case_id = int(input(f"{BOLD_YELLOW}Enter Case ID (_id): {RESET}"))
+        try:
+            #case_id = int(input("Enter Case ID (_id): "))
+            case_id = 3002376
+        except ValueError:
+            log_and_print("Invalid input. Please enter a numeric Case ID.", "error", ansi_format=BOLD_RED)
+            exit()
 
         while True:
             choice = display_menu()
@@ -80,37 +82,34 @@ if __name__ == "__main__":
                 process_ids = fetch_process_ids_by_case_id_sorted(case_id, db)
 
                 if not process_ids:
-                    print(f"{BOLD_RED}No process IDs found. Exiting.{RESET}")
+                    log_and_print("No process IDs found.", "warning", ansi_format=BOLD_RED)
                 else:
                     execute_sql_process_queries(server_name, database_name, user_name, password, process_ids)
             
             elif choice == 2:
-                print(f"{BOLD_GREEN}{normalize_hebrew('מסמכים בתיק...')}{RESET}\n")
+                log_and_print(f"\nמסמכים בתיק", ansi_format=BOLD_GREEN, is_hebrew=True)
                 fetch_documents_by_case_id(case_id, db)
             elif choice == 3:
-                print(f"{BOLD_GREEN}{normalize_hebrew('שאילתת החלטות בתיק...')}{RESET}\n")
+                log_and_print(f"\nשאילתת החלטות בתיק", ansi_format=BOLD_GREEN, is_hebrew=True)
                 results = fetch_decisions_and_documents_by_case_id(case_id, db)
                 if results:
-                    print(f"\n{BOLD_GREEN}{normalize_hebrew('ניתוח החלטות הושלם.')}{RESET}")
+                    log_and_print(f"\nניתוח החלטות הושלם", ansi_format=BOLD_GREEN, is_hebrew=True)
                 else:
-                    print(f"{BOLD_RED}{normalize_hebrew('לא נמצאו החלטות או מסמכים.')}{RESET}")
+                    log_and_print(f"\nלא נמצאו החלטות או מסמכים", ansi_format=BOLD_RED, is_hebrew=True)
             elif choice == 4:
-                print(f"{BOLD_GREEN}{normalize_hebrew(' בקשות בתיק')}{RESET}\n")
+                log_and_print(f"\nבקשות בתיק", ansi_format=BOLD_GREEN, is_hebrew=True)
                 results = parse_requests_by_case_id(case_id, db)
                 if results:
-                    print(f"\n{BOLD_GREEN}{normalize_hebrew('ניתוח בקשות הושלם.')}{RESET}")
+                    log_and_print(f"ניתוח בקשות הושלם", ansi_format=BOLD_GREEN, is_hebrew=True)
                 else:
-                    print(f"{BOLD_RED}{normalize_hebrew('לא נמצאו בקשות.')}{RESET}")
+                    log_and_print(f"לא נמצאו בקשות", ansi_format=BOLD_RED, is_hebrew=True)
             elif choice == 5:
-                print(f"{BOLD_RED}Exiting application.{RESET}")
+                log_and_print("Exiting application.", "info", ansi_format=BOLD_RED)
                 break
-          
-               
-    except ValueError:
-        print(f"{BOLD_RED}Invalid input. Please enter a numeric Case ID.{RESET}")
+    
     except Exception as e:
-        print(f"{BOLD_RED}An unexpected error occurred: {e}{RESET}")
+        log_and_print(f"An unexpected error occurred: {e}", "error", ansi_format=BOLD_RED)
     finally:
         if mongo_client:
             mongo_client.close()
-            print(f"{BOLD_YELLOW}MongoDB connection closed.{RESET}")
+            log_and_print("MongoDB connection closed.", ansi_format=BOLD_YELLOW)
