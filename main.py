@@ -70,7 +70,7 @@ if __name__ == "__main__":
         # Request Case ID once before the loop
         try:
             #case_id = int(input("Enter Case ID (_id): "))
-            case_id = 3002376
+            case_id = 3002378
         except ValueError:
             log_and_print("Invalid input. Please enter a numeric Case ID.", "error", ansi_format=BOLD_RED)
             exit()
@@ -87,22 +87,22 @@ if __name__ == "__main__":
                     execute_sql_process_queries(server_name, database_name, user_name, password, process_ids)
             
             elif choice == 2:
-                log_and_print(f"\nמסמכים בתיק", ansi_format=BOLD_GREEN, is_hebrew=True)
+                log_and_print(f"\n##########-- מסמכים בתיק --##########", ansi_format=BOLD_GREEN, is_hebrew=True)
                 fetch_documents_by_case_id(case_id, db)
             elif choice == 3:
-                log_and_print(f"\nשאילתת החלטות בתיק", ansi_format=BOLD_GREEN, is_hebrew=True)
+                log_and_print(f"\n##########-- שאילתת החלטות בתיק --##########", ansi_format=BOLD_GREEN, is_hebrew=True)
                 results = fetch_decisions_and_documents_by_case_id(case_id, db)
                 if results:
                     log_and_print(f"\nניתוח החלטות הושלם", ansi_format=BOLD_GREEN, is_hebrew=True)
                 else:
-                    log_and_print(f"\nלא נמצאו החלטות או מסמכים", ansi_format=BOLD_RED, is_hebrew=True)
+                    log_and_print(f"לא נמצאו החלטות או מסמכי החלטות", ansi_format=BOLD_RED, is_hebrew=True)
             elif choice == 4:
-                log_and_print(f"\nבקשות בתיק", ansi_format=BOLD_GREEN, is_hebrew=True)
+                log_and_print(f"\nשאילתת בקשות בתיק", ansi_format=BOLD_GREEN, is_hebrew=True)
                 results = parse_requests_by_case_id(case_id, db)
                 if results:
-                    log_and_print(f"ניתוח בקשות הושלם", ansi_format=BOLD_GREEN, is_hebrew=True)
+                    log_and_print(f"\nניתוח בקשות הושלם", ansi_format=BOLD_GREEN, is_hebrew=True)
                 else:
-                    log_and_print(f"לא נמצאו בקשות", ansi_format=BOLD_RED, is_hebrew=True)
+                    log_and_print(f"\nלא נמצאו בקשות", ansi_format=BOLD_RED, is_hebrew=True)
             elif choice == 5:
                 log_and_print("Exiting application.", "info", ansi_format=BOLD_RED)
                 break

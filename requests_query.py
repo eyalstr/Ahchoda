@@ -77,6 +77,6 @@ def parse_requests_by_case_id(case_id: str, db: Database) -> None:
                                 
             else:
                 log_and_print("RequestLeadingStatuses: None or invalid format", "info", BOLD_RED, is_hebrew=True, indent=4)
-
+        return leading_statuses
     except Exception as e:
         log_and_print(f"Error processing case document for Case ID {case_id}: {e}", "error", BOLD_RED, is_hebrew=True)
