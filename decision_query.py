@@ -4,6 +4,7 @@ from typing import List, Dict, Any, Optional
 from logging_utils import log_and_print, normalize_hebrew, logger
 from logging_utils import BOLD_YELLOW, BOLD_GREEN, BOLD_RED
 from doc_header_map import DOCUMENT_TYPE_MAPPING, DOCUMENT_CATEGORY_MAPPING # Import the mapping table
+from decision_status_mapping import decision_type_mapping
 
 # Decision status descriptions
 DECISION_STATUS_DESCRIPTIONS = {
@@ -87,10 +88,27 @@ def fetch_decisions_and_documents_by_case_id(case_id: str, db) -> List[Dict[str,
                 for req_idx, request in enumerate(decision_requests, start=1):
                     request_id = request.get("RequestId")
                     #log_and_print(f"  Request #{req_idx}:", ansi_format=BOLD_YELLOW, indent=6)
-                    log_and_print(f"\n*** {req_idx} בקשה ***", ansi_format=BOLD_YELLOW,indent=6, is_hebrew=True)
+                    log_and_print(f"\n*** {req_idx} בקשה ***", ansi_format=BOLD_YELLOW, is_hebrew=True,indent=6)
                     for key, val in request.items():
-                        log_and_print(f"    {key}: {val}", indent=8, is_hebrew=True)
+                        if key == "SubDecisions":
+                            if isinstance(val, list):
+                                log_and_print(f"\nSubDecisions:", "info", BOLD_YELLOW, indent=8, is_hebrew=True)
+                                for sub_idx, sub_decision in enumerate(val, start=1):
+                                    
+                                    for sub_key, sub_val in sub_decision.items():
+                                        if sub_key == "SubDecisionId":
+                                            log_and_print(f"\n*** {sub_idx} תת החלטה({sub_val})***", ansi_format=BOLD_YELLOW,indent=2, is_hebrew=True)
 
+                                        elif sub_key == "DecisionTypeToCourtId":
+                                            des_status_heb = normalize_hebrew(decision_type_mapping.get(sub_val, "Unknown Status"))
+                                            log_and_print(f"    {des_status_heb}({sub_val})", "info", BOLD_GREEN, is_hebrew=True, indent=4)
+                                        else:
+                                            log_and_print(f"    {sub_key}: {sub_val}", indent=12, is_hebrew=True)
+                            else:
+                                log_and_print(f"Unexpected format for 'SubDecisions', expected a list, got: {type(val)}", "warning", BOLD_RED, indent=8)
+                        else:            
+                            log_and_print(f"    {key}: {val}", indent=8, is_hebrew=True)
+                        
                     # Find documents matching all three criteria
                     documents = list(document_collection.find({
                         "Entities": {
