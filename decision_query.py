@@ -86,7 +86,8 @@ def fetch_decisions_and_documents_by_case_id(case_id: str, db) -> List[Dict[str,
 
                 for req_idx, request in enumerate(decision_requests, start=1):
                     request_id = request.get("RequestId")
-                    log_and_print(f"  Request #{req_idx}:", ansi_format=BOLD_YELLOW, indent=6)
+                    #log_and_print(f"  Request #{req_idx}:", ansi_format=BOLD_YELLOW, indent=6)
+                    log_and_print(f"\n*** {req_idx} בקשה ***", ansi_format=BOLD_YELLOW,indent=6, is_hebrew=True)
                     for key, val in request.items():
                         log_and_print(f"    {key}: {val}", indent=8, is_hebrew=True)
 
