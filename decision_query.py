@@ -78,9 +78,9 @@ def fetch_decisions_and_documents_by_case_id(case_id: str, db) -> List[Dict[str,
                 #log_and_print("\nDecisionRequests Details:", "info", BOLD_YELLOW, indent=4)
                 
                 if len(decision_requests) == 1:
-                    log_and_print("\nהחלטה בבקשה", "info", BOLD_GREEN, is_hebrew=True, indent=4)
+                    log_and_print("\n ***** החלטה בבקשה *****", "info", BOLD_GREEN, is_hebrew=True, indent=4)
                 else:
-                    log_and_print("\nהחלטה בבקשות", "info", BOLD_GREEN, is_hebrew=True, indent=4)
+                    log_and_print("\n***** החלטה בבקשות *****", "info", BOLD_GREEN, is_hebrew=True, indent=4)
 
 
 
