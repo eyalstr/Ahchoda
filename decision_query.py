@@ -54,8 +54,8 @@ def fetch_decisions_and_documents_by_case_id(case_id: str, db) -> List[Dict[str,
         for idx, decision in enumerate(decisions, start=1):
             decision_id = decision.get("DecisionId")
 
-            log_and_print(f"*************************************", ansi_format=BOLD_GREEN)
-            log_and_print(f"\n###### {idx} החלטה ######", ansi_format=BOLD_YELLOW, indent=2, is_hebrew=True)
+            log_and_print(f"\n*************************************", ansi_format=BOLD_GREEN)
+            log_and_print(f"###### {idx} החלטה ######", ansi_format=BOLD_YELLOW, indent=2, is_hebrew=True)
             log_and_print(f"*************************************", ansi_format=BOLD_GREEN)
 
             # Log top-level fields
@@ -105,7 +105,7 @@ def fetch_decisions_and_documents_by_case_id(case_id: str, db) -> List[Dict[str,
 
                                         elif sub_key == "DecisionTypeToCourtId":
                                             des_status_heb = normalize_hebrew(decision_type_mapping.get(sub_val, "Unknown Status"))
-                                            log_and_print(f"{des_status_heb}({sub_val}) :תוכן ההחלטה", "info", BOLD_GREEN, is_hebrew=True, indent=4)
+                                            log_and_print(f"תוכן ההחלטה : ({sub_val}){des_status_heb}", "info", BOLD_GREEN, is_hebrew=True, indent=4)
                                         #else:
                                         #    log_and_print(f"    {sub_key}: {sub_val}", indent=12, is_hebrew=True)
                             else:
