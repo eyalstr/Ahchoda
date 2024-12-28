@@ -3,6 +3,53 @@ from pymongo.database import Database
 from logging_utils import log_and_print, BOLD_YELLOW, BOLD_GREEN, BOLD_RED, normalize_hebrew, logger  # Importing from your logging utility
 from request_status_mapping import request_status_mapping,request_type_mapping  # Import the mapping
 
+
+def get_request_description(request_id: int, db: Database) -> str:
+    """
+    Retrieve the Hebrew description for a given request ID.
+
+    Args:
+        request_id (int): The Request ID.
+
+    Returns:
+        str: The Hebrew description of the request type, or "Unknown Status" if not found.
+    """
+    try:
+        # Query the database
+        collection = db["Case"]
+        # Search for the request in all cases
+        document = collection.find_one(
+            {"Requests.RequestId": request_id},
+            {"Requests.$": 1}  # Use projection to retrieve only the matching request
+        )
+
+        if not document or "Requests" not in document or not document["Requests"]:
+            log_and_print(
+                f"Request ID {request_id} not found in the database.",
+                "info",
+                BOLD_RED,
+                is_hebrew=True
+            )
+            return "Unknown Status"
+
+        # Retrieve the request
+        request = document["Requests"][0]
+        request_type_id = request.get("RequestTypeId")
+        des_request_heb = normalize_hebrew(request_type_mapping.get(request_type_id, "Unknown Status"))
+
+        return des_request_heb
+
+    except Exception as e:
+        log_and_print(
+            f"Error retrieving description for Request ID {request_id}: {str(e)}",
+            "error",
+            BOLD_RED,
+            is_hebrew=True
+        )
+        return "Unknown Status"
+
+
+
 def parse_requests_by_case_id(case_id: str, db: Database) -> None:
     """
     Parse the Requests array for a given Case ID and display specified fields using log_and_print.
