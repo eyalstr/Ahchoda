@@ -126,7 +126,7 @@ def fetch_decisions_and_documents_by_case_id(case_id: str, db) -> List[Dict[str,
 
                     # Log associated documents
                     if documents:
-                        log_and_print(f"\nמסמכי החלטה בתיק", ansi_format=BOLD_YELLOW, indent=6, is_hebrew=True)
+                        log_and_print(f"\n--מסמכי החלטה בתיק--", ansi_format=BOLD_YELLOW, indent=6, is_hebrew=True)
                         for doc in documents:
                             log_and_print(f"{doc.get('_id')}  מסמך החלטה", indent=10, is_hebrew=True)
                             log_and_print(f"{doc.get('FileName')}", indent=10, is_hebrew=True)
@@ -147,7 +147,7 @@ def fetch_decisions_and_documents_by_case_id(case_id: str, db) -> List[Dict[str,
                             }))
 
                             if decision_only_docs:
-                                log_and_print(f"\nמסמכי החלטה בלבד", ansi_format=BOLD_YELLOW, indent=6, is_hebrew=True)
+                                log_and_print(f"\n--מסמכי החלטה בלבד--", ansi_format=BOLD_YELLOW, indent=6, is_hebrew=True)
                                 for doc in decision_only_docs:
                                     log_and_print(f"DocumentId: {doc.get('_id')}, FileName: {doc.get('FileName')}", indent=10, is_hebrew=True)
                                     log_and_print(f"תוכן המסמך", ansi_format=BOLD_YELLOW, indent=10, is_hebrew=True)
