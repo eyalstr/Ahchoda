@@ -74,7 +74,7 @@ def parse_requests_by_case_id(case_id: str, db: Database) -> None:
             log_and_print(f"Invalid 'Requests' field format for Case ID {case_id}.", "info", BOLD_RED, is_hebrew=True)
             return
 
-        log_and_print(f"\n******({len(requests)}) סהכ בקשות בתיק *****\n", "info", BOLD_GREEN)
+        log_and_print(f"******({len(requests)}) סהכ בקשות בתיק *****", "info", BOLD_GREEN)
         #log_and_print(f"Total number of requests: {len(requests)}", "info", BOLD_YELLOW, is_hebrew=True)
 
         for index, request in enumerate(requests, start=1):

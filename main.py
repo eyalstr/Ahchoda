@@ -70,7 +70,8 @@ if __name__ == "__main__":
         # Request Case ID once before the loop
         try:
             #case_id = int(input("Enter Case ID (_id): "))
-            case_id = 3002385
+            case_id = 3002455
+            log_and_print(f"######-- Case=({case_id}) --######", "info", ansi_format=BOLD_RED)
         except ValueError:
             log_and_print("Invalid input. Please enter a numeric Case ID.", "error", ansi_format=BOLD_RED)
             exit()
@@ -97,7 +98,7 @@ if __name__ == "__main__":
                 else:
                     log_and_print(f"לא נמצאו החלטות או מסמכי החלטות", ansi_format=BOLD_RED, is_hebrew=True)
             elif choice == 4:
-                log_and_print(f"\nשאילתת בקשות בתיק", ansi_format=BOLD_GREEN, is_hebrew=True)
+                log_and_print(f"\n##########--שאילתת בקשות בתיק--########", ansi_format=BOLD_GREEN, is_hebrew=True)
                 results = parse_requests_by_case_id(case_id, db)
                 if results:
                     log_and_print(f"\nניתוח בקשות הושלם", ansi_format=BOLD_GREEN, is_hebrew=True)
