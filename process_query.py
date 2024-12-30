@@ -81,7 +81,7 @@ def execute_sql_process_queries(server_name, database_name, user_name, password,
                 continue
             else:
                 for row in rows_1:
-                    log_and_print(f"  ProcessID = {row[0]}")
+                    log_and_print(f"  תהליך = {row[0]}")
                     #log_and_print(f"  ProcessTypeName = {row[1]}", "info", BOLD_YELLOW, is_hebrew=True)
                     log_and_print(f"\n   נוצר תהליך חדש :{row[1]}", "info", BOLD_YELLOW, is_hebrew=True)
 

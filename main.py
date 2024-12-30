@@ -80,6 +80,8 @@ if __name__ == "__main__":
             choice = display_menu()
 
             if choice == 1:
+                log_and_print(f"\n##########-- תהליכים בתיק --##########", ansi_format=BOLD_GREEN, is_hebrew=True)
+                
                 process_ids = fetch_process_ids_by_case_id_sorted(case_id, db)
 
                 if not process_ids:
