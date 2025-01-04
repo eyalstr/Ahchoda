@@ -81,7 +81,7 @@ def execute_sql_process_queries(server_name, database_name, user_name, password,
                 continue
             else:
                 for row in rows_1:
-                    log_and_print(f"  תהליך = {row[0]}")
+                    log_and_print(f"תהליך = {row[0]}", is_hebrew=True)
                     #log_and_print(f"  ProcessTypeName = {row[1]}", "info", BOLD_YELLOW, is_hebrew=True)
                     log_and_print(f"\n   נוצר תהליך חדש :{row[1]}", "info", BOLD_YELLOW, is_hebrew=True)
 
@@ -112,7 +112,7 @@ def execute_sql_process_queries(server_name, database_name, user_name, password,
             #log_and_print(f"  Results from query (Fetched {len(rows_2)} rows):", "info", BOLD_GREEN)
             for row in rows_2:
                 query_2_counter += 1   
-
+                log_and_print(f"\n", "info")
                 log_and_print(f"\n********* שלב={query_2_counter} *************\n", "info", BOLD_GREEN, is_hebrew=True)            
 
                 try:
@@ -137,9 +137,9 @@ def execute_sql_process_queries(server_name, database_name, user_name, password,
                     rows_3 = cursor.fetchall()
 
                     if not rows_3:
-                        log_and_print(f"\nאין תת תהליכים פעילים בתהליך {process_step_id}.", "warning")
+                        log_and_print(f"\nאין תת תהליכים פעילים בתהליך {process_step_id}.", "warning", is_hebrew=True)
                     else:
-                        log_and_print(f"\nתת תהליכים פעילים בתהליך {process_step_id} ({len(rows_3)}):", "info", BOLD_GREEN)
+                        log_and_print(f"\nתת תהליכים פעילים בתהליך {process_step_id} ({len(rows_3)}):", "info", BOLD_GREEN, is_hebrew=True)
                         for row in rows_3:
                             #log_and_print(f"  ProcessStepStatusID = {row[0]}")
                             log_and_print(f"  מצב = {row[2]}", "info", BOLD_RED, is_hebrew=True)

@@ -50,7 +50,7 @@ def fetch_decisions_and_documents_by_case_id(case_id: str, db) -> List[Dict[str,
             reverse=True
         )
 
-        log_and_print(f"\n******({len(decisions)}) סהכ החלטות בתיק *****\n", "info", BOLD_GREEN)
+        log_and_print(f"\n******({len(decisions)}) סהכ החלטות בתיק *****\n", "info", BOLD_GREEN, is_hebrew=True)
         for idx, decision in enumerate(decisions, start=1):
             decision_id = decision.get("DecisionId")
 
@@ -65,9 +65,9 @@ def fetch_decisions_and_documents_by_case_id(case_id: str, db) -> List[Dict[str,
                     status_description = get_decision_status_description(value)
                     log_and_print(f"{status_description}", ansi_format=BOLD_GREEN, indent=2, is_hebrew=True)
                 elif field == "DecisionId":
-                    log_and_print(f"החלטה מספר: {value}", indent=2)
+                    log_and_print(f"החלטה מספר: {value}", indent=2, is_hebrew=True)
                 elif field == "Classifications":
-                    log_and_print(f"סיווג: {value}", indent=2)
+                    log_and_print(f"סיווג: {value}", indent=2, is_hebrew=True)
                 elif field == "IsForPublication":
                     if value is False:
                         log_and_print("לא לפרסום", "info", BOLD_RED, is_hebrew=True, indent=2)
@@ -101,7 +101,7 @@ def fetch_decisions_and_documents_by_case_id(case_id: str, db) -> List[Dict[str,
                                         if sub_key == "SubDecisionId":
                                             log_and_print(f"\n*** {sub_idx} תת החלטה({sub_val})***", ansi_format=BOLD_YELLOW,indent=2, is_hebrew=True)
                                             description = get_request_description(request_id,db)
-                                            log_and_print(f"החלטה בבקשה :{description} ({request_id})")
+                                            log_and_print(f"החלטה בבקשה :{description} ({request_id})", is_hebrew=True)
 
                                         elif sub_key == "DecisionTypeToCourtId":
                                             des_status_heb = normalize_hebrew(decision_type_mapping.get(sub_val, "Unknown Status"))
@@ -109,7 +109,7 @@ def fetch_decisions_and_documents_by_case_id(case_id: str, db) -> List[Dict[str,
                                         #else:
                                         #    log_and_print(f"    {sub_key}: {sub_val}", indent=12, is_hebrew=True)
                             else:
-                                log_and_print(f"Unexpected format for 'SubDecisions', expected a list, got: {type(val)}", "warning", BOLD_RED, indent=8)
+                                log_and_print(f"Unexpected format for 'SubDecisions', expected a list, got: {type(val)}", "warning", BOLD_RED, indent=8, is_hebrew=True)
                         #else:            
                         #    log_and_print(f"    {key}: {val}", indent=8, is_hebrew=True)
                         
