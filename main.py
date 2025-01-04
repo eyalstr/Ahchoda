@@ -47,7 +47,7 @@ def display_menu():
     print(f"\n{BOLD_YELLOW}Menu:{RESET}")
     print(f"1. {BOLD_GREEN}{normalize_hebrew('תהליכים בתיק')}{RESET}")
     print(f"2. {BOLD_GREEN}{normalize_hebrew('מסמכים בתיק')}{RESET}")
-    print(f"3. {BOLD_GREEN}{normalize_hebrew('החלטות')}{RESET}")
+    print(f"3. {BOLD_GREEN}{normalize_hebrew('החלטות בתיק/בבקשה')}{RESET}")
     print(f"4. {BOLD_GREEN}{normalize_hebrew('בקשות בתיק')}{RESET}")
     print(f"5. {BOLD_GREEN}{normalize_hebrew('יציאה')}{RESET}")
 
@@ -70,7 +70,7 @@ if __name__ == "__main__":
         # Request Case ID once before the loop
         try:
             #case_id = int(input("Enter Case ID (_id): "))
-            case_id = 3002455
+            case_id = 3002469
             log_and_print(f"######-- Case=({case_id}) --######", "info", ansi_format=BOLD_RED)
         except ValueError:
             log_and_print("Invalid input. Please enter a numeric Case ID.", "error", ansi_format=BOLD_RED)
