@@ -181,6 +181,24 @@ def display_menu():
     except ValueError:
         log_and_print("Invalid input. Please enter a number.", "error")
         return None
+def get_case_id_from_displayed(case_displayed, db):
+    """
+    Query MongoDB to get the _id based on the case_displayed value.
+    """
+    try:
+        # Search for the document in the MongoDB collection using 'CaseDisplayId' as the field
+        case = db["Case"].find_one({"CaseDisplayId": case_displayed})
+        
+        if case:
+            # Return the _id of the found case
+            return case["_id"]
+        else:
+            # If no matching case is found
+            log_and_print(f"No case found with CaseDisplayId {case_displayed}", "error")
+            return None
+    except Exception as e:
+        log_and_print(f"Error while querying MongoDB: {e}", "error")
+        return None
 
 
 if __name__ == "__main__":
@@ -206,16 +224,24 @@ if __name__ == "__main__":
         if db is None:
             log_and_print("Failed to connect to MongoDB. Exiting.", "error")
             exit()
-
-        # Request Case ID once before the loop
+        # Request Case Display ID from the user
         try:
-            case_id = 3002469
-            log_and_print(f"######-- Case=({case_id}) --######", "info")
+            case_displayed_input = input("Please enter the Case Displayed ID (e.g., 1018/25): ").strip()
+            # Retrieve the corresponding _id from MongoDB based on CaseDisplayId
+            case_id = get_case_id_from_displayed(case_displayed_input, db)
+            
+            if case_id is None:
+                log_and_print("Could not find Case ID from the provided Case Displayed ID.", "error")
+                exit()
+
+            # Log the case ID that was found
+            log_and_print(f"######-- Case ID=({case_id}) --######", "info")
         except ValueError:
-            log_and_print("Invalid input. Please enter a numeric Case ID.", "error")
+            log_and_print("Invalid input. Please enter a valid Case Displayed ID.", "error")
             exit()
 
         while True:
+            
             choice = display_menu()
 
             if choice == 1:
