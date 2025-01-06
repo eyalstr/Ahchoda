@@ -19,6 +19,35 @@ BOLD_RED = Fore.RED + Style.BRIGHT
 RESET = Style.RESET_ALL
 
 
+def load_configuration():
+    """
+    Dynamically load the .env file located in the same directory as the executable.
+    """
+    import sys
+    # Determine the directory of the current executable or script
+    if getattr(sys, 'frozen', False):  # Check if running as an executable
+        base_dir = os.path.dirname(sys.executable)
+    else:  # Running as a Python script
+        base_dir = os.path.dirname(os.path.abspath(__file__))
+
+    # Path to the .env file
+    env_path = os.path.join(base_dir, '.env')
+
+    # Load the .env file
+    if os.path.exists(env_path):
+        load_dotenv(env_path)
+        print(f"Loaded configuration from {env_path}")
+    else:
+        print(f"Configuration file not found at {env_path}. Please provide a .env file.")
+        exit(1)
+
+    required_env_vars = ["MONGO_CONNECTION_STRING", "DB_SERVER", "DB_NAME", "DB_USER", "DB_PASS"]
+
+    for var in required_env_vars:
+        if not os.getenv(var):
+            print(f"Error: Missing required environment variable: {var}")
+            exit(1)
+
 def set_temporary_console_font():
     """
     Temporarily set the console font to 'Courier New' for the current session.
@@ -140,10 +169,10 @@ def display_menu():
     Display a menu of options for the user and return their choice.
     """
     print(f"\nMenu:")
-    print(f"1. {normalize_hebrew('תהליכים בתיק')}")
-    print(f"2. {normalize_hebrew('מסמכים בתיק')}")
-    print(f"3. {normalize_hebrew('החלטות בתיק/בבקשה')}")
-    print(f"4. {normalize_hebrew('בקשות בתיק')}")
+    print(f"1. {normalize_hebrew('בקשות בתיק')}")
+    print(f"2. {normalize_hebrew('החלטות בתיק/בבקשה')}")
+    print(f"3. {normalize_hebrew('מסמכים בתיק')}")
+    print(f"4. {normalize_hebrew('תהליכים בתיק')}")
     print(f"5. {normalize_hebrew('יציאה')}")
 
     try:
@@ -160,7 +189,8 @@ if __name__ == "__main__":
         set_temporary_console_font()
 
         # Load environment variables
-        load_dotenv()
+        #load_dotenv()
+        load_configuration()
 
         # MongoDB connection string
         mongo_connection_string = os.getenv("MONGO_CONNECTION_STRING", "")
@@ -189,27 +219,6 @@ if __name__ == "__main__":
             choice = display_menu()
 
             if choice == 1:
-                log_and_print(f"\n##########-- תהליכים בתיק --##########", is_hebrew=True)
-                process_ids = fetch_process_ids_by_case_id_sorted(case_id, db)
-
-                if not process_ids:
-                    log_and_print("No process IDs found.", "warning")
-                else:
-                    execute_sql_process_queries(server_name, database_name, user_name, password, process_ids)
-
-            elif choice == 2:
-                log_and_print(f"\n##########-- מסמכים בתיק --##########", is_hebrew=True)
-                fetch_documents_by_case_id(case_id, db)
-
-            elif choice == 3:
-                log_and_print(f"\n##########-- שאילתת החלטות בתיק --##########", is_hebrew=True)
-                results = fetch_decisions_and_documents_by_case_id(case_id, db)
-                if results:
-                    log_and_print(f"\nניתוח החלטות הושלם", is_hebrew=True)
-                else:
-                    log_and_print(f"לא נמצאו החלטות או מסמכי החלטות", is_hebrew=True)
-
-            elif choice == 4:
                 log_and_print(f"\n##########--שאילתת בקשות בתיק--########", is_hebrew=True)
                 results = parse_requests_by_case_id(case_id, db)
                 if results:
@@ -217,6 +226,28 @@ if __name__ == "__main__":
                 else:
                     log_and_print(f"\nלא נמצאו בקשות",is_hebrew=True)
 
+            elif choice == 2:
+                log_and_print(f"\n##########-- שאילתת החלטות בתיק --##########", is_hebrew=True)
+                results = fetch_decisions_and_documents_by_case_id(case_id, db)
+                if results:
+                    log_and_print(f"\nניתוח החלטות הושלם", is_hebrew=True)
+                else:
+                    log_and_print(f"לא נמצאו החלטות או מסמכי החלטות", is_hebrew=True)
+
+            elif choice == 3:
+                log_and_print(f"\n##########-- מסמכים בתיק --##########", is_hebrew=True)
+                fetch_documents_by_case_id(case_id, db)
+
+                        
+            elif choice == 4:
+                log_and_print(f"\n##########-- תהליכים בתיק --##########", is_hebrew=True)
+                process_ids = fetch_process_ids_by_case_id_sorted(case_id, db)
+
+                if not process_ids:
+                    log_and_print("No process IDs found.", "warning")
+                else:
+                    execute_sql_process_queries(server_name, database_name, user_name, password, process_ids)
+            
             elif choice == 5:
                 log_and_print("Exiting application.", "info")
                 break
