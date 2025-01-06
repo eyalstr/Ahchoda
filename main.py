@@ -235,7 +235,7 @@ if __name__ == "__main__":
                 exit()
 
             # Log the case ID that was found
-            log_and_print(f"######-- מספר תיק:({case_id})({case_displayed_input}) --######", "info", is_hebrew=True)
+            log_and_print(f"######--({case_id})({case_displayed_input}) מספר תיק --######", "info", is_hebrew=True)
         except ValueError:
             log_and_print("Invalid input. Please enter a valid Case Displayed ID.", "error")
             exit()
