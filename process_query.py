@@ -64,7 +64,7 @@ def execute_sql_process_queries(server_name, database_name, user_name, password,
         return
 
     try:
-        log_and_print("\nConnecting to SQL Server...", "info")
+        #log_and_print("\nConnecting to SQL Server...", "info")
         connection = pyodbc.connect(
             f"DRIVER={{ODBC Driver 17 for SQL Server}};"
             f"SERVER={server_name};"
@@ -101,11 +101,11 @@ def execute_sql_process_queries(server_name, database_name, user_name, password,
                 continue
             else:
                 des_request_heb = normalize_hebrew(request_type_mapping.get(request_type_id, "Unknown Status"))
-                log_and_print(f"{des_request_heb}({request_type_id})", "info", BOLD_GREEN, is_hebrew=True, indent=4)
+                log_and_print(f"\n{des_request_heb}({request_type_id})", "info", BOLD_GREEN, is_hebrew=True, indent=4)
                 for row in rows_1:
                     #log_and_print(f"תהליך = {row[0]}", is_hebrew=True)
                     #log_and_print(f"  ProcessTypeName = {row[1]}", "info", BOLD_YELLOW, is_hebrew=True)
-                    log_and_print(f"נוצר תהליך חדש :{row[1]}", "info", BOLD_YELLOW, is_hebrew=True)
+                    log_and_print(f"בקשה חדשה :{row[1]}", "info", BOLD_YELLOW, is_hebrew=True)
 
             # SQL Query 2
             sql_query_2 = """
@@ -142,7 +142,7 @@ def execute_sql_process_queries(server_name, database_name, user_name, password,
                     #log_and_print(f"  ProcessStepID = {row[0]}")
                     #log_and_print(f"  ProcessID = {row[1]}")
                     log_and_print(f"{row[2]}", "info", BOLD_GREEN, indent=4,is_hebrew=True)
-                    log_and_print(f"{row[3]}", "info", BOLD_GREEN, indent=4,is_hebrew=True)
+                    log_and_print(f"   --{row[3]}--", "info", BOLD_GREEN, indent=4,is_hebrew=True)
 
                     # SQL Query 3
                     #log_and_print(f"  Information for ProcessStepID {process_step_id}...", "info", BOLD_YELLOW)
