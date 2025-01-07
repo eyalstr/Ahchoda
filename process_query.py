@@ -134,8 +134,8 @@ def execute_sql_process_queries(server_name, database_name, user_name, password,
             #log_and_print(f"  Results from query (Fetched {len(rows_2)} rows):", "info", BOLD_GREEN)
             for row in rows_2:
                 query_2_counter += 1   
-                log_and_print(f"\n", "info")
-                log_and_print(f"\n********* שלב={query_2_counter} *************\n", "info", BOLD_GREEN, indent=4, is_hebrew=True)            
+                #log_and_print(f"\n", "info")
+                log_and_print(f"\n************* שלב={query_2_counter} **************", "info", BOLD_GREEN, indent=4, is_hebrew=True)            
 
                 try:
                     process_step_id = row[0]
