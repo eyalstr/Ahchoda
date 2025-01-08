@@ -1,7 +1,7 @@
 import ctypes
 from pymongo import MongoClient
 from dotenv import load_dotenv
-from process_query import execute_sql_process_queries, fetch_process_ids_by_case_id_sorted
+from process_query import execute_sql_process_queries, fetch_process_ids_by_case_id_sorted,execute_sql_process_tasks
 from document_query import fetch_documents_by_case_id
 from decision_query import fetch_decisions_and_documents_by_case_id
 from requests_query import parse_requests_by_case_id
@@ -173,7 +173,8 @@ def display_menu():
     print(f"2. {normalize_hebrew('החלטות בתיק/בבקשה')}")
     print(f"3. {normalize_hebrew('מסמכים בתיק')}")
     print(f"4. {normalize_hebrew('תהליכים בתיק')}")
-    print(f"5. {normalize_hebrew('יציאה')}")
+    print(f"5. {normalize_hebrew('משימות לדיין בתיק')}")
+    print(f"6. {normalize_hebrew('יציאה')}")
 
     try:
         choice = int(input(f"Enter your choice: "))
@@ -275,6 +276,14 @@ if __name__ == "__main__":
                     execute_sql_process_queries(server_name, database_name, user_name, password, process_ids)
             
             elif choice == 5:
+                log_and_print(f"\n##########-- משימות לדיין בתיק --##########", is_hebrew=True)
+                process_ids = fetch_process_ids_by_case_id_sorted(case_id, db)
+
+                if not process_ids:
+                    log_and_print(f"אין משימות בתיק", "warning", is_hebrew=True)
+                else:
+                    execute_sql_process_tasks(server_name, database_name, user_name, password, process_ids)
+            elif choice == 6:
                 log_and_print("Exiting application.", "info")
                 break
 
