@@ -294,7 +294,7 @@ if __name__ == "__main__":
                             task_heb_desc = normalize_hebrew(judge_tasks_mapping.get(process_name, "Unknown Status"))
                             #Check if task_heb_desc is not "Unknown Status"
                             if task_heb_desc != "Unknown Status":
-                                log_and_print(f"\n{request_description}", "info", is_hebrew=True, indent=8)
+                                log_and_print(f"\n{request_description}", "info", is_hebrew=True)
                                 log_and_print(f"משימה לדיין :{task_heb_desc}",is_hebrew=True)               
                             
                     else:
