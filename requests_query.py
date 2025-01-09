@@ -85,7 +85,7 @@ def parse_requests_by_case_id(case_id: str, db: Database) -> None:
 
             #log_and_print(f"\nRequest #{index}:", "info", BOLD_RED, indent=2)
             log_and_print(f"\n###### {index} בקשה ######", ansi_format=BOLD_YELLOW,indent=2, is_hebrew=True)
-            log_and_print(f"RequestId: {request_id}", "info", BOLD_GREEN, indent=4)
+            log_and_print(f"{request_id} בקשה", "info", BOLD_GREEN, indent=4)
             log_and_print(f"{des_request_heb}({request_type_id})", "info", BOLD_GREEN, is_hebrew=True, indent=4)
 
             if leading_statuses and isinstance(leading_statuses, list):
