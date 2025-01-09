@@ -4,6 +4,7 @@ from dotenv import load_dotenv
 from process_query import execute_sql_process_queries, fetch_process_ids_by_case_id_sorted,execute_sql_process_tasks
 from document_query import fetch_documents_by_case_id
 from decision_query import fetch_decisions_and_documents_by_case_id
+from decision_status_mapping import judge_tasks_mapping
 from requests_query import parse_requests_by_case_id
 from logging_utils import log_and_print, normalize_hebrew, BOLD_YELLOW, BOLD_GREEN, BOLD_RED
 from colorama import init, Fore, Style
@@ -282,7 +283,23 @@ if __name__ == "__main__":
                 if not process_ids:
                     log_and_print(f"אין משימות בתיק", "warning", is_hebrew=True)
                 else:
-                    execute_sql_process_tasks(server_name, database_name, user_name, password, process_ids)
+                    judje_tasks = execute_sql_process_tasks(server_name, database_name, user_name, password, process_ids)
+                    # Check if the function returned a dictionary
+                    if judje_tasks:
+                        # Iterate over each key-value pair in the returned dictionary
+                        for process_step_id, subprocess_data in judje_tasks.items():
+                            # Access the process and request information
+                            process_name = subprocess_data.get('process')
+                            request_description = subprocess_data.get('request')
+                            task_heb_desc = normalize_hebrew(judge_tasks_mapping.get(process_name, "Unknown Status"))
+                            #Check if task_heb_desc is not "Unknown Status"
+                            if task_heb_desc != "Unknown Status":
+                                log_and_print(f"\n{request_description}", "info", is_hebrew=True, indent=8)
+                                log_and_print(f"משימה לדיין :{task_heb_desc}",is_hebrew=True)               
+                            
+                    else:
+                        print("No subprocess data returned.")
+
             elif choice == 6:
                 log_and_print("Exiting application.", "info")
                 break

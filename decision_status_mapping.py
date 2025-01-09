@@ -79,3 +79,9 @@ decision_type_mapping = {
     84: normalize_hebrew("שינוי מותב"),
     85: normalize_hebrew("איחוד תיקים")
 }
+
+judge_tasks_mapping = {
+    "עיון והחלטה":normalize_hebrew("ממתין לעיון ראשוני"),
+    "החלטה לאחר דיון":normalize_hebrew("ממתין להחלטה"),
+    "החלטה על תגובה בחריגה": normalize_hebrew("ממתין להחלטה")
+}

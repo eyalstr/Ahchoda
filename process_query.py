@@ -273,7 +273,7 @@ def execute_sql_process_tasks(server_name, database_name, user_name, password, p
                         }
                         process_subprocess_count[process_step_id] = subprocess_data
 
-                        log_and_print(f"Subprocess count = {len(rows_4)}: Process = {row[3]}, Request = {des_request_heb}", "info", BOLD_YELLOW)
+                        #log_and_print(f"Subprocess count = {len(rows_4)}: Process = {row[3]}, Request = {des_request_heb}", "info", BOLD_YELLOW)
 
                 except Exception as e:
                     log_and_print(f"Error processing ProcessStepID {row[0]}: {e}", "error", BOLD_RED)
