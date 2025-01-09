@@ -3,6 +3,7 @@ from dotenv import load_dotenv
 from logging_utils import log_and_print, normalize_hebrew, logger
 from logging_utils import BOLD_YELLOW, BOLD_GREEN, BOLD_RED
 from doc_header_map import DOCUMENT_TYPE_MAPPING, DOCUMENT_CATEGORY_MAPPING
+from requests_query import get_requests_by_case_id,request_type_mapping
 
 IsLeadingDoc = {
     "None": 'לא',
@@ -25,7 +26,9 @@ def fetch_documents_by_case_id(case_id, db, collection_name="Document"):
                 }
             }
         }
-
+        # retieve all requests for the specific case id {RequestId:RequestTypeId}
+        case_requests_dic = get_requests_by_case_id(case_id,db)
+     
         # Fetch all matching documents, sorted by DocumentReceiptTime in ascending order
         documents = collection.find(query).sort("DocumentReceiptTime", 1)
 
@@ -39,6 +42,36 @@ def fetch_documents_by_case_id(case_id, db, collection_name="Document"):
             for index, document in enumerate(matching_documents, start=1):
                 log_and_print(f"\nמסמך #{index}:", ansi_format=BOLD_YELLOW, is_hebrew=True)
 
+
+                # Process Entities array to find EntityValue where EntityTypeId == 2
+                entities = document.get("Entities", [])
+                entity_value_2 = None
+                for entity in entities:
+                    if entity.get("EntityTypeId") == 2:
+                        entity_value_2 = entity.get("EntityValue")
+                        break
+
+                if entity_value_2 is not None:
+                    
+
+                    matching_request_id = None
+
+                    # Iterate over the dictionary items to find the key with value 1
+                    for request_id, request_type_id in case_requests_dic.items():
+                        if request_id == entity_value_2:
+                            matching_request_id = request_type_id
+                            break  # Exit the loop once the first match is found
+
+                    # Output the result
+                    if matching_request_id:
+                        description_heb = normalize_hebrew(request_type_mapping.get(matching_request_id, "Unknown Status"))                        
+                        log_and_print(f"{description_heb} ({matching_request_id})", "info", is_hebrew=True, indent=8)
+                    else:
+                        log_and_print("No RequestId found with RequestTypeId 1.")
+                                           
+                         
+                
+              
                 # Iterate through document fields
                 for key, value in document.items():
                     if key == "DocumentTypeId" and isinstance(value, int):
@@ -57,7 +90,7 @@ def fetch_documents_by_case_id(case_id, db, collection_name="Document"):
                         log_and_print(f"{key}: {value}", indent=2, ansi_format=BOLD_YELLOW, is_hebrew=True)
                     #elif key == "Entities":
                     #    log_and_print(f"{key}: {value}", indent=2, is_hebrew=True)
-
+                
         return matching_documents
 
     except Exception as e:

@@ -127,3 +127,42 @@ def parse_requests_by_case_id(case_id: str, db: Database) -> None:
         return leading_statuses
     except Exception as e:
         log_and_print(f"Error processing case document for Case ID {case_id}: {e}", "error", BOLD_RED, is_hebrew=True)
+
+
+def get_requests_by_case_id(case_id: str, db: Database) -> dict:
+    """
+    Fetch the Requests array for a given Case ID and return a dictionary 
+    mapping RequestId to RequestTypeId.
+
+    Args:
+        case_id (str): The Case ID to fetch data for.
+        db (Database): The MongoDB database connection.
+
+    Returns:
+        dict: A dictionary where keys are RequestId and values are RequestTypeId.
+    """
+    try:
+        collection = db["Case"]
+        document = collection.find_one({"_id": case_id}, {"Requests": 1, "_id": 0})
+
+        if not document:
+            log_and_print(f"No document found for Case ID {case_id}.", "info", BOLD_RED, is_hebrew=True)
+            return {}
+
+        requests = document.get("Requests", [])
+        if not isinstance(requests, list):
+            log_and_print(f"Invalid 'Requests' field format for Case ID {case_id}.", "info", BOLD_RED, is_hebrew=True)
+            return {}
+
+        
+        request_mapping = {
+            request.get("RequestId"): request.get("RequestTypeId")
+            for request in requests
+            if request.get("RequestId") is not None and request.get("RequestTypeId") is not None
+        }
+
+        return request_mapping
+
+    except Exception as e:
+        log_and_print(f"Error fetching requests for Case ID {case_id}: {e}", "error", BOLD_RED)
+        return {}
