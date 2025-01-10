@@ -82,6 +82,13 @@ decision_type_mapping = {
 
 judge_tasks_mapping = {
     "עיון והחלטה":normalize_hebrew("ממתין לעיון ראשוני"),
-    "החלטה לאחר דיון":normalize_hebrew("ממתין להחלטה"),
-    "החלטה על תגובה בחריגה": normalize_hebrew("ממתין להחלטה")
+    "החלטה לאחר דיון":normalize_hebrew("ממתין להחלטה לאחר דיון"),
+    "החלטה על תגובה בחריגה": normalize_hebrew("ממתין להחלטה בחריגה"),
+    "החלטה בבקשה חדשה": normalize_hebrew("ממתין להחלטה בבקשה"),
+}
+
+
+other_tasks_mapping = {
+    "מטלה לכתב תשובה":normalize_hebrew("ממתין לתגובת משיב"),
+      
 }

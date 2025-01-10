@@ -273,8 +273,119 @@ def execute_sql_process_tasks(server_name, database_name, user_name, password, p
                         }
                         process_subprocess_count[process_step_id] = subprocess_data
 
-                        #log_and_print(f"Subprocess count = {len(rows_4)}: Process = {row[3]}, Request = {des_request_heb}", "info", BOLD_YELLOW)
+                        log_and_print(f"Subprocess count = {len(rows_4)}: Process = {row[3]}, Request = {des_request_heb}", "info", is_hebrew=True)
 
+                except Exception as e:
+                    log_and_print(f"Error processing ProcessStepID {row[0]}: {e}", "error", BOLD_RED)
+
+        return process_subprocess_count  # Return the dictionary with process and associated request information
+
+    except Exception as e:
+        log_and_print(f"Error querying SQL Server: {e}", "error", BOLD_RED)
+    finally:
+        if 'connection' in locals():
+            connection.close()
+            log_and_print("\nSQL Server connection closed.", "info", BOLD_GREEN)
+
+
+def execute_sql_all_processes(server_name, database_name, user_name, password, process_ids):
+    """Execute SQL queries for each Process ID."""
+    if not process_ids:
+        log_and_print("\nNo Process IDs provided. Exiting.", "warning")
+        return
+
+    process_subprocess_count = {}  # Dictionary to store process and request information for subprocess count
+
+    try:
+        #log_and_print("\nConnecting to SQL Server...", "info")
+        connection = pyodbc.connect(
+            f"DRIVER={{ODBC Driver 17 for SQL Server}};"
+            f"SERVER={server_name};"
+            f"DATABASE={database_name};"
+            f"UID={user_name};"
+            f"PWD={password};"
+            f"Trusted_Connection=yes;"
+        )
+        cursor = connection.cursor()
+        log_and_print("Connection to SQL Server established successfully.\n", "info", BOLD_GREEN)
+
+        query_2_counter = 0  # Counter for the second query
+
+        for process_id, request_type_id in process_ids.items():
+            
+            # SQL Query 1
+            sql_query_1 = """
+            SELECT TOP (1000) p.[ProcessID],
+                   pt.[ProcessTypeName]
+            FROM [BPM].[dbo].[Processes] AS p
+            JOIN [BPM].[dbo].[ProcessTypes] AS pt
+                ON pt.[ProcessTypeID] = p.[ProcessTypeID]
+            WHERE p.[ProcessID] = ?;
+            """
+            cursor.execute(sql_query_1, process_id)
+            rows_1 = cursor.fetchall()
+
+            if not rows_1:
+                log_and_print("No results found for the first query.", "warning")
+                continue
+            else:
+                des_request_heb = normalize_hebrew(request_type_mapping.get(request_type_id, "Unknown Status"))
+            
+            # SQL Query 2
+            sql_query_2 = """
+            SELECT TOP (1000) ps.[ProcessStepID],
+                   ps.[ProcessID],
+                   pt.[ProcessTypeName],
+                   at.[ActivityTypeName],
+                   ps.[ProcessTypeGatewayID],
+                   ps.[DateForBPETreatment]
+            FROM [BPM].[dbo].[ProcessSteps] AS ps
+            JOIN [BPM].[dbo].[ProcessTypeActivities] AS pta
+                ON ps.[ProcessTypeActivityID] = pta.[ProcessTypeActivityID]
+            JOIN [BPM].[dbo].[ProcessTypes] AS pt
+                ON pt.[ProcessTypeID] = pta.[ProcessTypeID]
+            JOIN [BPM].[dbo].[ActivityTypes] AS at
+                ON at.[ActivityTypeID] = pta.[ActivityTypeID]
+            WHERE ps.[ProcessID] = ?;
+            """
+            cursor.execute(sql_query_2, process_id)
+            rows_2 = cursor.fetchall()
+
+            if not rows_2:
+                log_and_print(f"No results found for ProcessID {process_id}.", "warning")
+                continue
+
+            for row in rows_2:
+                query_2_counter += 1
+               
+                try:
+                    process_step_id = row[0]
+                  
+                    # SQL Query 3
+                    sql_query_3 = """
+                    SELECT TOP (1000) p.[ProcessStepStatusID],
+                           p.[ProcessStepID],
+                           s.[Description_Heb]
+                    FROM [BPM].[dbo].[ProcessStepStatuses] AS p
+                    JOIN [BPM].[dbo].[StatusTypes] AS s
+                        ON p.[StatusTypeID] = s.[StatusTypeID]
+                    WHERE p.[ProcessStepID] = ?;
+                    """
+                    cursor.execute(sql_query_3, process_step_id)
+                    rows_4 = cursor.fetchall()
+
+                    
+                    if len(rows_4) < 3:
+                        # Collect the process and its associated request
+                        subprocess_data = {
+                            "process": row[3],  # The process name from the ActivityTypeName column
+                            "request": des_request_heb  # The request description
+                        }
+                        process_subprocess_count[process_step_id] = subprocess_data
+
+                        log_and_print(f"בהמתנה: Process = {row[3]}, Request = {des_request_heb}", "info", is_hebrew=True)
+                    else:
+                        log_and_print(f"הושלם:  Process = {row[3]}, Request = {des_request_heb}", "info", is_hebrew=True)    
                 except Exception as e:
                     log_and_print(f"Error processing ProcessStepID {row[0]}: {e}", "error", BOLD_RED)
 
