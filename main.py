@@ -329,7 +329,6 @@ if __name__ == "__main__":
                                 IsOtherTask = True          
                         # Iterate over each key-value pair in the returned dictionary                        
                         for process_step_id, subprocess_data in other_tasks.items():
-                            log_and_print(f"subprocess data={subprocess_data}")
                             
                             # Access and clean the process name without reversing text
                             raw_process_name = subprocess_data.get('process', '').strip()
