@@ -332,8 +332,7 @@ if __name__ == "__main__":
                             
                             # Access and clean the process name without reversing text
                             raw_process_name = subprocess_data.get('process', '').strip()
-                            log_and_print(f"Raw process name: '{raw_process_name}'")
-                             
+                                                         
                             # Fetch task description
                             request_description = subprocess_data.get('request', '')
                             tmp_heb_desc = secratary_tasks_mapping.get(raw_process_name, "Unknown Status")
