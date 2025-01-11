@@ -4,7 +4,7 @@ from dotenv import load_dotenv
 from process_query import execute_sql_process_queries, fetch_process_ids_by_case_id_sorted,execute_sql_process_tasks,execute_sql_all_processes
 from document_query import fetch_documents_by_case_id
 from decision_query import fetch_decisions_and_documents_by_case_id
-from decision_status_mapping import judge_tasks_mapping,other_tasks_mapping
+from decision_status_mapping import judge_tasks_mapping,other_tasks_mapping,secratary_tasks_mapping
 from requests_query import parse_requests_by_case_id
 from logging_utils import log_and_print, normalize_hebrew, BOLD_YELLOW, BOLD_GREEN, BOLD_RED
 from colorama import init, Fore, Style
@@ -318,14 +318,34 @@ if __name__ == "__main__":
                         # Iterate over each key-value pair in the returned dictionary
                         for process_step_id, subprocess_data in other_tasks.items():
                             # Access the process and request information
-                            process_name = subprocess_data.get('process')
+                            process_name = normalize_hebrew(subprocess_data.get('process', '').strip())
                             request_description = subprocess_data.get('request')
                             task_heb_desc = normalize_hebrew(other_tasks_mapping.get(process_name, "Unknown Status"))
                             #Check if task_heb_desc is not "Unknown Status"
                             if task_heb_desc != "Unknown Status":
-                                log_and_print(f"\n{request_description}", "info", is_hebrew=True)
-                                log_and_print(f"מטלה  :{task_heb_desc}",is_hebrew=True)     
+                                log_and_print(f"\n--מטלה לצדדים--", "info", is_hebrew=True)
+                                log_and_print(f"({request_description}) {task_heb_desc}",is_hebrew=True)  
+                               
                                 IsOtherTask = True          
+                        # Iterate over each key-value pair in the returned dictionary                        
+                        for process_step_id, subprocess_data in other_tasks.items():
+                            log_and_print(f"subprocess data={subprocess_data}")
+                            
+                            # Access and clean the process name without reversing text
+                            raw_process_name = subprocess_data.get('process', '').strip()
+                            log_and_print(f"Raw process name: '{raw_process_name}'")
+                             
+                            # Fetch task description
+                            request_description = subprocess_data.get('request', '')
+                            tmp_heb_desc = secratary_tasks_mapping.get(raw_process_name, "Unknown Status")
+                                                       
+                            if tmp_heb_desc != "Unknown Status":
+                                task_heb_desc = normalize_hebrew(tmp_heb_desc)
+                                log_and_print(f"\n--מטלה למזכירה--", "info", is_hebrew=True)
+                                log_and_print(f"({request_description}) {task_heb_desc}", is_hebrew=True)
+                                IsOtherTask = True
+
+    
                     if not IsOtherTask:
                         log_and_print(f"אין מטלות בתיק", "warning", is_hebrew=True)   
                     
