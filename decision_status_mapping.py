@@ -85,10 +85,22 @@ judge_tasks_mapping = {
     "החלטה לאחר דיון":normalize_hebrew("ממתין להחלטה לאחר דיון"),
     "החלטה על תגובה בחריגה": normalize_hebrew("ממתין להחלטה בחריגה"),
     "החלטה בבקשה חדשה": normalize_hebrew("ממתין להחלטה בבקשה"),
+    "החלטה על תגובה": normalize_hebrew("ממתין להחלטה בתגובה")
 }
 
 
 other_tasks_mapping = {
-    "מטלה לכתב תשובה":normalize_hebrew("ממתין לתגובת משיב"),
+    "מטלה לכתב תשובה":normalize_hebrew("ממתין לכתב תשובה משיב"),
+    "מטלה לתגובת צד ב":normalize_hebrew("ממתין לתגובת משיב"),
+    "מטלה לתגובת צד א":normalize_hebrew("ממתין לתגובת מערער") 
+      
+}
+
+
+secratary_tasks_mapping = {
+    "ביטול דיון":normalize_hebrew("ממתין לביטול דיון"),
+    "קביעת דיון":normalize_hebrew("ממתין לקביעת דיון"),
+    "בדיקת מזכירות":normalize_hebrew("ממתין לבדיקת מזכירות"),
+     "שינוי מועד דיון":normalize_hebrew("ממתין לשינוי מועד דיון"),
       
 }
