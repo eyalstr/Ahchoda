@@ -4,8 +4,8 @@ from typing import List, Dict, Any, Optional
 from logging_utils import log_and_print, normalize_hebrew, logger
 from logging_utils import BOLD_YELLOW, BOLD_GREEN, BOLD_RED
 from doc_header_map import DOCUMENT_TYPE_MAPPING, DOCUMENT_CATEGORY_MAPPING # Import the mapping table
-from decision_status_mapping import decision_type_mapping
-from requests_query import get_request_description
+from rtl_task_mappings import decision_type_mapping
+from request_data_manager import get_request_description
 
 # Decision status descriptions
 DECISION_STATUS_DESCRIPTIONS = {

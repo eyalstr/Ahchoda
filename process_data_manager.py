@@ -310,7 +310,7 @@ def execute_sql_all_processes(server_name, database_name, user_name, password, p
         log_and_print("Connection to SQL Server established successfully.\n", "info", BOLD_GREEN)
 
         query_2_counter = 0  # Counter for the second query
-
+        
         for process_id, request_type_id in process_ids.items():
             
             # SQL Query 1

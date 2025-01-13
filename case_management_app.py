@@ -1,11 +1,11 @@
 import ctypes
 from pymongo import MongoClient
 from dotenv import load_dotenv
-from process_query import execute_sql_process_queries, fetch_process_ids_by_case_id_sorted,execute_sql_process_tasks,execute_sql_all_processes
-from document_query import fetch_documents_by_case_id
-from decision_query import fetch_decisions_and_documents_by_case_id
-from decision_status_mapping import judge_tasks_mapping,other_tasks_mapping,secratary_tasks_mapping
-from requests_query import parse_requests_by_case_id
+from process_data_manager import execute_sql_process_queries, fetch_process_ids_by_case_id_sorted,execute_sql_process_tasks,execute_sql_all_processes
+from document_data_manager import fetch_documents_by_case_id
+from decision_data_manager import fetch_decisions_and_documents_by_case_id
+from rtl_task_mappings import judge_tasks_mapping,other_tasks_mapping,secratary_tasks_mapping
+from request_data_manager import parse_requests_by_case_id
 from logging_utils import log_and_print, normalize_hebrew, BOLD_YELLOW, BOLD_GREEN, BOLD_RED
 from colorama import init, Fore, Style
 import os

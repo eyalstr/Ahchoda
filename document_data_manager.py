@@ -3,7 +3,7 @@ from dotenv import load_dotenv
 from logging_utils import log_and_print, normalize_hebrew, logger
 from logging_utils import BOLD_YELLOW, BOLD_GREEN, BOLD_RED
 from doc_header_map import DOCUMENT_TYPE_MAPPING, DOCUMENT_CATEGORY_MAPPING
-from requests_query import get_requests_by_case_id,request_type_mapping
+from request_data_manager import get_requests_by_case_id,request_type_mapping
 
 IsLeadingDoc = {
     "None": 'לא',
