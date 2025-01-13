@@ -107,7 +107,7 @@ def parse_requests_by_case_id(case_id: str, db: Database) -> None:
                     main_status_index, main_status = statuses_with_null_end_date[0]
                     log_and_print(f"*****סטטוס בבקשה : {main_status}*****", "info", BOLD_GREEN, is_hebrew=True, indent=4)
                 else:
-                    log_and_print("No Main Status Identified (No EndDate is null)", "info", BOLD_RED, is_hebrew=True, indent=4)
+                    log_and_print("No Main Status Identified (EndDate is null)", "info", BOLD_RED, is_hebrew=True, indent=4)
 
                 # Second pass: Log all status details
                 log_and_print(f"\n***הסטוריה בבקשה***", "info", BOLD_YELLOW, is_hebrew=True, indent=4)
