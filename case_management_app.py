@@ -185,6 +185,47 @@ def display_menu():
     except ValueError:
         log_and_print("Invalid input. Please enter a number.", "error")
         return None
+    
+def get_case_id_by_displayed_id(db):
+    """
+    Prompt the user for a Case Displayed ID and fetch the corresponding Case ID from the database.
+
+    Args:
+        db: The MongoDB database connection object.
+
+    Returns:
+        str: The Case ID corresponding to the provided Case Displayed ID.
+
+    Raises:
+        SystemExit: If an invalid or non-existent Case Displayed ID is provided.
+    """
+    while True:
+        try:
+            # Prompt the user for Case Displayed ID
+            case_displayed_input = input("Please enter the Case Displayed ID (e.g., 1018/25): ").strip()
+
+            if not case_displayed_input:
+                log_and_print("Case Displayed ID cannot be empty. Please try again.", "error")
+                continue
+
+            # Fetch the corresponding Case ID from the database
+            case_id = get_case_id_from_displayed(case_displayed_input, db)
+
+            if case_id is None:
+                log_and_print(f"Could not find Case ID for the provided Case Displayed ID: {case_displayed_input}", "error")
+                continue
+
+            # Log the retrieved Case ID and exit the loop
+            log_and_print(f"######--({case_id})({case_displayed_input}) מספר תיק --######", "info", is_hebrew=True)
+            return case_id
+
+        except ValueError as e:
+            log_and_print(f"Invalid input or error occurred: {str(e)}", "error")
+
+        except Exception as e:
+            log_and_print(f"Unexpected error: {str(e)}", "error")
+            exit()
+
 def get_case_id_from_displayed(case_displayed, db):
     """
     Query MongoDB to get the _id based on the case_displayed value.
@@ -229,20 +270,7 @@ if __name__ == "__main__":
             log_and_print("Failed to connect to MongoDB. Exiting.", "error")
             exit()
         # Request Case Display ID from the user
-        try:
-            case_displayed_input = input("Please enter the Case Displayed ID (e.g., 1018/25): ").strip()
-            # Retrieve the corresponding _id from MongoDB based on CaseDisplayId
-            case_id = get_case_id_from_displayed(case_displayed_input, db)
-            
-            if case_id is None:
-                log_and_print("Could not find Case ID from the provided Case Displayed ID.", "error")
-                exit()
-
-            # Log the case ID that was found
-            log_and_print(f"######--({case_id})({case_displayed_input}) מספר תיק --######", "info", is_hebrew=True)
-        except ValueError:
-            log_and_print("Invalid input. Please enter a valid Case Displayed ID.", "error")
-            exit()
+        get_case_id_by_displayed_id(db)
 
         while True:
             IsOtherTask = False
