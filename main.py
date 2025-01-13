@@ -175,8 +175,9 @@ def display_menu():
     print(f"3. {normalize_hebrew('מסמכים בתיק')}")
     print(f"4. {normalize_hebrew('תהליכים בתיק')}")
     print(f"5. {normalize_hebrew('משימות לדיין בתיק')}")
-    print(f"6. {normalize_hebrew('מטלות בתיק')}")
-    print(f"7. {normalize_hebrew('יציאה')}")
+    print(f"6. {normalize_hebrew('משימות למזכירה בתיק')}")
+    print(f"7. {normalize_hebrew('מטלות בתיק')}")
+    print(f"8. {normalize_hebrew('יציאה')}")
 
     try:
         choice = int(input(f"Enter your choice: "))
@@ -284,7 +285,7 @@ if __name__ == "__main__":
                 process_ids = fetch_process_ids_by_case_id_sorted(case_id, db)
 
                 if not process_ids:
-                    log_and_print(f"אין משימות בתיק", "warning", is_hebrew=True)
+                    log_and_print(f"אין משימות לדיין בתיק", "warning", is_hebrew=True)
                 else:
                     judje_tasks = execute_sql_process_tasks(server_name, database_name, user_name, password, process_ids)
                     # Check if the function returned a dictionary
@@ -306,6 +307,33 @@ if __name__ == "__main__":
                     else:
                         print("No subprocess data returned.")
             elif choice == 6:
+                log_and_print(f"\n##########-- משימות למזכירה בתיק --##########", is_hebrew=True)
+                process_ids = fetch_process_ids_by_case_id_sorted(case_id, db)
+
+                if not process_ids:
+                   log_and_print(f"אין משימות למזכירה בתיק", "warning", is_hebrew=True)
+                else:
+                    other_tasks = execute_sql_process_tasks(server_name, database_name, user_name, password, process_ids)
+                    # Check if the function returned a dictionary
+                    if other_tasks:
+                        # Iterate over each key-value pair in the returned dictionary
+                        for process_step_id, subprocess_data in other_tasks.items():
+                            # Access the process and request information
+                            process_name = normalize_hebrew(subprocess_data.get('process', '').strip())
+                            request_description = subprocess_data.get('request')
+                            task_heb_desc = normalize_hebrew(other_tasks_mapping.get(process_name, "Unknown Status"))
+                            #Check if task_heb_desc is not "Unknown Status"
+                            if task_heb_desc != "Unknown Status":
+                                log_and_print(f"\n--משימה למזכירה--", "info", is_hebrew=True)
+                                log_and_print(f"({request_description}) {task_heb_desc}",is_hebrew=True)   
+                               
+                                IsOtherTask = True   
+                        
+    
+                    if not IsOtherTask:
+                        log_and_print(f"אין משימות למזכירה בתיק", "warning", is_hebrew=True)   
+            
+            elif choice == 7:
                 log_and_print(f"\n##########-- מטלות בתיק --##########", is_hebrew=True)
                 process_ids = fetch_process_ids_by_case_id_sorted(case_id, db)
 
@@ -327,27 +355,11 @@ if __name__ == "__main__":
                                 log_and_print(f"({request_description}) {task_heb_desc}",is_hebrew=True)  
                                
                                 IsOtherTask = True          
-                        # Iterate over each key-value pair in the returned dictionary                        
-                        for process_step_id, subprocess_data in other_tasks.items():
                             
-                            # Access and clean the process name without reversing text
-                            raw_process_name = subprocess_data.get('process', '').strip()
-                                                         
-                            # Fetch task description
-                            request_description = subprocess_data.get('request', '')
-                            tmp_heb_desc = secratary_tasks_mapping.get(raw_process_name, "Unknown Status")
-                                                       
-                            if tmp_heb_desc != "Unknown Status":
-                                task_heb_desc = normalize_hebrew(tmp_heb_desc)
-                                log_and_print(f"\n--מטלה למזכירה--", "info", is_hebrew=True)
-                                log_and_print(f"({request_description}) {task_heb_desc}", is_hebrew=True)
-                                IsOtherTask = True
-
-    
                     if not IsOtherTask:
                         log_and_print(f"אין מטלות בתיק", "warning", is_hebrew=True)   
-                    
-            elif choice == 7:
+
+            elif choice == 8:
                 log_and_print("Exiting application.", "info")
                 break
 
