@@ -7,17 +7,17 @@ from decision_data_manager import fetch_decisions_and_documents_by_case_id
 from rtl_task_mappings import judge_tasks_mapping,other_tasks_mapping,secratary_tasks_mapping
 from request_data_manager import parse_requests_by_case_id
 from logging_utils import log_and_print, normalize_hebrew, BOLD_YELLOW, BOLD_GREEN, BOLD_RED
-from colorama import init, Fore, Style
+#from colorama import init, Fore, Style
 import os
 
 # Initialize colorama
-init(autoreset=True)
+#init(autoreset=True)
 
 # ANSI escape codes replaced with colorama equivalents
-BOLD_YELLOW = Fore.YELLOW + Style.BRIGHT
-BOLD_GREEN = Fore.GREEN + Style.BRIGHT
-BOLD_RED = Fore.RED + Style.BRIGHT
-RESET = Style.RESET_ALL
+#BOLD_YELLOW = Fore.YELLOW + Style.BRIGHT
+#BOLD_GREEN = Fore.GREEN + Style.BRIGHT
+#BOLD_RED = Fore.RED + Style.BRIGHT
+#RESET = Style.RESET_ALL
 
 
 def load_configuration():
@@ -108,17 +108,17 @@ def connect_to_mongodb(mongo_connection, db_name="CaseManagement"):
         log_and_print(f"Error connecting to MongoDB: {e}", "error", ansi_format=BOLD_RED)
         return None, None
 
-from colorama import init, Fore, Style
+#from colorama import init, Fore, Style
 import os
 
 # Initialize colorama
-init(autoreset=True, strip=True)
+#init(autoreset=True, strip=True)
 
 # ANSI escape codes replaced with colorama equivalents
-BOLD_YELLOW = Fore.YELLOW + Style.BRIGHT
-BOLD_GREEN = Fore.GREEN + Style.BRIGHT
-BOLD_RED = Fore.RED + Style.BRIGHT
-RESET = Style.RESET_ALL
+#BOLD_YELLOW = Fore.YELLOW + Style.BRIGHT
+#BOLD_GREEN = Fore.GREEN + Style.BRIGHT
+#BOLD_RED = Fore.RED + Style.BRIGHT
+#RESET = Style.RESET_ALL
 
 
 def set_temporary_console_font():
