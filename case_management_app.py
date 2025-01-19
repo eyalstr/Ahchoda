@@ -174,10 +174,10 @@ def display_menu():
     print(f"2. {normalize_hebrew('החלטות בתיק/בבקשה')}")
     print(f"3. {normalize_hebrew('מסמכים בתיק')}")
     print(f"4. {normalize_hebrew('תהליכים בתיק')}")
-    print(f"5. {normalize_hebrew('משימות לדיין בתיק')}")
-    print(f"6. {normalize_hebrew('משימות למזכירה בתיק')}")
-    print(f"7. {normalize_hebrew('מטלות בתיק')}")
-    print(f"8. {normalize_hebrew('יציאה')}")
+  #  print(f"5. {normalize_hebrew('משימות לדיין בתיק')}")
+  #  print(f"6. {normalize_hebrew('משימות למזכירה בתיק')}")
+  #  print(f"7. {normalize_hebrew('מטלות בתיק')}")
+    print(f"5. {normalize_hebrew('יציאה')}")
 
     try:
         choice = int(input(f"Enter your choice: "))
@@ -201,49 +201,129 @@ def get_case_id_by_displayed_id(db):
     """
     while True:
         try:
-            # Prompt the user for Case Displayed ID
-            case_displayed_input = input("Please enter the Case Displayed ID (e.g., 1018/25): ").strip()
+            # Prompt the user for Case Displayed ID or Site Action ID
+            user_input = input("Please enter the Case Displayed ID (e.g., 1018/25) or Site Action ID (e.g., 67371): ").strip()
 
-            if not case_displayed_input:
-                log_and_print("Case Displayed ID cannot be empty. Please try again.", "error")
+            if not user_input:
+                log_and_print("Input cannot be empty. Please try again.", "error")
                 continue
 
-            # Fetch the corresponding Case ID from the database
-            case_id = get_case_id_from_displayed(case_displayed_input, db)
+            # Initialize the case_id variable
+            case_id = None
 
+            # Determine the input type (CaseDisplayId or SiteActionId)
+            if "/" in user_input:
+                # Handle CaseDisplayId
+                log_and_print(f"Identified input as Case Displayed ID: {user_input}", "info")
+                case_id = get_case_id_from_displayed(user_input, db)
+            else:
+                # Handle SiteActionId
+                try:
+                    site_action_id = int(user_input)
+                    log_and_print(f"Identified input as Site Action ID: {site_action_id}", "info")
+                    case_id = get_case_id_from_site_action_id(site_action_id, db)
+                except ValueError:
+                    log_and_print("Invalid Site Action ID. It must be a numeric value. Please try again.", "error")
+                    continue
+
+            # Check if a valid Case ID was retrieved
             if case_id is None:
-                log_and_print(f"Could not find Case ID for the provided Case Displayed ID: {case_displayed_input}", "error")
+                log_and_print(f"Could not find Case ID for the provided input: {user_input}", "error")
                 continue
 
             # Log the retrieved Case ID and exit the loop
-            log_and_print(f"######--({case_id})({case_displayed_input}) מספר תיק --######", "info", is_hebrew=True)
+            log_and_print(f"######--({case_id})({user_input}) מספר תיק --######", "info", is_hebrew=True)
             return case_id
-
-        except ValueError as e:
-            log_and_print(f"Invalid input or error occurred: {str(e)}", "error")
 
         except Exception as e:
             log_and_print(f"Unexpected error: {str(e)}", "error")
             exit()
 
-def get_case_id_from_displayed(case_displayed, db):
+
+
+def get_case_id_from_site_action_id(site_action_id, db, collection_name="Case"):
     """
-    Query MongoDB to get the _id based on the case_displayed value.
+    Query MongoDB to get the _id of a case based on SiteActionId found in any Requests element.
+
+    Args:
+        site_action_id (int): The SiteActionId to search for.
+        db: The MongoDB database connection object.
+        collection_name (str): The name of the collection to query (default: "Case").
+
+    Returns:
+        ObjectId or None: The _id of the case if found, otherwise None.
     """
     try:
-        # Search for the document in the MongoDB collection using 'CaseDisplayId' as the field
-        case = db["Case"].find_one({"CaseDisplayId": case_displayed})
+        if db is None:
+            log_and_print("Database connection is not initialized.", "error")
+            return None
+
+        if not site_action_id:
+            log_and_print("Invalid SiteActionId provided (empty or None)", "error")
+            return None
+
+        log_and_print(f"Searching for SiteActionId: {site_action_id} in Requests array within collection: {collection_name}", "info")
+
+        # Step 1: Retrieve the entire document to inspect the Requests array
+        collection = db[collection_name]
+        document = collection.find_one({"Requests.SiteActionId": site_action_id}, {"Requests": 1, "_id": 1})
+
+        if not document:
+            log_and_print(f"No document found for SiteActionId {site_action_id}.", "info", BOLD_RED, is_hebrew=True)
+            return None
+
+        # Step 2: Extract the Requests array
+        requests = document.get("Requests", [])
+        if not requests:
+            log_and_print(f"Requests array is empty for the document with SiteActionId {site_action_id}.", "info", BOLD_RED, is_hebrew=True)
+            return None
+
+        # Step 3: Search within the Requests array for the matching SiteActionId
+        for request in requests:
+            if request.get("SiteActionId") == site_action_id:
+                log_and_print(f"Found matching SiteActionId in document with _id: {document['_id']}", "info", is_hebrew=True)
+                return document["_id"]
+
+        log_and_print(f"No matching SiteActionId found in Requests for document with _id: {document['_id']}.", "info", BOLD_RED, is_hebrew=True)
+        return None
+
+    except Exception as e:
+        log_and_print(f"Error while querying MongoDB in collection {collection_name}: {e}", "error")
+        return None
+
+           
+def get_case_id_from_displayed(case_displayed, db, collection_name="Case"):
+    """
+    Query MongoDB to get the _id based on the case_displayed value.
+
+    Args:
+        case_displayed (str): The display ID of the case.
+        db: The MongoDB database connection object.
+        collection_name (str): The name of the collection to query (default: "Case").
+
+    Returns:
+        str or None: The _id of the case if found, otherwise None.
+    """
+    try:
+        if not case_displayed:
+            log_and_print("Invalid CaseDisplayId provided (empty or None)", "error")
+            return None
+
+        log_and_print(f"Searching for CaseDisplayId: {case_displayed} in collection: {collection_name}", "info")
+
+        # Search for the document in the specified collection
+        case = db[collection_name].find_one({"CaseDisplayId": case_displayed})
         
         if case:
-            # Return the _id of the found case
+            log_and_print(f"Found case with _id: {case['_id']} for CaseDisplayId: {case_displayed}", "info")
             return case["_id"]
         else:
-            # If no matching case is found
-            log_and_print(f"No case found with CaseDisplayId {case_displayed}", "error")
+            log_and_print(f"No case found with CaseDisplayId: {case_displayed}", "error")
             return None
     except Exception as e:
-        log_and_print(f"Error while querying MongoDB: {e}", "error")
+        log_and_print(f"Error while querying MongoDB in collection {collection_name}: {e}", "error")
         return None
+
 
 
 if __name__ == "__main__":
@@ -270,7 +350,7 @@ if __name__ == "__main__":
             log_and_print("Failed to connect to MongoDB. Exiting.", "error")
             exit()
         # Request Case Display ID from the user
-        get_case_id_by_displayed_id(db)
+        case_id = get_case_id_by_displayed_id(db)
 
         while True:
             IsOtherTask = False
@@ -308,7 +388,8 @@ if __name__ == "__main__":
                     #first solution with all states
                     #execute_sql_process_queries(server_name, database_name, user_name, password, process_ids)
                     execute_sql_all_processes(server_name, database_name, user_name, password, process_ids)
-            elif choice == 5:
+            
+            elif choice == 8:
                 log_and_print(f"\n##########-- משימות לדיין בתיק --##########", is_hebrew=True)
                 process_ids = fetch_process_ids_by_case_id_sorted(case_id, db)
 
@@ -386,8 +467,8 @@ if __name__ == "__main__":
                             
                     if not IsOtherTask:
                         log_and_print(f"אין מטלות בתיק", "warning", is_hebrew=True)   
-
-            elif choice == 8:
+            
+            elif choice == 5:
                 log_and_print("Exiting application.", "info")
                 break
 
