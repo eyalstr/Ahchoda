@@ -1,3 +1,4 @@
+
 import ctypes
 from pymongo import MongoClient
 from dotenv import load_dotenv
@@ -7,17 +8,17 @@ from decision_data_manager import fetch_decisions_and_documents_by_case_id
 from rtl_task_mappings import judge_tasks_mapping,other_tasks_mapping,secratary_tasks_mapping
 from request_data_manager import parse_requests_by_case_id
 from logging_utils import log_and_print, normalize_hebrew, BOLD_YELLOW, BOLD_GREEN, BOLD_RED
-#from colorama import init, Fore, Style
+from colorama import init, Fore, Style
 import os
 
 # Initialize colorama
-#init(autoreset=True)
+init(autoreset=True)
 
 # ANSI escape codes replaced with colorama equivalents
-#BOLD_YELLOW = Fore.YELLOW + Style.BRIGHT
-#BOLD_GREEN = Fore.GREEN + Style.BRIGHT
-#BOLD_RED = Fore.RED + Style.BRIGHT
-#RESET = Style.RESET_ALL
+BOLD_YELLOW = Fore.YELLOW + Style.BRIGHT
+BOLD_GREEN = Fore.GREEN + Style.BRIGHT
+BOLD_RED = Fore.RED + Style.BRIGHT
+RESET = Style.RESET_ALL
 
 
 def load_configuration():
@@ -100,7 +101,7 @@ def connect_to_mongodb(mongo_connection, db_name="CaseManagement"):
     """
     try:
         log_and_print("Connecting to MongoDB...", ansi_format=BOLD_YELLOW)
-        mongo_client = MongoClient(mongo_connection)
+        mongo_client = MongoClient(mongo_connection,minPoolSize=5)
         db = mongo_client[db_name]
         log_and_print("Connected to MongoDB successfully.\n", ansi_format=BOLD_GREEN)
         return mongo_client, db
@@ -170,7 +171,7 @@ def display_menu():
     Display a menu of options for the user and return their choice.
     """
     print(f"\nMenu:")
-    print(f"1. {normalize_hebrew('בקשות בתיק')}")
+    print(f"1. {normalize_hebrew('סטטוס ובקשות בתיק')}")
     print(f"2. {normalize_hebrew('החלטות בתיק/בבקשה')}")
     print(f"3. {normalize_hebrew('מסמכים בתיק')}")
     print(f"4. {normalize_hebrew('תהליכים בתיק')}")
@@ -214,7 +215,7 @@ def get_case_id_by_displayed_id(db):
             # Determine the input type (CaseDisplayId or SiteActionId)
             if "/" in user_input:
                 # Handle CaseDisplayId
-                log_and_print(f"Identified input as Case Displayed ID: {user_input}", "info")
+                #log_and_print(f"Identified input as Case Displayed ID: {user_input}", "info")
                 case_id = get_case_id_from_displayed(user_input, db)
             else:
                 # Handle SiteActionId
@@ -232,7 +233,7 @@ def get_case_id_by_displayed_id(db):
                 continue
 
             # Log the retrieved Case ID and exit the loop
-            log_and_print(f"######--({case_id})({user_input}) מספר תיק --######", "info", is_hebrew=True)
+            log_and_print(f"\n######--({case_id})({user_input}) מספר תיק --######", "info", BOLD_YELLOW, is_hebrew=True)
             return case_id
 
         except Exception as e:
@@ -309,16 +310,16 @@ def get_case_id_from_displayed(case_displayed, db, collection_name="Case"):
             log_and_print("Invalid CaseDisplayId provided (empty or None)", "error")
             return None
 
-        log_and_print(f"Searching for CaseDisplayId: {case_displayed} in collection: {collection_name}", "info")
+        #log_and_print(f"Searching for CaseDisplayId: {case_displayed} in collection: {collection_name}", "info")
 
         # Search for the document in the specified collection
         case = db[collection_name].find_one({"CaseDisplayId": case_displayed})
         
         if case:
-            log_and_print(f"Found case with _id: {case['_id']} for CaseDisplayId: {case_displayed}", "info")
+            #log_and_print(f"Found case with _id: {case['_id']} for CaseDisplayId: {case_displayed}", "info")
             return case["_id"]
         else:
-            log_and_print(f"No case found with CaseDisplayId: {case_displayed}", "error")
+            #log_and_print(f"No case found with CaseDisplayId: {case_displayed}", "error")
             return None
     except Exception as e:
         log_and_print(f"Error while querying MongoDB in collection {collection_name}: {e}", "error")
