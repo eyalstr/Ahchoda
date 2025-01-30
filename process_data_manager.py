@@ -373,8 +373,9 @@ def execute_sql_all_processes(server_name, database_name, user_name, password, p
                     """
                     cursor.execute(sql_query_3, process_step_id)
                     rows_4 = cursor.fetchall()
-
-                    
+                    #log_and_print(f"rows_4={rows_4[-1][2]}","info", is_hebrew=True)
+                    log_and_print(f"{row[3].strip()}={rows_4[-1][2]}, בקשה= {des_request_heb}", "info", is_hebrew=True)
+                    """
                     if len(rows_4) < 3:
                         # Collect the process and its associated request
                         subprocess_data = {
@@ -385,7 +386,9 @@ def execute_sql_all_processes(server_name, database_name, user_name, password, p
 
                         log_and_print(f"תהליך בהמתנה={row[3].strip()}, בקשה= {des_request_heb}", "info", is_hebrew=True)
                     else:
+                        
                         log_and_print(f"תהליך הושלם={row[3].strip()}, בקשה= {des_request_heb}", "info", is_hebrew=True)    
+                    """
                 except Exception as e:
                     log_and_print(f"Error processing ProcessStepID {row[0]}: {e}", "error", BOLD_RED)
 
