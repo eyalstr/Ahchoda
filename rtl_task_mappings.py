@@ -62,6 +62,8 @@ decision_type_mapping = {
     53: normalize_hebrew("אישור"),
     57: normalize_hebrew("החזרה לרשות"),
     58: normalize_hebrew("כתב תשובה / הגנה"),
+    59: normalize_hebrew("איחוד תיקים"),
+    60: normalize_hebrew("שינוי מותב"),
     70: normalize_hebrew("החלטה על קביעת / שינוי / ביטול דיון"),
     71: normalize_hebrew("הפצת פרוטוקול דיון"),
     72: normalize_hebrew("החלטה בפשרה"),
