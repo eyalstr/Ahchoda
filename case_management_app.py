@@ -176,10 +176,10 @@ def display_menu():
     print(f"2. {normalize_hebrew('החלטות בתיק/בבקשה')}")
     print(f"3. {normalize_hebrew('מסמכים בתיק')}")
     print(f"4. {normalize_hebrew('תהליכים בתיק')}")
-    print(f"5. {normalize_hebrew('שולחן עבודה דיין')}")
+   # print(f"5. {normalize_hebrew('שולחן עבודה דיין')}")
   #  print(f"6. {normalize_hebrew('משימות למזכירה בתיק')}")
   #  print(f"7. {normalize_hebrew('מטלות בתיק')}")
-    print(f"6. {normalize_hebrew('יציאה')}")
+    print(f"5. {normalize_hebrew('יציאה')}")
 
     try:
         choice = int(input(f"Enter your choice: "))
@@ -391,9 +391,9 @@ if __name__ == "__main__":
                     #execute_sql_process_queries(server_name, database_name, user_name, password, process_ids)
                     execute_sql_all_processes(server_name, database_name, user_name, password, process_ids)
             
-            # .elif choice == 5:
-            #     log_and_print(f"\n##########-- שולחן עבודה דיין  --##########", is_hebrew=True)
-            #     judge_data = fetch_judge_data()
+            elif choice == 6:
+                log_and_print(f"\n##########-- שולחן עבודה דיין  --##########", is_hebrew=True)
+                judge_data = fetch_judge_data()
 
             #     if not judge_data:
             #         log_and_print(f"אין מידע במודול משימות", is_hebrew=True)
@@ -478,7 +478,7 @@ if __name__ == "__main__":
             #         if not IsOtherTask:
             #             log_and_print(f"אין מטלות בתיק", "warning", is_hebrew=True)   
             
-            elif choice == 6:
+            elif choice == 5:
                 log_and_print("Exiting application.", "info")
                 break
 

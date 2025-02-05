@@ -306,6 +306,7 @@ def execute_sql_all_processes(server_name, database_name, user_name, password, p
             f"PWD={password};"
             f"Trusted_Connection=yes;"
         )
+        
         cursor = connection.cursor()
         log_and_print("Connection to SQL Server established successfully.\n", "info", BOLD_GREEN)
 
