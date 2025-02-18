@@ -26,6 +26,7 @@ def load_configuration():
     Dynamically load the .env file located in the same directory as the executable.
     """
     import sys
+
     # Determine the directory of the current executable or script
     if getattr(sys, 'frozen', False):  # Check if running as an executable
         base_dir = os.path.dirname(sys.executable)
@@ -37,18 +38,21 @@ def load_configuration():
 
     # Load the .env file
     if os.path.exists(env_path):
-        load_dotenv(env_path)
-        print(f"Loaded configuration from {env_path}")
+        load_dotenv(env_path, override=True)  # Force override of existing variables
+        print(f"✅ Loaded configuration from {env_path}")
     else:
-        print(f"Configuration file not found at {env_path}. Please provide a .env file.")
+        print(f"❌ Configuration file not found at {env_path}. Please provide a .env file.")
         exit(1)
 
     required_env_vars = ["MONGO_CONNECTION_STRING", "DB_SERVER", "DB_NAME", "DB_USER", "DB_PASS"]
 
     for var in required_env_vars:
-        if not os.getenv(var):
-            print(f"Error: Missing required environment variable: {var}")
+        value = os.getenv(var)
+        if not value:
+            print(f"❌ Error: Missing required environment variable: {var}")
             exit(1)
+        else:
+            print(f"✅ Loaded {var} = {value}")  # **Debugging step**
 
 def set_temporary_console_font():
     """
@@ -345,6 +349,7 @@ if __name__ == "__main__":
         user_name = os.getenv("DB_USER")
         password = os.getenv("DB_PASS")
 
+        log_and_print(f"server name={server_name}")
         # Connect to MongoDB
         mongo_client, db = connect_to_mongodb(mongo_connection_string)
         if db is None:

@@ -237,7 +237,8 @@ def check_assignments_for_decisions(decisions_list: List[Dict[str, Any]], server
                     
                     # Hebrew translation of decision type
                     des_heb = normalize_hebrew(decision_type_mapping.get(sub_value, "Unknown Status"))
-                    log_and_print(f"Checking latest Decision ID: {decision_id} for sub_value: {sub_value} ({des_heb})",is_hebrew=True)
+                    log_and_print(f"")
+                    log_and_print(f"החלטה: {decision_id}, מטלה:({des_heb})",is_hebrew=True)
 
                     # Execute the query with the decision_id and dynamically determined assignment_id
                     cursor.execute(sql_query, decision_id, assignment_id)
