@@ -1,11 +1,12 @@
 import requests
 import os
 from dotenv import load_dotenv
-from logging_utils import log_and_print
+from logging_utils import log_and_print,normalize_hebrew
 import urllib3
 import json  # Import json module
 from datetime import datetime
 from typing import List, Dict, Any, Optional
+from rtl_task_mappings import decision_type_mapping
 
 
 # Disable InsecureRequestWarning
@@ -225,7 +226,7 @@ def check_assignments_for_decisions(decisions_list: List[Dict[str, Any]], server
             # For each decision, check the latest decision based on the sub_value
             for decision_item in decisions_list:
                 for sub_value, decision_id in decision_item.items():
-                    log_and_print(f"Checking latest Decision ID: {decision_id} for sub_value: {sub_value}")
+                    #log_and_print(f"Checking latest Decision ID: {decision_id} for sub_value: {sub_value}")
 
                     # Proceed only if sub_value is 29 or 30
                     if sub_value == 29 or sub_value == 31:
@@ -234,18 +235,19 @@ def check_assignments_for_decisions(decisions_list: List[Dict[str, Any]], server
                         assignment_id = 2
                     else:
                         # Skip this iteration if sub_value is not 29 or 30
-                        log_and_print(f"Skipping invalid sub_value: {sub_value} for Decision ID: {decision_id}", "warning", is_hebrew=True)
+                        #log_and_print(f"Skipping invalid sub_value: {sub_value} for Decision ID: {decision_id}", "warning", is_hebrew=True)
                         continue  # Skip to the next decision_item
-
+                    des_heb = normalize_hebrew(decision_type_mapping.get(sub_value, "Unknown Status"))
+                                            
                     # Execute the query with the decision_id and dynamically determined assignment_id
                     cursor.execute(sql_query, decision_id, assignment_id)
                     assignment = cursor.fetchall()
 
                     if assignment:
                         # If the assignment exists, log it as active
-                        log_and_print(f"מטלה פעילה - Decision ID: {decision_id} Assignment ID: {assignment_id}", is_hebrew=True)
+                        log_and_print(f"נמצאה מטלה פעילה עבור {des_heb} ", is_hebrew=True)
                     else:
-                        log_and_print(f"לא נמצאה מטלה פעילה עבור Decision ID: {decision_id} Assignment ID: {assignment_id}", is_hebrew=True)
+                        log_and_print(f"לא נמצאה מטלה פעילה עבור : {des_heb}", is_hebrew=True)
 
         except Exception as e:
             log_and_print(f"Error querying request status for decisions: {e}", "error", is_hebrew=True)
