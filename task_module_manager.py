@@ -192,6 +192,7 @@ def check_assignments_for_decisions(decisions_list: List[Dict[str, Any]], server
     For each decision item in the list, run a SQL query to check if an assignment exists
     with matching Decision_Id and Assignment_Type_Id based on the value of sub_value.
     Only sub_value 29 and 30 are checked; others are skipped.
+    We validate only the latest decision for each sub_value.
     """
 
     try:
@@ -223,31 +224,30 @@ def check_assignments_for_decisions(decisions_list: List[Dict[str, Any]], server
         """
 
         try:
-            # For each decision, check the latest decision based on the sub_value
-            for decision_item in decisions_list:
-                for sub_value, decision_id in decision_item.items():
-                    #log_and_print(f"Checking latest Decision ID: {decision_id} for sub_value: {sub_value}")
+            # Iterate over the decisions list to check for each sub_value
+            for sub_value in [29, 30]:  # Only check sub_value 29 and 30
+                # Get all the decisions for this sub_value from the sorted list
+                filtered_decisions = [d for d in decisions_list if list(d.keys())[0] == sub_value]
 
-                    # Proceed only if sub_value is 29 or 30
-                    if sub_value == 29 or sub_value == 31:
-                        assignment_id = 1
-                    elif sub_value == 30:
-                        assignment_id = 2
-                    else:
-                        # Skip this iteration if sub_value is not 29 or 30
-                        #log_and_print(f"Skipping invalid sub_value: {sub_value} for Decision ID: {decision_id}", "warning", is_hebrew=True)
-                        continue  # Skip to the next decision_item
+                if filtered_decisions:
+                    # Get the latest decision for the sub_value (first item due to sorting)
+                    latest_decision = filtered_decisions[0]
+                    decision_id = list(latest_decision.values())[0]
+                    assignment_id = 1 if sub_value == 29 else 2  # Assignment ID based on sub_value
+                    
+                    # Hebrew translation of decision type
                     des_heb = normalize_hebrew(decision_type_mapping.get(sub_value, "Unknown Status"))
-                                            
+                    log_and_print(f"Checking latest Decision ID: {decision_id} for sub_value: {sub_value} ({des_heb})",is_hebrew=True)
+
                     # Execute the query with the decision_id and dynamically determined assignment_id
                     cursor.execute(sql_query, decision_id, assignment_id)
                     assignment = cursor.fetchall()
 
                     if assignment:
                         # If the assignment exists, log it as active
-                        log_and_print(f"נמצאה מטלה פעילה עבור {des_heb} ", is_hebrew=True)
+                        log_and_print(f"נמצאה מטלה פעילה עבור {des_heb}", is_hebrew=True)
                     else:
-                        log_and_print(f"לא נמצאה מטלה פעילה עבור : {des_heb}", is_hebrew=True)
+                        log_and_print(f"לא נמצאה מטלה פעילה עבור: {des_heb}", is_hebrew=True)
 
         except Exception as e:
             log_and_print(f"Error querying request status for decisions: {e}", "error", is_hebrew=True)
