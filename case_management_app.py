@@ -51,8 +51,7 @@ def load_configuration():
         if not value:
             print(f"❌ Error: Missing required environment variable: {var}")
             exit(1)
-        else:
-            print(f"✅ Loaded {var} = {value}")  # **Debugging step**
+        
 
 def set_temporary_console_font():
     """
@@ -349,7 +348,6 @@ if __name__ == "__main__":
         user_name = os.getenv("DB_USER")
         password = os.getenv("DB_PASS")
 
-        log_and_print(f"server name={server_name}")
         # Connect to MongoDB
         mongo_client, db = connect_to_mongodb(mongo_connection_string)
         if db is None:
