@@ -208,7 +208,12 @@ def parse_requests_by_case_id(case_id: str, db: Database) -> None:
                                 
             else:
                 log_and_print("RequestLeadingStatuses: None or invalid format", "info", BOLD_RED, is_hebrew=True, indent=4)
-        return statuses_with_null_end_date[0]
+                # Ensure that statuses_with_null_end_date is not empty or None
+        if statuses_with_null_end_date and len(statuses_with_null_end_date) > 0:
+            return statuses_with_null_end_date[0]
+        else:
+            log_and_print("No valid status found in statuses_with_null_end_date. Returning None.", "warning", BOLD_YELLOW, is_hebrew=True)
+            return None  # Or another default value if needed
     except Exception as e:
         log_and_print(f"Error processing case document for Case ID {case_id}: {e}", "error", BOLD_RED, is_hebrew=True)
 
@@ -244,7 +249,7 @@ def main():
 
         if main_hachoda_Status[1] == main_menora_heb:
             # Do something with the case when statuses differ
-            pass
+            log_and_print(f"בתיק {case_id} ==> מצב תיק ={main_hachoda_Status[1]} תקין", is_hebrew=True)
         else:
             log_and_print(f"בתיק {case_id} ==> מצב תיק באחודה={main_hachoda_Status[1]} , מצב תיק במנורה={main_menora_heb}", is_hebrew=True)
 
