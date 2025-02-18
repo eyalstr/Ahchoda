@@ -8,6 +8,7 @@ from pymongo import MongoClient
 from request_status_mapping import request_status_mapping,request_type_mapping  # Import the mapping
 from logging_utils import log_and_print, BOLD_YELLOW, BOLD_GREEN, BOLD_RED, normalize_hebrew, logger
 from pymongo.database import Database
+import pandas as pd
 
 # Set up logging
 logging.basicConfig(
@@ -220,7 +221,7 @@ def parse_requests_by_case_id(case_id: str, db: Database) -> None:
 
 def main():
     load_configuration()
-
+    case_data_to_pd = []
     # Connect to databases
     mongo_client, db = connect_to_mongodb()
     if db is None:
@@ -249,9 +250,36 @@ def main():
 
         if main_hachoda_Status[1] == main_menora_heb:
             # Do something with the case when statuses differ
-            log_and_print(f"בתיק {case_id} ==> מצב תיק ={main_hachoda_Status[1]} תקין", is_hebrew=True)
+            case_data_to_pd.append({
+                "מצב אחודה": main_hachoda_Status[1],
+                "מצב מנורה": main_menora_heb,
+                "סטטוס תאימות": "תקין",
+                "מספר תיק": case_id,  # Add case ID as the "מספר תיק" column
+            })
+            log_and_print(f"בתיק {case_id} ==> מצב תיק ={main_hachoda_Status[1]}=> תקין", is_hebrew=True)
+
         else:
+            case_data_to_pd.append({
+                "מצב אחודה": main_hachoda_Status[1],
+                "מצב מנורה": main_menora_heb,
+                "סטטוס תאימות": "לא תקין",
+                "מספר תיק": case_id,  # Add case ID as the "מספר תיק" column
+            })
+
             log_and_print(f"בתיק {case_id} ==> מצב תיק באחודה={main_hachoda_Status[1]} , מצב תיק במנורה={main_menora_heb}", is_hebrew=True)
+        
+          
+    # Create a DataFrame from the collected case data
+    if case_data_to_pd:
+        df = pd.DataFrame(case_data_to_pd)
+        log_and_print(f"Exporting {len(case_data_to_pd)} rows to Excel.", "info", BOLD_GREEN, is_hebrew=True)
+        # Write the DataFrame to an Excel file
+        excel_file = 'convertion_report.xlsx'
+        df.to_excel(excel_file, index=False, engine='openpyxl')
+
+        print(f"Data has been successfully exported to {excel_file}")
+    else:
+        log_and_print("No data was collected for export.", "info", BOLD_RED, is_hebrew=True)
 
     # Close connections
     cursor.close()
