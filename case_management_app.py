@@ -397,15 +397,17 @@ if __name__ == "__main__":
                 log_and_print(f"\n##########-- מטלות בתיק  --##########", is_hebrew=True)
                 
                 decisions_list = fetch_decisions_by_case_id(case_id, db)
+                log_and_print(f"decision_list={decisions_list}")
+
                 # Call the function with required arguments
                 check_assignments_for_decisions(decisions_list, server_name, database_name, user_name, password)
-                #log_and_print(f"מספר החלטות בתיק הוא :{results}",is_hebrew=True)
+                log_and_print(f"מספר החלטות בתיק הוא :{len(decisions_list)}",is_hebrew=True)
                 if decisions_list:
                     log_and_print(f"\nניתוח מטלות הושלם", is_hebrew=True)
                 else:
                     log_and_print(f"לא נמצאו מטלות בתיק", is_hebrew=True)
 
-                  
+                break   
             elif choice == 6:
                 log_and_print("Exiting application.", "info")
                 break
