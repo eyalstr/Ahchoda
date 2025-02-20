@@ -8,7 +8,7 @@ from decision_data_manager import fetch_decisions_and_documents_by_case_id
 from request_data_manager import parse_requests_by_case_id
 from logging_utils import log_and_print, normalize_hebrew, BOLD_YELLOW, BOLD_GREEN, BOLD_RED
 from colorama import init, Fore, Style
-from task_module_manager import fetch_decisions_by_case_id,check_assignments_for_decisions
+from task_module_manager import fetch_decisions_by_case_id,check_assignments_for_decisions,fetch_tasks_by_case
 import os
 
 # Initialize colorama
@@ -408,6 +408,9 @@ if __name__ == "__main__":
                     log_and_print(f"לא נמצאו מטלות בתיק", is_hebrew=True)
 
                 break   
+            elif choice == 7:
+                tasks= fetch_tasks_by_case(case_id)
+                log_and_print(f"tasks={tasks}")
             elif choice == 6:
                 log_and_print("Exiting application.", "info")
                 break

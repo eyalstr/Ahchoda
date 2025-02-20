@@ -26,61 +26,139 @@ if not BASE_URL:
     log_and_print("Error: BASE_URL is not set in the .env file.")
     exit(1)
 
-# API Configuration
-PARAMS = {
-    "User": USERNAME,  # Use the USERNAME environment variable here
-    "RoleId": "5",
-    "TaskStatusIds": "1,2",  # Updated for multiple TaskStatusIds
-    "OfficeIds": "802",
-    "ScreenTypeId": "11"
-}
+# # API Configuration
+# PARAMS = {
+#     "User": USERNAME,  # Use the USERNAME environment variable here
+#     "RoleId": "5",
+#     "TaskStatusIds": "1,2",  # Updated for multiple TaskStatusIds
+#     "OfficeIds": "802",
+#     "ScreenTypeId": "11"
+# }
 
-HEADERS = {
-    "Accept": "application/json, text/plain, */*",
-    "Accept-Encoding": "gzip, deflate, br, zstd",
-    "Accept-Language": "he,en;q=0.9,en-GB;q=0.8,en-US;q=0.7",
-    "Authorization": f"Bearer {BEARER_TOKEN}"
-}
+# HEADERS = {
+#     "Accept": "application/json, text/plain, */*",
+#     "Accept-Encoding": "gzip, deflate, br, zstd",
+#     "Accept-Language": "he,en;q=0.9,en-GB;q=0.8,en-US;q=0.7",
+#     "Authorization": f"Bearer {BEARER_TOKEN}"
+# }
 
-def fetch_judge_data():
+# def fetch_judge_data():
+#     """
+#     Fetches task data from the specified API using Bearer token authentication.
+#     Returns parsed JSON data.
+#     """
+#     if not USERNAME or not PASSWORD or not BEARER_TOKEN:
+#         log_and_print("Error: Credentials or Bearer token are missing. Please check the .env file.")
+#         return None
+#     # if DUMMY:
+#     #     try:
+#     #         # Parse the string into a dictionary
+#     #         data = json.loads(DUMMY)  # Ensure this is a valid JSON
+#     #         print("Fetched Data:", data)
+#     #     except json.JSONDecodeError as e:
+#     #         print(f"Failed to parse JSON: {e}")
+#     # else:
+#     #     print("DUMMY_JSON_RESPONSE is not set in the .env file.")
+
+#     try:
+#         response = requests.get(BASE_URL, headers=HEADERS, params=PARAMS, verify=False)  # Disable SSL verification
+#         response.raise_for_status()  # Raises an error for 4xx and 5xx responses
+
+#         log_and_print(f"Status Code: {response.status_code}")
+        
+#         #Ensure it's JSON and return parsed data
+#         if response.headers.get("Content-Type", "").startswith("application/json"):
+#             data = json.loads(response.content)  # Parse the string to a dictionary
+#             #log_and_print("Fetched Data:", data)
+
+#             # Now that we have the data, let's extract the necessary information
+#             drafts_total = data.get("draftsTotal", 0)
+#             all_tasks_total = data.get("allTasksTotal", 0)
+#             totals = data.get("totals", [])
+
+#             log_and_print(f"Drafts Total: {drafts_total}")
+#             log_and_print(f"All Tasks Total: {all_tasks_total}")
+
+#             # Mapping for tabTypeId to corresponding Hebrew text
+#             tab_type_mapping = {
+#                 1: "תיקים בעיון ראשוני",
+#                 2: "בקשות",
+#                 3: "תגובות",
+#                 4: "תגובות בחריגה",
+#                 5: "החלטות ופרוטוקול",
+#                 6: "ממתינים לפסק דין",
+#                 7: "משימות בטיוטה"
+#             }
+
+#             for tab in totals:
+#                 tab_type_id = tab.get("tabTypeId")
+#                 total = tab.get("total")
+
+#                 # Fetch the Hebrew text based on the tab_type_id
+#                 tab_type_text = tab_type_mapping.get(tab_type_id, "Unknown Type")
+                
+#                 log_and_print(f"TabTypeId {tab_type_id} ({tab_type_text}) has total: {total}", is_hebrew=True)
+
+#         else:
+#             log_and_print("Unexpected Response Format:", response.text)
+#             return None
+
+#     except requests.exceptions.RequestException as e:
+#         log_and_print(f"Request failed: {e}")
+#         log_and_print(f"Response Content: {response.text if 'response' in locals() else 'No response content'}")
+#         return None
+
+def fetch_tasks_by_case(case_id):
     """
     Fetches task data from the specified API using Bearer token authentication.
-    Returns parsed JSON data.
+    Returns parsed JSON data, including the list of tasks.
     """
-    if not USERNAME or not PASSWORD or not BEARER_TOKEN:
-        log_and_print("Error: Credentials or Bearer token are missing. Please check the .env file.")
+    # Ensure the required environment variables (credentials and token) are available
+    if not BEARER_TOKEN:
+        log_and_print("Error: Bearer token is missing. Please check the .env file.")
         return None
-    # if DUMMY:
-    #     try:
-    #         # Parse the string into a dictionary
-    #         data = json.loads(DUMMY)  # Ensure this is a valid JSON
-    #         print("Fetched Data:", data)
-    #     except json.JSONDecodeError as e:
-    #         print(f"Failed to parse JSON: {e}")
-    # else:
-    #     print("DUMMY_JSON_RESPONSE is not set in the .env file.")
+
+    # Define the API endpoint URL with the necessary query parameters
+    url = f"https://bo-casemanagement-qa.devqa.k8s.justice.gov.il/api/DesktopTasks"
+    
+    # Set up parameters for the GET request
+    params = {
+        "RoleId": "null",  # Example, change if needed
+        "TaskTypeIds": [3, 4, 6, 7, 8, 9, 10, 11, 12, 14, 15, 16, 26],  # Example list of TaskTypeIds
+        "TaskStatusIds": [1, 2],  # Example list of TaskStatusIds
+        "CaseId": case_id,
+        "OfficeIds": 802  # Example, adjust as necessary
+    }
+    
+    # Set the headers including the Bearer token for authentication
+    headers = {
+        "Authorization": f"Bearer {BEARER_TOKEN}",
+        "Content-Type": "application/json"
+    }
+    log_and_print(f"Using Bearer Token: {BEARER_TOKEN}")
 
     try:
-        response = requests.get(BASE_URL, headers=HEADERS, params=PARAMS, verify=False)  # Disable SSL verification
+        # Make the GET request to the API
+        response = requests.get(url, headers=headers, params=params, verify=False)  # Disable SSL verification if needed
         response.raise_for_status()  # Raises an error for 4xx and 5xx responses
 
         log_and_print(f"Status Code: {response.status_code}")
         
-        #Ensure it's JSON and return parsed data
+        # Ensure the response is in JSON format
         if response.headers.get("Content-Type", "").startswith("application/json"):
-            data = json.loads(response.content)  # Parse the string to a dictionary
-            #log_and_print("Fetched Data:", data)
+            data = response.json()  # Directly parse the JSON content
 
-            # Now that we have the data, let's extract the necessary information
+            # Log some key info from the response
             drafts_total = data.get("draftsTotal", 0)
             all_tasks_total = data.get("allTasksTotal", 0)
             totals = data.get("totals", [])
+            tasks = data.get("tasks", [])  # Assuming the tasks are located here, adjust as needed
 
             log_and_print(f"Drafts Total: {drafts_total}")
             log_and_print(f"All Tasks Total: {all_tasks_total}")
 
-            # Mapping for tabTypeId to corresponding Hebrew text
-            tab_type_mapping = {
+            # Mapping for task types to corresponding Hebrew text
+            task_type_mapping = {
                 1: "תיקים בעיון ראשוני",
                 2: "בקשות",
                 3: "תגובות",
@@ -90,14 +168,18 @@ def fetch_judge_data():
                 7: "משימות בטיוטה"
             }
 
+            # Iterate over each item in totals and log the relevant info
             for tab in totals:
                 tab_type_id = tab.get("tabTypeId")
                 total = tab.get("total")
 
-                # Fetch the Hebrew text based on the tab_type_id
-                tab_type_text = tab_type_mapping.get(tab_type_id, "Unknown Type")
+                # Fetch the Hebrew text based on the task_type_id
+                tab_type_text = task_type_mapping.get(tab_type_id, "Unknown Type")
                 
                 log_and_print(f"TabTypeId {tab_type_id} ({tab_type_text}) has total: {total}", is_hebrew=True)
+
+            # Return the tasks list, in case you want to process or use it later
+            return tasks
 
         else:
             log_and_print("Unexpected Response Format:", response.text)
@@ -107,7 +189,7 @@ def fetch_judge_data():
         log_and_print(f"Request failed: {e}")
         log_and_print(f"Response Content: {response.text if 'response' in locals() else 'No response content'}")
         return None
-
+    
 def fetch_decisions_by_case_id(case_id: str, db) -> List[Dict[str, Any]]:
     """
     Fetch Decisions from MongoDB for a given Case ID (_id).
