@@ -13,14 +13,19 @@ from rtl_task_mappings import decision_type_mapping
 urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
 
 # Load environment variables from .env file
-load_dotenv()
+
+#load_dotenv()  # Load the environment variables
+
+BEARER_TOKEN = os.getenv("BEARER_TOKEN")
+log_and_print(f"\nBEARER_TOKEN:, {BEARER_TOKEN}")  # Add this to verify the token is loaded
 
 # Read credentials securely from environment variables
 USERNAME = os.getenv("USERNAME")  # Fetch username from .env file
 PASSWORD = os.getenv("DB_PASS")
-BEARER_TOKEN = os.getenv("BEARER_TOKEN")
+#BEARER_TOKEN = os.getenv("BEARER_TOKEN")
 BASE_URL = os.getenv("BASE_URL")  # Fetch the base URL from .env file
 DUMMY = os.getenv("DUMMY_JSON_RESPONSE")
+#BEARER_TOKEN = "eyJ0eXAiOiJKV1QiLCJhbGciOiJSUzI1NiIsIng1dCI6ImltaTBZMnowZFlLeEJ0dEFxS19UdDVoWUJUayIsImtpZCI6ImltaTBZMnowZFlLeEJ0dEFxS19UdDVoWUJUayJ9.eyJhdWQiOiJhcGk6Ly9lM2JhOTkwNi02YzJiLTQyMTQtYjhjMC0zNzc3MTJjZTcwMGUiLCJpc3MiOiJodHRwczovL3N0cy53aW5kb3dzLm5ldC9jZTM3YjEyNC04OTU5LTQzMzItYjc3Zi0yNzE0M2MzNTk2MTAvIiwiaWF0IjoxNzQwMDI0NTUwLCJuYmYiOjE3NDAwMjQ1NTAsImV4cCI6MTc0MDAyOTY5OCwiYWNyIjoiMSIsImFpbyI6IkFWUUFxLzhaQUFBQW41OXM2V0E0MmJ6eXZuMFRNL0pGblEvemJjNEhyZHErN3VzQ25YMWhpNGRIUU1RUFNLdjdBeHN2Yk8vOFk0NWZlNFJ5NW9HMW5ta0NBaXlMR3hFRExVSUQzaTVBMmw4NG5yZERpUGgvT3A0PSIsImFtciI6WyJwd2QiLCJyc2EiLCJtZmEiXSwiYXBwaWQiOiJlM2JhOTkwNi02YzJiLTQyMTQtYjhjMC0zNzc3MTJjZTcwMGUiLCJhcHBpZGFjciI6IjAiLCJkZXZpY2VpZCI6ImE5YzJmYjFmLWFmNTYtNGM0NC04ZmE5LTBiMzQyMDVhMmQyZSIsImZhbWlseV9uYW1lIjoi16nXmNeo15DXldehIiwiZ2l2ZW5fbmFtZSI6IteQ15nXnCIsImlwYWRkciI6IjE0Ny4yMzcuNzAuMTQ3IiwibmFtZSI6IkV5YWwgU3RyYXVzcyIsIm9pZCI6IjU0YWJhNTYxLTY5YmUtNGMyZS1iMDY2LTM4NDkwNWUzNTEzNyIsIm9ucHJlbV9zaWQiOiJTLTEtNS0yMS04MDY0NjgtMzYwOTExNjM4LTE3MDA5NTA1ODAtNTk3Mjk1MDIiLCJyaCI6IjEuQVVnQUpMRTN6bG1KTWtPM2Z5Y1VQRFdXRUFhWnV1TXJiQlJDdU1BM2R4TE9jQTVJQU1OSUFBLiIsInNjcCI6Im1vai1hei1hci1lY291cnRzIiwic2lkIjoiMDAxZmViZjktZTA0OC03NGE2LTkxZTctYjNiNzM3OGZmYWZlIiwic3ViIjoiTGF1SW01dng5UUdVa1RjRElwVGdjejZlY0VRbHdJQVlScmpOQzR4YXZiOCIsInRpZCI6ImNlMzdiMTI0LTg5NTktNDMzMi1iNzdmLTI3MTQzYzM1OTYxMCIsInVuaXF1ZV9uYW1lIjoiRXlhbFN0QGp1c3RpY2UuZ292LmlsIiwidXBuIjoiRXlhbFN0QGp1c3RpY2UuZ292LmlsIiwidXRpIjoiMXlnRzJFczg0a2E4dTBTcnVqRjdBQSIsInZlciI6IjEuMCJ9.mM-eQRseFof1GGJux97jQkSctltO6oArY47wIMULn4BJb0xaCDfbZ4TtvYQpEDwlhtIIqrydtKFsPAtR6j3dlEelsYH3CJtlOGIx6YaFw-WKPqoh_1Ecq1St5xaoTYtl3-ec40ZNGTISPV3AJShMzL3iClyE8JDddoW6G0SQTMwYmuDZn0LOVpjz1-p3Pqhqj2uD5LgCeh3o8GiL08ES6PdrPhZNCMyqlBWFSKnG0RLWGq7klYMrkMHsBijwVQWofCUI2zTlUTSanFTvHeaqNQRSBJN1sUKMo0IyxrvuujVyUWbomrkr6regi8ymP1g-TG6jI98GGTgQKWMF27q-Pw"
 
 if not BASE_URL:
     log_and_print("Error: BASE_URL is not set in the .env file.")
@@ -308,14 +313,17 @@ def check_assignments_for_decisions(decisions_list: List[Dict[str, Any]], server
         try:
             # Iterate over the decisions list to check for each sub_value
             for sub_value in [29, 30, 31, 58]:  # Check sub_value 29, 30, 31, and 58
-                # Get all the decisions for this sub_value from the sorted list
+                # Get all the decisions for this sub_value
                 filtered_decisions = [d for d in decisions_list if list(d.keys())[0] == sub_value]
 
                 if filtered_decisions:
-                    # Get the latest decision for the sub_value (first item due to sorting)
+                    # Sort the filtered decisions by the decision_id in descending order
+                    filtered_decisions.sort(key=lambda d: list(d.values())[0], reverse=True)
+
+                    # Get the latest decision (first item after sorting by decision_id)
                     latest_decision = filtered_decisions[0]
                     decision_id = list(latest_decision.values())[0]
-                    
+
                     # Determine the assignment_id based on sub_value
                     if sub_value == 29:
                         assignment_ids = [1]
