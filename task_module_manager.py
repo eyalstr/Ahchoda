@@ -1,5 +1,6 @@
 import requests
 import os
+from config import load_configuration
 from dotenv import load_dotenv
 from logging_utils import log_and_print,normalize_hebrew
 import urllib3
@@ -14,10 +15,10 @@ urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
 
 # Load environment variables from .env file
 
-#load_dotenv()  # Load the environment variables
+load_dotenv()  # Load the environment variables
+load_configuration()
 
 BEARER_TOKEN = os.getenv("BEARER_TOKEN")
-log_and_print(f"\nBEARER_TOKEN:, {BEARER_TOKEN}")  # Add this to verify the token is loaded
 
 # Read credentials securely from environment variables
 USERNAME = os.getenv("USERNAME")  # Fetch username from .env file
@@ -112,7 +113,6 @@ if not BASE_URL:
 #         log_and_print(f"Request failed: {e}")
 #         log_and_print(f"Response Content: {response.text if 'response' in locals() else 'No response content'}")
 #         return None
-
 def fetch_tasks_by_case(case_id):
     """
     Fetches task data from the specified API using Bearer token authentication.
@@ -183,6 +183,23 @@ def fetch_tasks_by_case(case_id):
                 
                 log_and_print(f"TabTypeId {tab_type_id} ({tab_type_text}) has total: {total}", is_hebrew=True)
 
+            # Now parsing and counting taskDetails for each task
+            for task in tasks:
+                task_details = task.get("taskDetails", {})
+                
+                if task_details:  # Check if taskDetails exists and is not empty
+                    task_type_id = task_details.get("taskTypeId", "Unknown Type")
+                    task_title = task_details.get("taskTypeDescription", "No Title")
+                    task_status = task_details.get("status", "Unknown Status")
+                    task_due_date = task_details.get("dueDate", "No Due Date")
+                    task_assigned_to = task_details.get("assignUserNameForDisplay", "Not Assigned")
+
+                    log_and_print(f"Task Type: {task_type_id} - {task_title}, Status: {task_status}, Due Date: {task_due_date}, Assigned to: {task_assigned_to}")
+                    
+                    # Count the tasks by case and task type
+                    task_count = len(task_details.get("taskDetails", []))
+                    log_and_print(f"Task Details Count: {task_count}")
+
             # Return the tasks list, in case you want to process or use it later
             return tasks
 
@@ -194,6 +211,7 @@ def fetch_tasks_by_case(case_id):
         log_and_print(f"Request failed: {e}")
         log_and_print(f"Response Content: {response.text if 'response' in locals() else 'No response content'}")
         return None
+
     
 def fetch_decisions_by_case_id(case_id: str, db) -> List[Dict[str, Any]]:
     """

@@ -1,5 +1,6 @@
 
 import ctypes
+from config import load_configuration
 from pymongo import MongoClient
 from dotenv import load_dotenv
 from process_data_manager import execute_sql_process_queries, fetch_process_ids_by_case_id_sorted,execute_sql_process_tasks,execute_sql_all_processes
@@ -21,37 +22,37 @@ BOLD_RED = Fore.RED + Style.BRIGHT
 RESET = Style.RESET_ALL
 
 
-def load_configuration():
-    """
-    Dynamically load the .env file located in the same directory as the executable.
-    """
-    import sys
+# def load_configuration():
+#     """
+#     Dynamically load the .env file located in the same directory as the executable.
+#     """
+#     import sys
 
-    # Determine the directory of the current executable or script
-    if getattr(sys, 'frozen', False):  # Check if running as an executable
-        base_dir = os.path.dirname(sys.executable)
-    else:  # Running as a Python script
-        base_dir = os.path.dirname(os.path.abspath(__file__))
+#     # Determine the directory of the current executable or script
+#     if getattr(sys, 'frozen', False):  # Check if running as an executable
+#         base_dir = os.path.dirname(sys.executable)
+#     else:  # Running as a Python script
+#         base_dir = os.path.dirname(os.path.abspath(__file__))
 
-    # Path to the .env file
-    env_path = os.path.join(base_dir, '.env')
+#     # Path to the .env file
+#     env_path = os.path.join(base_dir, '.env')
 
-    # Load the .env file
-    if os.path.exists(env_path):
-        load_dotenv(env_path, override=True)  # Force override of existing variables
-        print(f"✅ Loaded configuration from {env_path}")
-    else:
-        print(f"❌ Configuration file not found at {env_path}. Please provide a .env file.")
-        exit(1)
+#     # Load the .env file
+#     if os.path.exists(env_path):
+#         load_dotenv(env_path, override=True)  # Force override of existing variables
+#         print(f"✅ Loaded configuration from {env_path}")
+#     else:
+#         print(f"❌ Configuration file not found at {env_path}. Please provide a .env file.")
+#         exit(1)
 
-    required_env_vars = ["MONGO_CONNECTION_STRING", "DB_SERVER", "DB_NAME", "DB_USER", "DB_PASS"]
+#     required_env_vars = ["BEARER_TOKEN","MONGO_CONNECTION_STRING", "DB_SERVER", "DB_NAME", "DB_USER", "DB_PASS"]
 
-    for var in required_env_vars:
-        value = os.getenv(var)
-        if not value:
-            print(f"❌ Error: Missing required environment variable: {var}")
-            exit(1)
-        
+#     for var in required_env_vars:
+#         value = os.getenv(var)
+#         if not value:
+#             print(f"❌ Error: Missing required environment variable: {var}")
+#             exit(1)
+#         log_and_print(f"\n{var}:{value}")
 
 def set_temporary_console_font():
     """
@@ -336,7 +337,7 @@ if __name__ == "__main__":
         set_temporary_console_font()
         
         # Load environment variables
-        #load_dotenv()
+        load_dotenv()
         load_configuration()
 
         # MongoDB connection string
@@ -347,7 +348,8 @@ if __name__ == "__main__":
         database_name = os.getenv("DB_NAME")
         user_name = os.getenv("DB_USER")
         password = os.getenv("DB_PASS")
-
+        bearer = os.getenv("BEARER_TOKEN")
+        log_and_print(f"BEARER in main case={bearer}")
         # Connect to MongoDB
         mongo_client, db = connect_to_mongodb(mongo_connection_string)
         if db is None:
@@ -411,6 +413,7 @@ if __name__ == "__main__":
             elif choice == 7:
                 tasks= fetch_tasks_by_case(case_id)
                 log_and_print(f"tasks={tasks}")
+                break
             elif choice == 6:
                 log_and_print("Exiting application.", "info")
                 break
