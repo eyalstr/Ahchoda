@@ -144,7 +144,10 @@ def fetch_tasks_by_case(case_id):
 
         if response.headers.get("Content-Type", "").startswith("application/json"):
             data = response.json()
-            log_and_print(data)
+            #log_and_print(data)
+            # Count and print the number of tasks
+            num_tasks = len(data)
+            log_and_print(f"מספר משימות הוא: {num_tasks}", is_hebrew=True)
             for task in data:
                 task_details = task.get("taskDetails")
                 if isinstance(task_details, dict):
@@ -155,7 +158,7 @@ def fetch_tasks_by_case(case_id):
                     task_due_date = task_details.get("dueDate", "No Due Date")
                     task_assigned_to = task_details.get("assignUserNameForDisplay", "Not Assigned") 
 
-                    log_and_print(f"Task Type: {task_type_id} - {task_title}, Status: {task_status}, Due Date: {task_due_date}, Assigned to: {task_assigned_to}",is_hebrew=True)
+                    log_and_print(f"משימה- {task_title}",is_hebrew=True)
 
             
             #return tasks
