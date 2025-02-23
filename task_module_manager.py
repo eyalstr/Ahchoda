@@ -206,7 +206,6 @@ def fetch_decisions_by_case_id(case_id: str, db) -> List[Dict[str, Any]]:
             reverse=True
         )
 
-        log_and_print(f"\n******({len(decisions)}) סהכ החלטות בתיק *****\n", "info", is_hebrew=True)
         for idx, decision in enumerate(decisions, start=1):
             decision_id = decision.get("DecisionId")
 
