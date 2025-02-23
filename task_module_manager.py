@@ -201,7 +201,7 @@ def check_assignments_for_decisions(decisions_list: List[Dict[str, Any]], server
             ,[Process_Id]
             ,[Is_Active]
         FROM [Responses].[dbo].[Assignments]
-        WHERE Decision_Id = ? AND Assignment_Type_Id = ?
+        WHERE Decision_Id = ? AND Assignment_Type_Id = ? AND Assignment_Status_Id='1'
         """
 
         try:
