@@ -348,7 +348,7 @@ if __name__ == "__main__":
         user_name = os.getenv("DB_USER")
         password = os.getenv("DB_PASS")
         bearer = os.getenv("BEARER_TOKEN")
-        log_and_print(f"BEARER in main case={bearer}")
+        
         # Connect to MongoDB
         mongo_client, db = connect_to_mongodb(mongo_connection_string)
         if db is None:
