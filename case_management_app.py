@@ -180,9 +180,8 @@ def display_menu():
     print(f"3. {normalize_hebrew('מסמכים בתיק')}")
     print(f"4. {normalize_hebrew('תהליכים בתיק')}")
     print(f"5. {normalize_hebrew('מטלות בתיק')}")
-  #  print(f"6. {normalize_hebrew('משימות למזכירה בתיק')}")
-  #  print(f"7. {normalize_hebrew('מטלות בתיק')}")
-    print(f"6. {normalize_hebrew('יציאה')}")
+    print(f"6. {normalize_hebrew('משימות בתיק')}")
+    print(f"7. {normalize_hebrew('יציאה')}")
 
     try:
         choice = int(input(f"Enter your choice: "))
@@ -399,22 +398,21 @@ if __name__ == "__main__":
                 log_and_print(f"\n##########-- מטלות בתיק  --##########", is_hebrew=True)
                 
                 decisions_list = fetch_decisions_by_case_id(case_id, db)
-                log_and_print(f"decision_list={decisions_list}")
-
+                
                 # Call the function with required arguments
                 check_assignments_for_decisions(decisions_list, server_name, database_name, user_name, password)
-                log_and_print(f"מספר החלטות בתיק הוא :{len(decisions_list)}",is_hebrew=True)
+                
                 if decisions_list:
                     log_and_print(f"\nניתוח מטלות הושלם", is_hebrew=True)
                 else:
                     log_and_print(f"לא נמצאו מטלות בתיק", is_hebrew=True)
 
                  
-            elif choice == 7:
-                tasks= fetch_tasks_by_case(case_id)
-                # log_and_print(f"tasks={tasks}")
-                
             elif choice == 6:
+                tasks= fetch_tasks_by_case(case_id)
+            
+                
+            elif choice == 7:
                 log_and_print("Exiting application.", "info")
                 break
 
