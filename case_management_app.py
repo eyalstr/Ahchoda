@@ -409,11 +409,11 @@ if __name__ == "__main__":
                 else:
                     log_and_print(f"לא נמצאו מטלות בתיק", is_hebrew=True)
 
-                break   
+                 
             elif choice == 7:
                 tasks= fetch_tasks_by_case(case_id)
-                log_and_print(f"tasks={tasks}")
-                break
+                # log_and_print(f"tasks={tasks}")
+                
             elif choice == 6:
                 log_and_print("Exiting application.", "info")
                 break

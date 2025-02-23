@@ -113,96 +113,52 @@ if not BASE_URL:
 #         log_and_print(f"Request failed: {e}")
 #         log_and_print(f"Response Content: {response.text if 'response' in locals() else 'No response content'}")
 #         return None
+
+import requests
 def fetch_tasks_by_case(case_id):
     """
     Fetches task data from the specified API using Bearer token authentication.
     Returns parsed JSON data, including the list of tasks.
     """
-    # Ensure the required environment variables (credentials and token) are available
     if not BEARER_TOKEN:
         log_and_print("Error: Bearer token is missing. Please check the .env file.")
         return None
 
-    # Define the API endpoint URL with the necessary query parameters
     url = f"https://bo-casemanagement-qa.devqa.k8s.justice.gov.il/api/DesktopTasks"
-    
-    # Set up parameters for the GET request
     params = {
         "RoleId": "null",  # Example, change if needed
-        "TaskTypeIds": [3, 4, 6, 7, 8, 9, 10, 11, 12, 14, 15, 16, 26],  # Example list of TaskTypeIds
-        "TaskStatusIds": [1, 2],  # Example list of TaskStatusIds
+        "TaskTypeIds": [3, 4, 6, 7, 8, 9, 10, 11, 12, 14, 15, 16, 26],
+        "TaskStatusIds": [1, 2],
         "CaseId": case_id,
-        "OfficeIds": 802  # Example, adjust as necessary
+        "OfficeIds": 802
     }
     
-    # Set the headers including the Bearer token for authentication
     headers = {
         "Authorization": f"Bearer {BEARER_TOKEN}",
         "Content-Type": "application/json"
     }
-    log_and_print(f"Using Bearer Token: {BEARER_TOKEN}")
 
     try:
-        # Make the GET request to the API
-        response = requests.get(url, headers=headers, params=params, verify=False)  # Disable SSL verification if needed
-        response.raise_for_status()  # Raises an error for 4xx and 5xx responses
+        response = requests.get(url, headers=headers, params=params, verify=False)
+        response.raise_for_status()
 
-        log_and_print(f"Status Code: {response.status_code}")
-        
-        # Ensure the response is in JSON format
         if response.headers.get("Content-Type", "").startswith("application/json"):
-            data = response.json()  # Directly parse the JSON content
-
-            # Log some key info from the response
-            drafts_total = data.get("draftsTotal", 0)
-            all_tasks_total = data.get("allTasksTotal", 0)
-            totals = data.get("totals", [])
-            tasks = data.get("tasks", [])  # Assuming the tasks are located here, adjust as needed
-
-            log_and_print(f"Drafts Total: {drafts_total}")
-            log_and_print(f"All Tasks Total: {all_tasks_total}")
-
-            # Mapping for task types to corresponding Hebrew text
-            task_type_mapping = {
-                1: "תיקים בעיון ראשוני",
-                2: "בקשות",
-                3: "תגובות",
-                4: "תגובות בחריגה",
-                5: "החלטות ופרוטוקול",
-                6: "ממתינים לפסק דין",
-                7: "משימות בטיוטה"
-            }
-
-            # Iterate over each item in totals and log the relevant info
-            for tab in totals:
-                tab_type_id = tab.get("tabTypeId")
-                total = tab.get("total")
-
-                # Fetch the Hebrew text based on the task_type_id
-                tab_type_text = task_type_mapping.get(tab_type_id, "Unknown Type")
-                
-                log_and_print(f"TabTypeId {tab_type_id} ({tab_type_text}) has total: {total}", is_hebrew=True)
-
-            # Now parsing and counting taskDetails for each task
-            for task in tasks:
-                task_details = task.get("taskDetails", {})
-                
-                if task_details:  # Check if taskDetails exists and is not empty
+            data = response.json()
+            log_and_print(data)
+            for task in data:
+                task_details = task.get("taskDetails")
+                if isinstance(task_details, dict):
+                #taskDetails = data.get("taskDetails", 0)
                     task_type_id = task_details.get("taskTypeId", "Unknown Type")
                     task_title = task_details.get("taskTypeDescription", "No Title")
                     task_status = task_details.get("status", "Unknown Status")
                     task_due_date = task_details.get("dueDate", "No Due Date")
-                    task_assigned_to = task_details.get("assignUserNameForDisplay", "Not Assigned")
+                    task_assigned_to = task_details.get("assignUserNameForDisplay", "Not Assigned") 
 
-                    log_and_print(f"Task Type: {task_type_id} - {task_title}, Status: {task_status}, Due Date: {task_due_date}, Assigned to: {task_assigned_to}")
-                    
-                    # Count the tasks by case and task type
-                    task_count = len(task_details.get("taskDetails", []))
-                    log_and_print(f"Task Details Count: {task_count}")
+                    log_and_print(f"Task Type: {task_type_id} - {task_title}, Status: {task_status}, Due Date: {task_due_date}, Assigned to: {task_assigned_to}",is_hebrew=True)
 
-            # Return the tasks list, in case you want to process or use it later
-            return tasks
-
+            
+            #return tasks
         else:
             log_and_print("Unexpected Response Format:", response.text)
             return None
@@ -212,7 +168,8 @@ def fetch_tasks_by_case(case_id):
         log_and_print(f"Response Content: {response.text if 'response' in locals() else 'No response content'}")
         return None
 
-    
+
+
 def fetch_decisions_by_case_id(case_id: str, db) -> List[Dict[str, Any]]:
     """
     Fetch Decisions from MongoDB for a given Case ID (_id).
