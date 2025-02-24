@@ -32,4 +32,4 @@ def load_configuration():
         if not value:
             print(f"❌ Error: Missing required environment variable: {var}")
             exit(1)
-        #log_and_print(f"\n{var}:{value}")
+        

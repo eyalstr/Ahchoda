@@ -3,7 +3,7 @@ import ctypes
 from config import load_configuration
 from pymongo import MongoClient
 from dotenv import load_dotenv
-from process_data_manager import execute_sql_process_queries, fetch_process_ids_by_case_id_sorted,execute_sql_process_tasks,execute_sql_all_processes
+from process_data_manager import execute_sql_process_queries, fetch_process_ids_by_case_id_sorted,execute_sql_process_tasks,execute_sql_all_processes,fetch_process_activity_with_request_id_sorted
 from document_data_manager import fetch_documents_by_case_id
 from decision_data_manager import fetch_decisions_and_documents_by_case_id
 from request_data_manager import parse_requests_by_case_id
@@ -411,7 +411,9 @@ if __name__ == "__main__":
             elif choice == 6:
                 tasks= fetch_tasks_by_case(case_id)
             
-                
+            elif choice == 8:
+                process_dic = fetch_process_activity_with_request_id_sorted(case_id, db)
+                log_and_print(f"ids for process={process_dic}")
             elif choice == 7:
                 log_and_print("Exiting application.", "info")
                 break
