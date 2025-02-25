@@ -156,7 +156,7 @@ def display_menu():
     print(f"3. {normalize_hebrew('מסמכים בתיק')}")
     print(f"4. {normalize_hebrew('תהליכים בתיק')}")
     print(f"5. {normalize_hebrew('מטלות בתיק')}")
-    print(f"6. {normalize_hebrew('משימות בתיק')}")
+    print(f"6. {normalize_hebrew('משימות לדיין בתיק')}")
     print(f"7. {normalize_hebrew('הפצות בתיק')}")
     print(f"8. {normalize_hebrew('יציאה')}")
 
@@ -377,6 +377,7 @@ if __name__ == "__main__":
                 print_process_info(valid_waiting_process)
                  
             elif choice == 6:
+                log_and_print(f"\n##########-- משימות לדיין בתיק  --##########", is_hebrew=True)
                  #tasks= fetch_tasks_by_case(case_id)
                 process_dic = fetch_process_ids_and_request_type_by_case_id_sorted(case_id, db)
                 processes_dic = bpm_collect_all_processes_steps_and_status(server_name, database_name, user_name, password, process_dic)
