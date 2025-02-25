@@ -91,7 +91,7 @@ def bpm_collect_all_processes_steps_and_status(server_name, database_name, user_
         )
 
         cursor = connection.cursor()
-        log_and_print("Connection to SQL Server established successfully.\n", "info", BOLD_GREEN)
+        #log_and_print("Connection to SQL Server established successfully.\n", "info", BOLD_GREEN)
 
         query_2_counter = 0  # Counter for the second query
 
@@ -190,7 +190,7 @@ def bpm_collect_all_processes_steps_and_status(server_name, database_name, user_
         # Close the SQL Server connection
         if 'connection' in locals():
             connection.close()
-            log_and_print("\nSQL Server connection closed.", "info", BOLD_GREEN)
+            #log_and_print("\nSQL Server connection closed.", "info", BOLD_GREEN)
 
 def print_process_info(process_dict):
     """Print all elements in the dictionary or list in a specific format."""
@@ -204,7 +204,7 @@ def print_process_info(process_dict):
                     # Print the information in the required format
                     heb_process_step_status = normalize_hebrew(bpm_process_status_type.get(process_info['process_step_status'], "Unknown Status"))
                     
-                    log_and_print(f"{process_info['process_activity_name']}={heb_process_step_status} - {process_info['request_type']}", is_hebrew=True)
+                    log_and_print(f"{process_info['process_activity_name']}={heb_process_step_status}-{process_info['request_type']} - {process_info['process_id']}", is_hebrew=True)
                 else:
                     log_and_print("Missing expected keys in process info.", "warning")
 
@@ -216,7 +216,7 @@ def print_process_info(process_dict):
                     # Print the information in the required format
                     heb_process_step_status = normalize_hebrew(bpm_process_status_type.get(process_info['process_step_status'], "Unknown Status"))
                   
-                    log_and_print(f"{process_info['process_activity_name']}={heb_process_step_status} - {process_info['request_type']}", is_hebrew=True)
+                    log_and_print(f"{process_info['process_activity_name']}={heb_process_step_status}-{process_info['request_type']} - {process_info['process_id']}", is_hebrew=True)
                 else:
                     log_and_print("Missing expected keys in process info.", "warning")
 
