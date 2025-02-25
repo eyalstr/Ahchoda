@@ -5,7 +5,21 @@ from logging_utils import BOLD_YELLOW, BOLD_GREEN, BOLD_RED
 import logging
 import pyodbc
 
-
+bpm_process_status_type = {
+    1: normalize_hebrew("חדש"),
+    2: normalize_hebrew("נפתח מחדש"),
+    3: normalize_hebrew("הופעל"),
+    4: normalize_hebrew("הורם אירוע"),
+    5: normalize_hebrew("בדחייה"),
+    6: normalize_hebrew("בהמתנה (עבור מטלה)"),
+    7: normalize_hebrew("סיום טיפול/בוצע"),
+    8: normalize_hebrew("סיום טיפול ב terminate"),
+    9: normalize_hebrew("קידום ישיר מהורם אירוע"),
+    10: normalize_hebrew("בקשה להפעלה"),
+    11: normalize_hebrew("בוצע חלקית"),
+    12: normalize_hebrew("השהייה (עבור השהייה)"),
+    13: normalize_hebrew("נסגר מביטול תהליך")
+}
 
 def fetch_process_ids_and_request_type_by_case_id_sorted(case_id, db):
     """
@@ -139,7 +153,7 @@ def bpm_collect_all_processes_steps_and_status(server_name, database_name, user_
                     sql_query_3 = """
                     SELECT TOP (1000) p.[ProcessStepStatusID],
                            p.[ProcessStepID],
-                           s.[Description_Heb]
+                           p.[StatusTypeID]
                     FROM [BPM].[dbo].[ProcessStepStatuses] AS p
                     JOIN [BPM].[dbo].[StatusTypes] AS s
                         ON p.[StatusTypeID] = s.[StatusTypeID]
