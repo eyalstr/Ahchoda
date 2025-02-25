@@ -156,7 +156,8 @@ def display_menu():
     print(f"4. {normalize_hebrew('תהליכים בתיק')}")
     print(f"5. {normalize_hebrew('מטלות בתיק')}")
     print(f"6. {normalize_hebrew('משימות בתיק')}")
-    print(f"7. {normalize_hebrew('יציאה')}")
+    print(f"7. {normalize_hebrew('הפצות בתיק')}")
+    print(f"8. {normalize_hebrew('יציאה')}")
 
     try:
         choice = int(input(f"Enter your choice: "))
@@ -375,16 +376,15 @@ if __name__ == "__main__":
                 print_process_info(valid_waiting_process)
                  
             elif choice == 6:
-                tasks= fetch_tasks_by_case(case_id)
+                 tasks= fetch_tasks_by_case(case_id)
             
-            elif choice == 8:
+            elif choice == 7:
                 process_dic = fetch_process_ids_and_request_type_by_case_id_sorted(case_id, db)
                 processes_dic = bpm_collect_all_processes_steps_and_status(server_name, database_name, user_name, password, process_dic)
                 popultion_process = filter_population_process_status(processes_dic)
-                #valid_waiting_process = check_process_assignment_is_valid(waiting_task_process,server_name, database_name, user_name, password)
                 print_process_info(popultion_process)
 
-            elif choice == 7:
+            elif choice == 8:
                 log_and_print("Exiting application.", "info")
                 break
 
