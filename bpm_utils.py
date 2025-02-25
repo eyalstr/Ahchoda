@@ -57,7 +57,7 @@ def fetch_process_ids_and_request_type_by_case_id_sorted(case_id, db):
         return {}
 
 
-def bpm_create_dic_with_all_processes_steps_and_status(server_name, database_name, user_name, password, process_ids):
+def bpm_collect_all_processes_steps_and_status(server_name, database_name, user_name, password, process_ids):
     """Execute SQL queries for each Process ID provided in the list of dictionaries."""
     if not process_ids:
         log_and_print("\nNo Process Information provided. Exiting.", "warning")
