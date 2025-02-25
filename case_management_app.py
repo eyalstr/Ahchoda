@@ -11,7 +11,7 @@ from logging_utils import log_and_print, normalize_hebrew, BOLD_YELLOW, BOLD_GRE
 from colorama import init, Fore, Style
 from task_module_manager import fetch_decisions_by_case_id,check_assignments_for_decisions,fetch_tasks_by_case
 import os
-from bpm_utils import fetch_bpm_process_activity_with_request_id_sorted
+from bpm_utils import fetch_process_ids_and_request_type_by_case_id_sorted,bpm_generate_dic_with_all_processes_steps_and_status
 
 # Initialize colorama
 init(autoreset=True)
@@ -413,8 +413,9 @@ if __name__ == "__main__":
                 tasks= fetch_tasks_by_case(case_id)
             
             elif choice == 8:
-                process_dic = fetch_bpm_process_activity_with_request_id_sorted(case_id, db)
-                log_and_print(f"ids for process={process_dic}")
+                process_dic = fetch_process_ids_and_request_type_by_case_id_sorted(case_id, db)
+                processes_dic = bpm_generate_dic_with_all_processes_steps_and_status(server_name, database_name, user_name, password, process_dic)
+                
             elif choice == 7:
                 log_and_print("Exiting application.", "info")
                 break
