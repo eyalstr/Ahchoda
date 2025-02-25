@@ -177,9 +177,9 @@ def bpm_collect_all_processes_steps_and_status(server_name, database_name, user_
                 except Exception as e:
                     log_and_print(f"Error processing ProcessStepID {row[0]}: {e}", "error", BOLD_RED)
         
-        # Print each dictionary and its key-value pairs
-        for process_info in process_subprocess_count:
-            log_and_print(f"{process_info['process_activity_name']}={process_info['process_step_status']} - {process_info['request_type']}", is_hebrew=True)
+        # # Print each dictionary and its key-value pairs
+        # for process_info in process_subprocess_count:
+        #      log_and_print(f"{process_info['process_activity_name']}={process_info['process_step_status']} - {process_info['request_type']}", is_hebrew=True)
 
         return process_subprocess_count  # Return the list of process information
 
@@ -191,3 +191,33 @@ def bpm_collect_all_processes_steps_and_status(server_name, database_name, user_
         if 'connection' in locals():
             connection.close()
             log_and_print("\nSQL Server connection closed.", "info", BOLD_GREEN)
+
+def print_process_info(process_dict):
+    """Print all elements in the dictionary or list in a specific format."""
+    try:
+        # Check if process_dict is a dictionary
+        if isinstance(process_dict, dict):
+            # Iterate over the dictionary items
+            for process_info in process_dict.values():
+                # Ensure the keys exist before accessing to avoid KeyError
+                if 'process_activity_name' in process_info and 'process_step_status' in process_info and 'request_type' in process_info:
+                    # Print the information in the required format
+                    log_and_print(f"{process_info['process_activity_name']}={process_info['process_step_status']} - {process_info['request_type']}", is_hebrew=True)
+                else:
+                    log_and_print("Missing expected keys in process info.", "warning")
+
+        # Check if process_dict is a list
+        elif isinstance(process_dict, list):
+            for process_info in process_dict:
+                # Ensure the keys exist before accessing to avoid KeyError
+                if 'process_activity_name' in process_info and 'process_step_status' in process_info and 'request_type' in process_info:
+                    # Print the information in the required format
+                    log_and_print(f"{process_info['process_activity_name']}={process_info['process_step_status']} - {process_info['request_type']}", is_hebrew=True)
+                else:
+                    log_and_print("Missing expected keys in process info.", "warning")
+
+        else:
+            log_and_print("The provided data is neither a list nor a dictionary.", "error")
+
+    except Exception as e:
+        log_and_print(f"Error printing process info: {e}", "error")
