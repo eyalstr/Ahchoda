@@ -16,7 +16,8 @@ from bpm_utils import (fetch_process_ids_and_request_type_by_case_id_sorted,
                        filter_process_info_by_waiting_for_task_status,
                        check_process_assignment_is_valid,
                        filter_population_process_status,
-                       filter_internal_task_process_status) 
+                       filter_internal_judge_task_process_status,
+                       filter_internal_secretery_task_process_status) 
 
 import os
 
@@ -157,8 +158,9 @@ def display_menu():
     print(f"4. {normalize_hebrew('תהליכים בתיק')}")
     print(f"5. {normalize_hebrew('מטלות בתיק')}")
     print(f"6. {normalize_hebrew('משימות לדיין בתיק')}")
-    print(f"7. {normalize_hebrew('הפצות בתיק')}")
-    print(f"8. {normalize_hebrew('יציאה')}")
+    print(f"7. {normalize_hebrew('משימות למזכירה בתיק')}")
+    print(f"8. {normalize_hebrew('הפצות בתיק')}")
+    print(f"9. {normalize_hebrew('יציאה')}")
 
     try:
         choice = int(input(f"Enter your choice: "))
@@ -381,16 +383,24 @@ if __name__ == "__main__":
                  #tasks= fetch_tasks_by_case(case_id)
                 process_dic = fetch_process_ids_and_request_type_by_case_id_sorted(case_id, db)
                 processes_dic = bpm_collect_all_processes_steps_and_status(server_name, database_name, user_name, password, process_dic)
-                judge_task_processes = filter_internal_task_process_status(processes_dic)
+                judge_task_processes = filter_internal_judge_task_process_status(processes_dic)
                 print_process_info(judge_task_processes)
 
             elif choice == 7:
+                log_and_print(f"\n##########-- משימות למזכירה בתיק  --##########", is_hebrew=True)
+                
+                process_dic = fetch_process_ids_and_request_type_by_case_id_sorted(case_id, db)
+                processes_dic = bpm_collect_all_processes_steps_and_status(server_name, database_name, user_name, password, process_dic)
+                sec_task_processes = filter_internal_secretery_task_process_status(processes_dic)
+                print_process_info(sec_task_processes)
+
+            elif choice == 8:
                 process_dic = fetch_process_ids_and_request_type_by_case_id_sorted(case_id, db)
                 processes_dic = bpm_collect_all_processes_steps_and_status(server_name, database_name, user_name, password, process_dic)
                 popultion_process = filter_population_process_status(processes_dic)
                 print_process_info(popultion_process)
 
-            elif choice == 8:
+            elif choice == 9:
                 log_and_print("Exiting application.", "info")
                 break
 
