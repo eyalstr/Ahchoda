@@ -13,7 +13,9 @@ from task_module_manager import fetch_decisions_by_case_id,check_assignments_for
 from bpm_utils import (fetch_process_ids_and_request_type_by_case_id_sorted,
                        bpm_collect_all_processes_steps_and_status,
                        print_process_info,
-                       filter_process_info_by_waiting_for_task_status) 
+                       filter_process_info_by_waiting_for_task_status,
+                       check_process_assignment_is_valid,
+                       filter_population_process_status) 
 
 import os
 
@@ -365,17 +367,12 @@ if __name__ == "__main__":
             
             elif choice == 5:
                 log_and_print(f"\n##########-- מטלות בתיק  --##########", is_hebrew=True)
-                
-                decisions_list = fetch_decisions_by_case_id(case_id, db)
-                
-                # Call the function with required arguments
-                check_assignments_for_decisions(decisions_list, server_name, database_name, user_name, password)
-                
-                if decisions_list:
-                    log_and_print(f"\nניתוח מטלות הושלם", is_hebrew=True)
-                else:
-                    log_and_print(f"לא נמצאו מטלות בתיק", is_hebrew=True)
 
+                process_dic = fetch_process_ids_and_request_type_by_case_id_sorted(case_id, db)
+                processes_dic = bpm_collect_all_processes_steps_and_status(server_name, database_name, user_name, password, process_dic)
+                waiting_task_process = filter_process_info_by_waiting_for_task_status(processes_dic)
+                valid_waiting_process = check_process_assignment_is_valid(waiting_task_process,server_name, database_name, user_name, password)
+                print_process_info(valid_waiting_process)
                  
             elif choice == 6:
                 tasks= fetch_tasks_by_case(case_id)
@@ -383,8 +380,9 @@ if __name__ == "__main__":
             elif choice == 8:
                 process_dic = fetch_process_ids_and_request_type_by_case_id_sorted(case_id, db)
                 processes_dic = bpm_collect_all_processes_steps_and_status(server_name, database_name, user_name, password, process_dic)
-                waiting_task_process = filter_process_info_by_waiting_for_task_status(processes_dic)
-                print_process_info(waiting_task_process)
+                popultion_process = filter_population_process_status(processes_dic)
+                #valid_waiting_process = check_process_assignment_is_valid(waiting_task_process,server_name, database_name, user_name, password)
+                print_process_info(popultion_process)
 
             elif choice == 7:
                 log_and_print("Exiting application.", "info")
