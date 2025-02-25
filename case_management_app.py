@@ -15,7 +15,8 @@ from bpm_utils import (fetch_process_ids_and_request_type_by_case_id_sorted,
                        print_process_info,
                        filter_process_info_by_waiting_for_task_status,
                        check_process_assignment_is_valid,
-                       filter_population_process_status) 
+                       filter_population_process_status,
+                       filter_internal_task_process_status) 
 
 import os
 
@@ -376,8 +377,12 @@ if __name__ == "__main__":
                 print_process_info(valid_waiting_process)
                  
             elif choice == 6:
-                 tasks= fetch_tasks_by_case(case_id)
-            
+                 #tasks= fetch_tasks_by_case(case_id)
+                process_dic = fetch_process_ids_and_request_type_by_case_id_sorted(case_id, db)
+                processes_dic = bpm_collect_all_processes_steps_and_status(server_name, database_name, user_name, password, process_dic)
+                judge_task_processes = filter_internal_task_process_status(processes_dic)
+                print_process_info(judge_task_processes)
+
             elif choice == 7:
                 process_dic = fetch_process_ids_and_request_type_by_case_id_sorted(case_id, db)
                 processes_dic = bpm_collect_all_processes_steps_and_status(server_name, database_name, user_name, password, process_dic)

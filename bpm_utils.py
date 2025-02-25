@@ -346,6 +346,37 @@ def filter_population_process_status(process_dict):
     # Return the filtered list
     return filtered_items
 
+#############################  משימות #########################
+def filter_internal_task_process_status(process_dict):
+    """Filter process info and return a list of items where process_step_status equals status_to_filter."""
+    filtered_items = []  # List to store items that match the filter condition
+
+    try:
+        # Check if process_dict is a dictionary
+        if isinstance(process_dict, dict):
+            # Iterate over the dictionary values
+            for process_info in process_dict.values():
+                if 'process_step_status' in process_info and process_info['process_activity_name'] in [7, 10, 11, 12, 14, 26, 37, 38, 39, 40, 41, 43]:
+                    filtered_items.append(process_info)
+
+        # Check if process_dict is a list
+        elif isinstance(process_dict, list):
+            for process_info in process_dict:
+                if 'process_step_status' in process_info and process_info['process_activity_name'] in [7, 10, 11, 12, 14, 26, 37, 38, 39, 40, 41, 43]:
+                    filtered_items.append(process_info)
+
+        else:
+            log_and_print("The provided data is neither a list nor a dictionary.", "error")
+
+        # Check if no items were found
+        if not filtered_items:
+            log_and_print("אין מידע רלוונטי", "info")
+
+    except Exception as e:
+        log_and_print(f"Error filtering process info: {e}", "error")
+
+    # Return the filtered list
+    return filtered_items
 
 def check_process_assignment_is_valid(all_waiting_tasks, server_name, database_name, user_name, password):
     """Filter tasks by checking each Process_Id against the database for active assignments."""
