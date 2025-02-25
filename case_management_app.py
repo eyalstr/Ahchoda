@@ -10,7 +10,11 @@ from request_data_manager import parse_requests_by_case_id
 from logging_utils import log_and_print, normalize_hebrew, BOLD_YELLOW, BOLD_GREEN, BOLD_RED
 from colorama import init, Fore, Style
 from task_module_manager import fetch_decisions_by_case_id,check_assignments_for_decisions,fetch_tasks_by_case
-from bpm_utils import fetch_process_ids_and_request_type_by_case_id_sorted,bpm_collect_all_processes_steps_and_status,print_process_info
+from bpm_utils import (fetch_process_ids_and_request_type_by_case_id_sorted,
+                       bpm_collect_all_processes_steps_and_status,
+                       print_process_info,
+                       filter_process_info_by_waiting_for_task_status) 
+
 import os
 
 # Initialize colorama
@@ -354,14 +358,10 @@ if __name__ == "__main__":
                         
             elif choice == 4:
                 log_and_print(f"\n##########-- תהליכים בתיק --##########", is_hebrew=True)
-                process_ids = fetch_process_ids_by_case_id_sorted(case_id, db)
+                process_dic = fetch_process_ids_and_request_type_by_case_id_sorted(case_id, db)
+                processes_dic = bpm_collect_all_processes_steps_and_status(server_name, database_name, user_name, password, process_dic)
+                print_process_info(processes_dic)
 
-                if not process_ids:
-                    log_and_print("No process IDs found.", "warning")
-                else:
-                    #first solution with all states
-                    #execute_sql_process_queries(server_name, database_name, user_name, password, process_ids)
-                    execute_sql_all_processes(server_name, database_name, user_name, password, process_ids)
             
             elif choice == 5:
                 log_and_print(f"\n##########-- מטלות בתיק  --##########", is_hebrew=True)
@@ -383,7 +383,8 @@ if __name__ == "__main__":
             elif choice == 8:
                 process_dic = fetch_process_ids_and_request_type_by_case_id_sorted(case_id, db)
                 processes_dic = bpm_collect_all_processes_steps_and_status(server_name, database_name, user_name, password, process_dic)
-                print_process_info(processes_dic)
+                waiting_task_process = filter_process_info_by_waiting_for_task_status(processes_dic)
+                print_process_info(waiting_task_process)
 
             elif choice == 7:
                 log_and_print("Exiting application.", "info")

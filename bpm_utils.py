@@ -202,7 +202,9 @@ def print_process_info(process_dict):
                 # Ensure the keys exist before accessing to avoid KeyError
                 if 'process_activity_name' in process_info and 'process_step_status' in process_info and 'request_type' in process_info:
                     # Print the information in the required format
-                    log_and_print(f"{process_info['process_activity_name']}={process_info['process_step_status']} - {process_info['request_type']}", is_hebrew=True)
+                    heb_process_step_status = normalize_hebrew(bpm_process_status_type.get(process_info['process_step_status'], "Unknown Status"))
+                    
+                    log_and_print(f"{process_info['process_activity_name']}={heb_process_step_status} - {process_info['request_type']}", is_hebrew=True)
                 else:
                     log_and_print("Missing expected keys in process info.", "warning")
 
@@ -212,7 +214,9 @@ def print_process_info(process_dict):
                 # Ensure the keys exist before accessing to avoid KeyError
                 if 'process_activity_name' in process_info and 'process_step_status' in process_info and 'request_type' in process_info:
                     # Print the information in the required format
-                    log_and_print(f"{process_info['process_activity_name']}={process_info['process_step_status']} - {process_info['request_type']}", is_hebrew=True)
+                    heb_process_step_status = normalize_hebrew(bpm_process_status_type.get(process_info['process_step_status'], "Unknown Status"))
+                  
+                    log_and_print(f"{process_info['process_activity_name']}={heb_process_step_status} - {process_info['request_type']}", is_hebrew=True)
                 else:
                     log_and_print("Missing expected keys in process info.", "warning")
 
@@ -221,3 +225,31 @@ def print_process_info(process_dict):
 
     except Exception as e:
         log_and_print(f"Error printing process info: {e}", "error")
+
+
+def filter_process_info_by_waiting_for_task_status(process_dict, status_to_filter=6):
+    """Filter process info and return a list of items where process_step_status equals status_to_filter."""
+    filtered_items = []  # List to store items that match the filter condition
+
+    try:
+        # Check if process_dict is a dictionary
+        if isinstance(process_dict, dict):
+            # Iterate over the dictionary values
+            for process_info in process_dict.values():
+                if 'process_step_status' in process_info and process_info['process_step_status'] == status_to_filter:
+                    filtered_items.append(process_info)
+
+        # Check if process_dict is a list
+        elif isinstance(process_dict, list):
+            for process_info in process_dict:
+                if 'process_step_status' in process_info and process_info['process_step_status'] == status_to_filter:
+                    filtered_items.append(process_info)
+
+        else:
+            log_and_print("The provided data is neither a list nor a dictionary.", "error")
+
+    except Exception as e:
+        log_and_print(f"Error filtering process info: {e}", "error")
+
+    # Return the filtered list
+    return filtered_items
