@@ -379,12 +379,12 @@ if __name__ == "__main__":
                 print_process_info(valid_waiting_process)
                  
             elif choice == 6:
-                log_and_print(f"\n##########-- משימות לדיין בתיק  --##########", is_hebrew=True)
-                 #tasks= fetch_tasks_by_case(case_id)
-                process_dic = fetch_process_ids_and_request_type_by_case_id_sorted(case_id, db)
-                processes_dic = bpm_collect_all_processes_steps_and_status(server_name, database_name, user_name, password, process_dic)
-                judge_task_processes = filter_internal_judge_task_process_status(processes_dic)
-                print_process_info(judge_task_processes)
+                tasks= fetch_tasks_by_case(case_id)
+                # log_and_print(f"\n##########-- משימות לדיין בתיק  --##########", is_hebrew=True)
+                # process_dic = fetch_process_ids_and_request_type_by_case_id_sorted(case_id, db)
+                # processes_dic = bpm_collect_all_processes_steps_and_status(server_name, database_name, user_name, password, process_dic)
+                # judge_task_processes = filter_internal_judge_task_process_status(processes_dic)
+                # print_process_info(judge_task_processes)
 
             elif choice == 7:
                 log_and_print(f"\n##########-- משימות למזכירה בתיק  --##########", is_hebrew=True)
