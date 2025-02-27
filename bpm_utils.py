@@ -413,6 +413,66 @@ def filter_internal_secretery_task_process_status(process_dict):
     # Return the filtered list
     return filtered_items
 
+#################### דיונים #########################
+def fetch_all_discussion_by_case(case_id, server_name, database_name, user_name, password):
+    """Filter tasks by checking each Process_Id against the database for active assignments."""
+    valid_tasks = []  # List to store tasks with valid assignments
+
+    try:
+        # Establish connection to SQL Server
+        connection = pyodbc.connect(
+            f"DRIVER={{ODBC Driver 17 for SQL Server}};"
+            f"SERVER={server_name};"
+            f"DATABASE={database_name};"
+            f"UID={user_name};"
+            f"PWD={password};"
+            f"Trusted_Connection=yes;"
+        )
+        cursor = connection.cursor()
+
+        # SQL query to check for active assignments
+        sql_query = """
+        SELECT 
+            d.[Discussion_Id], d.[Start_Time],
+            dt.[Description_Heb] AS Discussion_Type_Description_Heb,  -- Replacing d.[Discussion_Type_Id] with Description_Heb
+            ds.[Description_Heb] AS Discussion_Status_Description_Heb  -- Replacing d.[Discussion_Status_Id] with Description_Heb
+        FROM 
+            [Discussions].[dbo].[Discussions] d
+        LEFT JOIN 
+            [Discussions].[dbo].[Request_To_Discussions] r ON r.Discussion_Id = d.Discussion_Id
+        LEFT JOIN 
+            [Discussions].[code].[CT_Discussion_Types] dt ON dt.Discussion_Type_Id = d.Discussion_Type_Id
+        LEFT JOIN 
+            [Discussions].[code].[CT_Discussion_Statuses] ds ON ds.Discussion_Status_Id = d.Discussion_Status_Id
+        WHERE 
+            r.Case_Id = ?
+        """
+        cursor.execute(sql_query, case_id)
+        rows = cursor.fetchall()
+
+        if not rows:
+            log_and_print(f"אין דיונים להציג.", is_hebrew=True)
+        else:
+            # Print the count of discussions
+            log_and_print(f"מספר דיונים : {len(rows)}", is_hebrew=True)
+            
+            # Print each tuple's data in one line
+            for row in rows:
+                log_and_print(f"דיון לתאריך: {row.Start_Time} - {row.Discussion_Type_Description_Heb} - {row.Discussion_Status_Description_Heb}", is_hebrew=True)
+    except Exception as e:
+        log_and_print(f"Error querying SQL Server: {e}", "error")
+
+    finally:
+        # Close the cursor and connection if they were opened
+        if 'cursor' in locals():
+            cursor.close()
+        if 'connection' in locals():
+            connection.close()
+
+    return valid_tasks
+
+
+
 def check_process_assignment_is_valid(all_waiting_tasks, server_name, database_name, user_name, password):
     """Filter tasks by checking each Process_Id against the database for active assignments."""
     valid_tasks = []  # List to store tasks with valid assignments
