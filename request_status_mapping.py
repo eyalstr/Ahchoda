@@ -139,3 +139,31 @@ request_type_mapping = {
     129: normalize_hebrew("בקשה לפתיחת תיק ערר קורונה - מענק פגיעה ממושכת"),
     130: normalize_hebrew("בקשה לפתיחת תיק ערר קורונה - מענק אומיקרון")
 }
+
+# Define the mapping dictionary for Action Log Types
+action_log_types_mapping = {
+    1: normalize_hebrew("הוגשה בקשה לפתיחת תיק"),
+    2: normalize_hebrew("בדיקת מזכירות"),
+    3: normalize_hebrew("ניתוב לדיין"),
+    4: normalize_hebrew("הושלמו מסמכי פתיחת תיק מהאתר"),
+    5: normalize_hebrew("בדיקת מזכירות בחריגה בהשלמת מסמכים"),
+    6: normalize_hebrew("בדיקת מזכירות השלמת מסמכים"),
+    7: normalize_hebrew("הוגשה תגובה מהאתר"),
+    8: normalize_hebrew("ניתנה החלטה"),
+    9: normalize_hebrew("הוגש כתב תשובה מהאתר"),
+    10: normalize_hebrew("בוטל דיון"),
+    11: normalize_hebrew("השתנה מועד דיון בתיק"),
+    12: normalize_hebrew("נקבע דיון"),
+    13: normalize_hebrew("הוגשה בקשה"),
+    14: normalize_hebrew("סגירת תיק"),
+    15: normalize_hebrew("שינוי סוג תיק"),
+    16: normalize_hebrew("הקפאת תיק"),
+    17: normalize_hebrew("שינוי סטטוס תיק"),
+    18: normalize_hebrew("נוסף מסמך בתיק"),
+    19: normalize_hebrew("פתיחת תיק אחרי סגירה"),
+    20: normalize_hebrew("חיווי על תקינות מסמך על ידי המזכירה"),
+    21: normalize_hebrew("סגירת טיפול במסמך"),
+    22: normalize_hebrew("שינוי החלטה"),
+    23: normalize_hebrew("אישור נתוני רשות המסים באופו ידני"),
+    24: normalize_hebrew("הפצת פרוטוקול דיון לצדדים")
+}

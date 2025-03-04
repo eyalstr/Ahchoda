@@ -1,5 +1,5 @@
 
-from request_status_mapping import request_status_mapping,request_type_mapping  # Import the mapping
+from request_status_mapping import request_status_mapping,request_type_mapping,action_log_types_mapping  # Import the mapping
 from logging_utils import log_and_print, normalize_hebrew, logger
 from logging_utils import BOLD_YELLOW, BOLD_GREEN, BOLD_RED
 import logging
@@ -514,3 +514,71 @@ def check_process_assignment_is_valid(all_waiting_tasks, server_name, database_n
             connection.close()
 
     return valid_tasks
+
+#######################  יומן תיק ##########################
+
+def parse_requestsLog_by_case_id(case_id: str, db) -> None:
+    """
+    Parse the Requests array for a given Case ID, collect all logs, and display detailed information
+    including RequestStatusId, ActionLogTypeId, CreateActionUser, CreateActionDate, CreateLogDate, Remark, and ProcessStepId.
+
+    Args:
+        case_id (str): The Case ID to fetch data for.
+        db (Database): The MongoDB database connection.
+
+    Returns:
+        None
+    """
+    try:
+        collection = db["Case"]
+        document = collection.find_one({"_id": case_id}, {"Requests": 1, "_id": 0})
+
+        if not document:
+            log_and_print(f"No document found for Case ID {case_id}.", "info", is_hebrew=True)
+            return
+
+        requests = document.get("Requests", [])
+        if not isinstance(requests, list):
+            log_and_print(f"Invalid 'Requests' field format for Case ID {case_id}.", "info", is_hebrew=True)
+            return
+
+        total_logs = 0  # Counter for all logs across requests
+        all_logs = []  # List to store logs
+
+        log_and_print(f"******({len(requests)}) סהכ בקשות בתיק *****", "info",  is_hebrew=True)
+
+        for index, request in enumerate(requests):
+            request_id = request.get("RequestId")
+            request_type_id = request.get("RequestTypeId")
+            des_request_heb = normalize_hebrew(request_type_mapping.get(request_type_id, "סטטוס לא ידוע"))
+            
+            log_and_print(f"({index+1}) בקשה: {des_request_heb}, Request ID: {request_id}", "info",  is_hebrew=True)
+
+            diary_list = request.get("RequestLogs", [])
+
+            if isinstance(diary_list, list):
+                total_logs += len(diary_list)
+                all_logs.extend(diary_list)  # Collecting all logs in one list
+
+        # Print total logs found
+        log_and_print(f"******סהכ רשומות יומן ({total_logs})*****", "info",  is_hebrew=True)
+
+        # Print details for each log
+        for log_index, log in enumerate(all_logs):
+            request_status_id = log.get("RequestStatusId", "לא ידוע")
+            description_heb = normalize_hebrew(request_status_mapping.get(request_status_id, "Unknown Status"))
+            action_log_type_id = log.get("ActionLogTypeId", "לא ידוע")
+            description_action_heb = normalize_hebrew(action_log_types_mapping.get(action_log_type_id, "Unknown Status"))
+            create_action_user = log.get("CreateActionUser", "לא ידוע")
+            create_action_date = log.get("CreateActionDate", "לא זמין")
+            # Formatting to show only time and date
+            formatted_value = create_action_date.strftime("%H:%M:%S %Y-%m-%d")
+
+            create_log_date = log.get("CreateLogDate", "לא זמין")
+            remark = log.get("Remark", "אין הערה")
+            process_step_id = log.get("ProcessStepId", "לא ידוע")
+
+            log_and_print(f"תיאור פעולה: {description_action_heb} ,סטטוס: ,{description_heb} , תאריך יצירת פעולה: {formatted_value}", is_hebrew=True)
+
+    except Exception as e:
+        log_and_print(f"Error parsing Requests log for Case ID {case_id}: {e}", "error",  is_hebrew=True)

@@ -18,7 +18,7 @@ from bpm_utils import (fetch_process_ids_and_request_type_by_case_id_sorted,
                        filter_population_process_status,
                        filter_internal_judge_task_process_status,
                        filter_internal_secretery_task_process_status,
-                       fetch_all_discussion_by_case) 
+                       fetch_all_discussion_by_case,parse_requestsLog_by_case_id) 
 
 import os
 
@@ -161,7 +161,8 @@ def display_menu():
     print(f"6. {normalize_hebrew('משימות לדיין בתיק')}")
     print(f"7. {normalize_hebrew('דיונים בתיק')}")
     print(f"8. {normalize_hebrew('הפצות בתיק')}")
-    print(f"9. {normalize_hebrew('יציאה')}")
+    print(f"9. {normalize_hebrew('יומן תיק')}")
+    print(f"10. {normalize_hebrew('יציאה')}")
 
     try:
         choice = int(input(f"Enter your choice: "))
@@ -380,7 +381,7 @@ if __name__ == "__main__":
                 print_process_info(valid_waiting_process)
                  
             elif choice == 6:
-                #tasks= fetch_tasks_by_case(case_id)
+                #1083/tasks= fetch_tasks_by_case(case_id)
                 log_and_print(f"\n##########-- משימות לדיין בתיק  --##########", is_hebrew=True)
                 process_dic = fetch_process_ids_and_request_type_by_case_id_sorted(case_id, db)
                 processes_dic = bpm_collect_all_processes_steps_and_status(server_name, database_name, user_name, password, process_dic)
@@ -401,11 +402,14 @@ if __name__ == "__main__":
                 processes_dic = bpm_collect_all_processes_steps_and_status(server_name, database_name, user_name, password, process_dic)
                 popultion_process = filter_population_process_status(processes_dic)
                 print_process_info(popultion_process)
-
+            
             elif choice == 9:
+                parse_requestsLog_by_case_id(case_id, db)
+           
+            elif choice == 10:
                 log_and_print("Exiting application.", "info")
                 break
-
+            
     except Exception as e:
         log_and_print(f"An unexpected error occurred: {e}", "error")
     finally:
