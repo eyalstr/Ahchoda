@@ -36,7 +36,8 @@ request_status_mapping = {
     26: normalize_hebrew("ממתין לתגובת הצדדים - משיבה"),
     27: normalize_hebrew("תיק מוקפא / מעוכב"),
     28: normalize_hebrew("המשך הליכים בתיק"),
-    29: normalize_hebrew("ממתין לביטול דיון")
+    29: normalize_hebrew("ממתין לביטול דיון"),
+    32: normalize_hebrew("ממתין לקליטת מסמכים")
 }
 
 
