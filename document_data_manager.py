@@ -91,10 +91,10 @@ def fetch_documents_by_case_id(case_id, db, collection_name="Document"):
                             desc = "נצפה על ידי עורר"  # Corrected assignment
                         
                         watched = IsWatched.get(str(value), f"לא ידוע ({value})")
-                        log_and_print(f"{desc}: {watched}", indent=2, ansi_format=BOLD_YELLOW, is_hebrew=True)
+                        log_and_print(f"{desc}: {watched}", indent=2,  is_hebrew=True)
                     
                     elif key in ["MojId", "FileName"]:                   
-                        log_and_print(f"{key}: {value}", indent=2, ansi_format=BOLD_YELLOW, is_hebrew=True)
+                        log_and_print(f"{key}: {value}", indent=2,  is_hebrew=True)
 
                 
         return matching_documents
