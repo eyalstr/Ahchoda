@@ -5,8 +5,8 @@ from logging_utils import BOLD_YELLOW, BOLD_GREEN, BOLD_RED
 from doc_header_map import DOCUMENT_TYPE_MAPPING, DOCUMENT_CATEGORY_MAPPING
 from request_data_manager import get_requests_by_case_id,request_type_mapping
 
-IsLeadingDoc = {
-    "None": 'לא',
+IsWatched = {
+    "False": 'לא',
     "True": 'כן'
 }
 def fetch_documents_by_case_id(case_id, db, collection_name="Document"):
@@ -69,27 +69,33 @@ def fetch_documents_by_case_id(case_id, db, collection_name="Document"):
                     else:
                         log_and_print("No RequestId found with RequestTypeId 1.")
                                            
-                         
+                  
                 
               
-                # Iterate through document fields
+               # Iterate through document fields
                 for key, value in document.items():
                     if key == "DocumentTypeId" and isinstance(value, int):
                         description = normalize_hebrew(DOCUMENT_TYPE_MAPPING.get(value, f"לא ידוע ({value})"))
                         log_and_print(f"סוג המסמך: {description} ({value})", indent=2, ansi_format=BOLD_GREEN, is_hebrew=True)
+                    
                     elif key == "DocumentCategoryId":
                         description = normalize_hebrew(DOCUMENT_CATEGORY_MAPPING.get(value, 0))
                         if description == 0:                            
                             description = "לא ידוע"
                         log_and_print(f"קטגוריית המסמך: {description} ({value})", indent=2, ansi_format=BOLD_GREEN, is_hebrew=True)
-                    elif key == "IsLeadingDocument":
-                        # Fixed the handling of IsLeadingDocument
-                        description = IsLeadingDoc.get(str(value), f"לא ידוע ({value})")
-                        log_and_print(f"מסמך מוביל: {description}", indent=2, ansi_format=BOLD_GREEN, is_hebrew=True)
-                    elif key in ["MojId", "FileName"]:
+                    
+                    elif key in ["WatchedByDefendant", "WatchedByProsecutor"]:   
+                        if key == "WatchedByDefendant":
+                            desc = "נצפה על ידי משיבה"  # Corrected assignment
+                        else:             
+                            desc = "נצפה על ידי עורר"  # Corrected assignment
+                        
+                        watched = IsWatched.get(str(value), f"לא ידוע ({value})")
+                        log_and_print(f"{desc}: {watched}", indent=2, ansi_format=BOLD_YELLOW, is_hebrew=True)
+                    
+                    elif key in ["MojId", "FileName"]:                   
                         log_and_print(f"{key}: {value}", indent=2, ansi_format=BOLD_YELLOW, is_hebrew=True)
-                    #elif key == "Entities":
-                    #    log_and_print(f"{key}: {value}", indent=2, is_hebrew=True)
+
                 
         return matching_documents
 
