@@ -89,14 +89,14 @@ def fetch_documents_by_case_id(case_id, db, collection_name="Document"):
                             log_and_print(f"סטטוס מסמך בדוקומנטום :פעיל", indent=2, ansi_format=BOLD_GREEN, is_hebrew=True)
                         else:
                             log_and_print(f"סטטוס מסמך בדוקומנטום :לא פעיל", indent=2, ansi_format=BOLD_GREEN, is_hebrew=True)
-                    elif key in ["WatchedByDefendant", "WatchedByProsecutor"]:   
-                        if key == "WatchedByDefendant":
-                            desc = "נצפה על ידי משיבה"  # Corrected assignment
-                        else:             
-                            desc = "נצפה על ידי עורר"  # Corrected assignment
+                    # elif key in ["WatchedByDefendant", "WatchedByProsecutor"]:   
+                    #     if key == "WatchedByDefendant":
+                    #         desc = "נצפה על ידי משיבה"  # Corrected assignment
+                    #     else:             
+                    #         desc = "נצפה על ידי עורר"  # Corrected assignment
                         
-                        watched = IsWatched.get(str(value), f"לא ידוע ({value})")
-                        log_and_print(f"{desc}: {value}", indent=2, ansi_format=BOLD_GREEN, is_hebrew=True)
+                    #     watched = IsWatched.get(str(value), f"לא ידוע ({value})")
+                    #     log_and_print(f"{desc}: {value}", indent=2, ansi_format=BOLD_GREEN, is_hebrew=True)
                     
                     elif key in ["MojId", "FileName"]:                   
                         log_and_print(f"{key}: {value}", indent=2,  is_hebrew=True)
