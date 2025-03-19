@@ -545,14 +545,14 @@ def parse_requestsLog_by_case_id(case_id: str, db) -> None:
         total_logs = 0  # Counter for all logs across requests
         all_logs = []  # List to store logs
 
-        log_and_print(f"******({len(requests)}) סהכ בקשות בתיק *****", "info",  is_hebrew=True)
+        #log_and_print(f"******({len(requests)}) סהכ בקשות בתיק *****", "info",  is_hebrew=True)
 
         for index, request in enumerate(requests):
             request_id = request.get("RequestId")
             request_type_id = request.get("RequestTypeId")
             des_request_heb = normalize_hebrew(request_type_mapping.get(request_type_id, "סטטוס לא ידוע"))
             
-            log_and_print(f"({index+1}) בקשה: {des_request_heb}, Request ID: {request_id}", "info",  is_hebrew=True)
+            #log_and_print(f"({index+1}) בקשה: {des_request_heb}, Request ID: {request_id}", "info",  is_hebrew=True)
 
             diary_list = request.get("RequestLogs", [])
 
@@ -565,6 +565,7 @@ def parse_requestsLog_by_case_id(case_id: str, db) -> None:
 
         # Print details for each log
         for log_index, log in enumerate(all_logs):
+            
             request_status_id = log.get("RequestStatusId", "לא ידוע")
             description_heb = normalize_hebrew(request_status_mapping.get(request_status_id, "Unknown Status"))
             action_log_type_id = log.get("ActionLogTypeId", "לא ידוע")
@@ -578,7 +579,7 @@ def parse_requestsLog_by_case_id(case_id: str, db) -> None:
             remark = log.get("Remark", "אין הערה")
             process_step_id = log.get("ProcessStepId", "לא ידוע")
 
-            log_and_print(f"תיאור פעולה: {description_action_heb} ,סטטוס: ,{description_heb} , תאריך יצירת פעולה: {formatted_value}", is_hebrew=True)
+            log_and_print(f"תיאור פעולה: {description_action_heb} ,סטטוס: ,{description_heb}, צד:{create_action_user}, תאריך יצירת פעולה: {formatted_value}", is_hebrew=True)
 
     except Exception as e:
         log_and_print(f"Error parsing Requests log for Case ID {case_id}: {e}", "error",  is_hebrew=True)
