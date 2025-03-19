@@ -152,17 +152,19 @@ def display_menu():
     """
     Display a menu of options for the user and return their choice.
     """
-    print(f"\nMenu:")
-    print(f"1. {normalize_hebrew('סטטוס ובקשות בתיק')}")
-    print(f"2. {normalize_hebrew('החלטות בתיק/בבקשה')}")
-    print(f"3. {normalize_hebrew('מסמכים בתיק')}")
-    print(f"4. {normalize_hebrew('תהליכים בתיק')}")
-    print(f"5. {normalize_hebrew('מטלות בתיק')}")
-    print(f"6. {normalize_hebrew('משימות לדיין בתיק')}")
-    print(f"7. {normalize_hebrew('דיונים בתיק')}")
-    print(f"8. {normalize_hebrew('הפצות בתיק')}")
-    print(f"9. {normalize_hebrew('יומן תיק')}")
-    print(f"10. {normalize_hebrew('יציאה')}")
+    log_and_print("##### - תפריט - #####", "info", BOLD_YELLOW, is_hebrew=True)
+    log_and_print("סטטוס ובקשות בתיק  - 1", "info", BOLD_GREEN, is_hebrew=True)
+    log_and_print("החלטות בתיק/בבקשה  - 2", "info", BOLD_GREEN, is_hebrew=True)
+    log_and_print("מסמכים בתיק  - 3", "info", BOLD_GREEN, is_hebrew=True)
+    log_and_print("תהליכים בתיק  - 4", "info", BOLD_GREEN, is_hebrew=True)
+    log_and_print("מטלות בתיק  - 5", "info", BOLD_GREEN, is_hebrew=True)
+    log_and_print("משימות לדיין בתיק  - 6", "info", BOLD_GREEN, is_hebrew=True)
+    log_and_print("דיונים בתיק  - 7", "info", BOLD_GREEN, is_hebrew=True)
+    log_and_print("הפצות בתיק  - 8", "info", BOLD_GREEN, is_hebrew=True)
+    log_and_print("יומן תיק  - 9", "info", BOLD_GREEN, is_hebrew=True)
+    log_and_print("יציאה - 10", "info", BOLD_GREEN, is_hebrew=True)
+
+
 
     try:
         choice = int(input(f"Enter your choice: "))

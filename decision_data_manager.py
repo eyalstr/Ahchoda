@@ -73,24 +73,18 @@ def fetch_decisions_and_documents_by_case_id(case_id: str, db) -> List[Dict[str,
                         log_and_print("לא לפרסום", "info", BOLD_RED, is_hebrew=True, indent=2)
                     elif value is True:
                         log_and_print("החלטה לפרסום", "info", BOLD_GREEN, is_hebrew=True, indent=2)
-
+                elif field == "IsActive":
+                    if value == "True":
+                        log_and_print(f"החלטה פעילה", ansi_format=BOLD_GREEN,indent=2, is_hebrew=True)
+                    else:
+                        log_and_print(f"החלטה לא פעילה", ansi_format=BOLD_GREEN,indent=2, is_hebrew=True)
             # Process DecisionRequests and check documents
             decision_requests = decision.get("DecisionRequests", [])
-            if decision_requests:
-                #log_and_print("\nDecisionRequests Details:", "info", BOLD_YELLOW, indent=4)
-                
-              #  if len(decision_requests) == 1:
-              #      log_and_print("\n ***** החלטה בבקשה *****", "info", BOLD_GREEN, is_hebrew=True, indent=4)
-              #  else:
-              #      log_and_print("\n***** החלטה בבקשות *****", "info", BOLD_GREEN, is_hebrew=True, indent=4)
-
-
+            if decision_requests:             
 
                 for req_idx, request in enumerate(decision_requests, start=1):
-                    request_id = request.get("RequestId")
-                
-                    #log_and_print(f"  Request #{req_idx}:", ansi_format=BOLD_YELLOW, indent=6)
-                    #log_and_print(f"\n*** {request_id} בקשה ***", ansi_format=BOLD_YELLOW, is_hebrew=True,indent=6)
+                    request_id = request.get("RequestId")              
+            
                     for key, val in request.items():
                         if key == "SubDecisions":
                             if isinstance(val, list):

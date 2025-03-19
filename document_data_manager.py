@@ -84,7 +84,11 @@ def fetch_documents_by_case_id(case_id, db, collection_name="Document"):
                         if description == 0:                            
                             description = "לא ידוע"
                         log_and_print(f"קטגוריית המסמך: {description} ({value})", indent=2, ansi_format=BOLD_GREEN, is_hebrew=True)
-                    
+                    elif key == "DocumentValidityTypeId":
+                        if value==1:
+                            log_and_print(f"סטטוס מסמך בדוקומנטום :פעיל", indent=2, ansi_format=BOLD_GREEN, is_hebrew=True)
+                        else:
+                            log_and_print(f"סטטוס מסמך בדוקומנטום :לא פעיל", indent=2, ansi_format=BOLD_GREEN, is_hebrew=True)
                     elif key in ["WatchedByDefendant", "WatchedByProsecutor"]:   
                         if key == "WatchedByDefendant":
                             desc = "נצפה על ידי משיבה"  # Corrected assignment
