@@ -260,7 +260,7 @@ def print_process_info(process_dict):
                     # Print the information in the required format
                     heb_process_step_status = normalize_hebrew(bpm_process_status_type.get(process_info['process_step_status'], "Unknown Status"))
                     heb_activity_type = normalize_hebrew(activity_type_mapping.get(process_info['process_activity_name'], "Unknown Status"))
-                    log_and_print(f"{heb_activity_type}={heb_process_step_status}-{process_info['request_type']} - {process_info['process_id']}", is_hebrew=True)
+                    log_and_print(f"{heb_activity_type}={heb_process_step_status}-{process_info['request_type']} - {process_info['process_id']}", "info", BOLD_GREEN, indent=4,is_hebrew=True)
                     data_printed = True
                 else:
                     log_and_print("Missing expected keys in process info.", "warning")
@@ -274,7 +274,7 @@ def print_process_info(process_dict):
                     heb_process_step_status = normalize_hebrew(bpm_process_status_type.get(process_info['process_step_status'], "Unknown Status"))
                     heb_activity_type = normalize_hebrew(activity_type_mapping.get(process_info['process_activity_name'], "Unknown Status"))
                     
-                    log_and_print(f"{heb_activity_type}={heb_process_step_status}-{process_info['request_type']} - {process_info['process_id']}", is_hebrew=True)
+                    log_and_print(f"{heb_activity_type}={heb_process_step_status}-{process_info['request_type']} - {process_info['process_id']}", "info", BOLD_GREEN, indent=4,is_hebrew=True)
                     data_printed = True
                 else:
                     log_and_print("Missing expected keys in process info.", "warning")

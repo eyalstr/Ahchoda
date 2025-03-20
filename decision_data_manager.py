@@ -74,10 +74,11 @@ def fetch_decisions_and_documents_by_case_id(case_id: str, db) -> List[Dict[str,
                     elif value is True:
                         log_and_print("החלטה לפרסום", "info", BOLD_GREEN, is_hebrew=True, indent=2)
                 elif field == "IsActive":
-                    if value == "True":
-                        log_and_print(f"החלטה פעילה", ansi_format=BOLD_GREEN,indent=2, is_hebrew=True)
+                    if str(value).lower() == "true":
+                        log_and_print(f"החלטה פעילה", "info", BOLD_GREEN, indent=2, is_hebrew=True)
                     else:
-                        log_and_print(f"החלטה לא פעילה", ansi_format=BOLD_GREEN,indent=2, is_hebrew=True)
+                        log_and_print(f"החלטה לא פעילה", "info", BOLD_GREEN, indent=2, is_hebrew=True)
+
             # Process DecisionRequests and check documents
             decision_requests = decision.get("DecisionRequests", [])
             if decision_requests:             

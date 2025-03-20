@@ -346,35 +346,35 @@ if __name__ == "__main__":
             choice = display_menu()
 
             if choice == 1:
-                log_and_print(f"\n##########--שאילתת בקשות בתיק--########", is_hebrew=True)
+                log_and_print(f"\n##########--שאילתת בקשות בתיק--########", BOLD_YELLOW, indent=4,is_hebrew=True)
                 results = parse_requests_by_case_id(case_id, db)
                 if results:
-                    log_and_print(f"\nניתוח בקשות הושלם", is_hebrew=True)
+                    log_and_print(f"\nניתוח בקשות הושלם", BOLD_YELLOW, indent=4,is_hebrew=True)
                 else:
-                    log_and_print(f"\nלא נמצאו בקשות",is_hebrew=True)
+                    log_and_print(f"\nלא נמצאו בקשות", BOLD_YELLOW, indent=4,is_hebrew=True)
 
             elif choice == 2:
-                log_and_print(f"\n##########-- שאילתת החלטות בתיק --##########", is_hebrew=True)
+                log_and_print(f"\n##########--  החלטות בתיק --##########", BOLD_YELLOW, indent=4,is_hebrew=True)
                 results = fetch_decisions_and_documents_by_case_id(case_id, db)
                 if results:
-                    log_and_print(f"\nניתוח החלטות הושלם", is_hebrew=True)
+                    log_and_print(f"\nניתוח החלטות הושלם", BOLD_YELLOW, indent=4,is_hebrew=True)
                 else:
-                    log_and_print(f"לא נמצאו החלטות או מסמכי החלטות", is_hebrew=True)
+                    log_and_print(f"לא נמצאו החלטות או מסמכי החלטות", BOLD_YELLOW, indent=4,is_hebrew=True)
 
             elif choice == 3:
-                log_and_print(f"\n##########-- מסמכים בתיק --##########", is_hebrew=True)
+                log_and_print(f"\n##########-- מסמכים בתיק --##########", BOLD_YELLOW, indent=4,is_hebrew=True)
                 fetch_documents_by_case_id(case_id, db)
 
                         
             elif choice == 4:
-                log_and_print(f"\n##########-- תהליכים בתיק --##########", is_hebrew=True)
+                log_and_print(f"\n##########-- תהליכים בתיק --##########", "info", BOLD_YELLOW, indent=4,is_hebrew=True)
                 process_dic = fetch_process_ids_and_request_type_by_case_id_sorted(case_id, db)
                 processes_dic = bpm_collect_all_processes_steps_and_status(server_name, database_name, user_name, password, process_dic)
                 print_process_info(processes_dic)
 
             
             elif choice == 5:
-                log_and_print(f"\n##########-- מטלות בתיק  --##########", is_hebrew=True)
+                log_and_print(f"\n##########-- מטלות בתיק  --##########", BOLD_YELLOW, indent=4,is_hebrew=True)
 
                 process_dic = fetch_process_ids_and_request_type_by_case_id_sorted(case_id, db)
                 processes_dic = bpm_collect_all_processes_steps_and_status(server_name, database_name, user_name, password, process_dic)
@@ -384,14 +384,14 @@ if __name__ == "__main__":
                  
             elif choice == 6:
                 #1083/tasks= fetch_tasks_by_case(case_id)
-                log_and_print(f"\n##########-- משימות לדיין בתיק  --##########", is_hebrew=True)
+                log_and_print(f"\n##########-- משימות לדיין בתיק  --##########", BOLD_YELLOW, indent=4,is_hebrew=True)
                 process_dic = fetch_process_ids_and_request_type_by_case_id_sorted(case_id, db)
                 processes_dic = bpm_collect_all_processes_steps_and_status(server_name, database_name, user_name, password, process_dic)
                 judge_task_processes = filter_internal_judge_task_process_status(processes_dic)
                 print_process_info(judge_task_processes)
 
             elif choice == 7:
-                log_and_print(f"\n##########-- דיונים בתיק  --##########", is_hebrew=True)
+                log_and_print(f"\n##########-- דיונים בתיק  --##########", BOLD_YELLOW, indent=4,is_hebrew=True)
                 fetch_all_discussion_by_case(case_id,server_name, database_name, user_name, password)
 
                 # process_dic = fetch_process_ids_and_request_type_by_case_id_sorted(case_id, db)
