@@ -4,6 +4,7 @@ from logging_utils import log_and_print, normalize_hebrew, logger
 from logging_utils import BOLD_YELLOW, BOLD_GREEN, BOLD_RED
 import logging
 import pyodbc
+import os
 
 bpm_process_status_type = {
     1: normalize_hebrew("חדש"),
@@ -128,6 +129,8 @@ def bpm_collect_all_processes_steps_and_status(server_name, database_name, user_
         return
 
     process_subprocess_count = []  # List to store dictionaries with process information
+    node_id = os.getenv("NODEID")
+    #log_and_print(f"NodeId={node_id}")
 
     try:
         # Establish connection to SQL Server
@@ -157,9 +160,9 @@ def bpm_collect_all_processes_steps_and_status(server_name, database_name, user_
             FROM [BPM].[dbo].[Processes] AS p
             JOIN [BPM].[dbo].[ProcessTypes] AS pt  
                 ON pt.[ProcessTypeID] = p.[ProcessTypeID]
-            WHERE p.[ProcessID] = ?;
+            WHERE p.[ProcessID] = ? and p.[LdapLeafID] = ?;
             """
-            cursor.execute(sql_query_1, process_id)
+            cursor.execute(sql_query_1, process_id,node_id)
             rows_1 = cursor.fetchall()
 
             if not rows_1:
@@ -260,7 +263,7 @@ def print_process_info(process_dict):
                     # Print the information in the required format
                     heb_process_step_status = normalize_hebrew(bpm_process_status_type.get(process_info['process_step_status'], "Unknown Status"))
                     heb_activity_type = normalize_hebrew(activity_type_mapping.get(process_info['process_activity_name'], "Unknown Status"))
-                    log_and_print(f"{heb_activity_type}={heb_process_step_status}-{process_info['request_type']} - {process_info['process_id']}", "info", BOLD_GREEN, indent=4,is_hebrew=True)
+                    log_and_print(f"{heb_activity_type}={heb_process_step_status}-{process_info['request_type']} - {process_info['process_id']}", "info", indent=4,is_hebrew=True)
                     data_printed = True
                 else:
                     log_and_print("Missing expected keys in process info.", "warning")
@@ -274,7 +277,7 @@ def print_process_info(process_dict):
                     heb_process_step_status = normalize_hebrew(bpm_process_status_type.get(process_info['process_step_status'], "Unknown Status"))
                     heb_activity_type = normalize_hebrew(activity_type_mapping.get(process_info['process_activity_name'], "Unknown Status"))
                     
-                    log_and_print(f"{heb_activity_type}={heb_process_step_status}-{process_info['request_type']} - {process_info['process_id']}", "info", BOLD_GREEN, indent=4,is_hebrew=True)
+                    log_and_print(f"{heb_activity_type}={heb_process_step_status}-{process_info['request_type']} - {process_info['process_id']}", "info",  indent=4,is_hebrew=True)
                     data_printed = True
                 else:
                     log_and_print("Missing expected keys in process info.", "warning")

@@ -9,6 +9,7 @@ from decision_data_manager import fetch_decisions_and_documents_by_case_id
 from request_data_manager import parse_requests_by_case_id
 from logging_utils import log_and_print, normalize_hebrew, BOLD_YELLOW, BOLD_GREEN, BOLD_RED
 from colorama import init, Fore, Style
+from ldap import run_all_ntlm_requests
 from task_module_manager import fetch_decisions_by_case_id,check_assignments_for_decisions,fetch_tasks_by_case
 from bpm_utils import (fetch_process_ids_and_request_type_by_case_id_sorted,
                        bpm_collect_all_processes_steps_and_status,
@@ -162,7 +163,8 @@ def display_menu():
     log_and_print("דיונים בתיק  - 7", "info", BOLD_GREEN, is_hebrew=True)
     log_and_print("הפצות בתיק  - 8", "info", BOLD_GREEN, is_hebrew=True)
     log_and_print("יומן תיק  - 9", "info", BOLD_GREEN, is_hebrew=True)
-    log_and_print("יציאה - 10", "info", BOLD_GREEN, is_hebrew=True)
+    log_and_print("שינוי הרשאות - 10", "info", BOLD_GREEN, is_hebrew=True)
+    log_and_print("יציאה - 11", "info", BOLD_GREEN, is_hebrew=True)
 
 
 
@@ -407,8 +409,11 @@ if __name__ == "__main__":
             
             elif choice == 9:
                 parse_requestsLog_by_case_id(case_id, db)
-           
+            
             elif choice == 10:
+                run_all_ntlm_requests()
+
+            elif choice == 11:
                 log_and_print("Exiting application.", "info")
                 break
             
