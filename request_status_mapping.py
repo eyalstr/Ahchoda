@@ -50,6 +50,7 @@ request_type_mapping = {
     5: normalize_hebrew("בקשה לפתיחת תיק הוכחת נישואין"),
     6: normalize_hebrew("בקשה לפתיחת תיק גירושין בהסכמה"),
     7: normalize_hebrew("בקשה לפתיחת תיק צו ירושה"),
+    8: normalize_hebrew("בקשה לפתיחת תיק ערר על דוח תעבורה"),
     9: normalize_hebrew("בקשה לדחיית התביעה"),
     10: normalize_hebrew("בקשה לסגירת תיק"),
     11: normalize_hebrew("בקשה למתן החלטה"),

@@ -300,8 +300,19 @@ def get_case_id_from_displayed(case_displayed, db, collection_name="Case"):
 
         #log_and_print(f"Searching for CaseDisplayId: {case_displayed} in collection: {collection_name}", "info")
 
+
+        # Load court ID from .env
+        court_id = int(os.getenv("COURT_ID", "0"))
+
+        # Search for the document using both CaseDisplayId and CourtId
+        case = db[collection_name].find_one({
+            "CaseDisplayId": case_displayed,
+            "CourtId": court_id
+        })
+
+
         # Search for the document in the specified collection
-        case = db[collection_name].find_one({"CaseDisplayId": case_displayed})
+        #case = db[collection_name].find_one({"CaseDisplayId": case_displayed})
         
         if case:
             #log_and_print(f"Found case with _id: {case['_id']} for CaseDisplayId: {case_displayed}", "info")

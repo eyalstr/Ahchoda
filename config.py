@@ -25,7 +25,7 @@ def load_configuration():
         print(f"❌ Configuration file not found at {env_path}. Please provide a .env file.")
         exit(1)
 
-    required_env_vars = ["NODEID","API_URL","BEARER_TOKEN","MONGO_CONNECTION_STRING", "DB_SERVER", "DB_NAME", "DB_USER", "DB_PASS"]
+    required_env_vars = ["COURT_ID","NODEID","API_URL","BEARER_TOKEN","MONGO_CONNECTION_STRING", "DB_SERVER", "DB_NAME", "DB_USER", "DB_PASS"]
 
     for var in required_env_vars:
         value = os.getenv(var)

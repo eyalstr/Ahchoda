@@ -5,6 +5,10 @@ from logging_utils import BOLD_YELLOW, BOLD_GREEN, BOLD_RED
 import logging
 import pyodbc
 import os
+from dotenv import load_dotenv
+
+# Load environment variables
+load_dotenv()
 
 bpm_process_status_type = {
     1: normalize_hebrew("חדש"),
@@ -78,17 +82,28 @@ def fetch_process_ids_and_request_type_by_case_id_sorted(case_id, db):
     and return a dictionary with ProcessId as the key and RequestTypeId as the value.
     """
     process_dict = {}
-
+    #court_id = 11
+    court_id = int(os.getenv("COURT_ID", "0"))
+    log_and_print(f"court_id={court_id}")
+    
     try:
         collection = db["Case"]
         document = collection.find_one(
-            {"_id": case_id},
-            {"Requests.RequestId": 1, "Requests.RequestTypeId": 1, "Requests.Processes.ProcessId": 1, "Requests.Processes.LastPublishDate": 1, "_id": 1}
+            {"_id": case_id, "CourtId": court_id},
+            {
+                "Requests.RequestId": 1,
+                "Requests.RequestTypeId": 1,
+                "Requests.Processes.ProcessId": 1,
+                "Requests.Processes.LastPublishDate": 1,
+                "_id": 1
+            }
         )
 
         if not document:
-            log_and_print(f"No document found for Case ID {case_id}.")
+            log_and_print(f"No document found for Case ID {case_id} with Court ID {court_id}.")
             return {}
+
+
 
         requests = document.get("Requests", [])
         for request in requests:
