@@ -83,12 +83,23 @@ def fetch_documents_by_case_id(case_id, db, collection_name="Document"):
                         description = normalize_hebrew(DOCUMENT_CATEGORY_MAPPING.get(value, 0))
                         if description == 0:                            
                             description = "לא ידוע"
-                        log_and_print(f"קטגוריית המסמך: {description} ({value})", indent=2, ansi_format=BOLD_GREEN, is_hebrew=True)
-                    elif key == "DocumentValidityTypeId":
-                        if value==1:
-                            log_and_print(f"סטטוס מסמך בדוקומנטום :פעיל", indent=2, ansi_format=BOLD_GREEN, is_hebrew=True)
+                            log_and_print(f"קטגוריית המסמך: {description} ({value})", indent=2, ansi_format=BOLD_GREEN, is_hebrew=True)
+
+                    elif key == 'DocumentViews':
+                        views = document.get("DocumentViews", [])
+                        if len(views) > 0:
+                            log_and_print(f"DocumentViews contains {len(views)} entries.")
+                            for view in views:
+                                log_and_print(f" צפיות במסמך על-ידי: {view['UserIdentifyId']}", indent=2, ansi_format=BOLD_GREEN, is_hebrew=True)
+
                         else:
-                            log_and_print(f"סטטוס מסמך בדוקומנטום :לא פעיל", indent=2, ansi_format=BOLD_GREEN, is_hebrew=True)
+                            log_and_print(f"אין צפיות במסמך", indent=2, ansi_format=BOLD_GREEN, is_hebrew=True)
+
+                            # elif key == "DocumentValidityTypeId":
+                        #     if value==1:
+                        #         log_and_print(f"סטטוס מסמך בדוקומנטום :פעיל", indent=2, ansi_format=BOLD_GREEN, is_hebrew=True)
+                        #     else:
+                        #         log_and_print(f"סטטוס מסמך בדוקומנטום :לא פעיל", indent=2, ansi_format=BOLD_GREEN, is_hebrew=True)
                     # elif key in ["WatchedByDefendant", "WatchedByProsecutor"]:   
                     #     if key == "WatchedByDefendant":
                     #         desc = "נצפה על ידי משיבה"  # Corrected assignment

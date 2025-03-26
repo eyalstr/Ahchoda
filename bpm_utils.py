@@ -7,7 +7,7 @@ import pyodbc
 import os
 from dotenv import load_dotenv
 
-# Load environment variables
+# Load environment variable
 load_dotenv()
 
 bpm_process_status_type = {
@@ -85,7 +85,7 @@ def fetch_process_ids_and_request_type_by_case_id_sorted(case_id, db):
     #court_id = 11
     court_id = int(os.getenv("COURT_ID", "0"))
     log_and_print(f"court_id={court_id}")
-    
+
     try:
         collection = db["Case"]
         document = collection.find_one(
@@ -601,3 +601,37 @@ def parse_requestsLog_by_case_id(case_id: str, db) -> None:
 
     except Exception as e:
         log_and_print(f"Error parsing Requests log for Case ID {case_id}: {e}", "error",  is_hebrew=True)
+
+
+def fetch_case_from_vsearchcase(case_display_id, involved_identify_id, db):
+    """
+    Fetch a case document from the vSearchCase collection using CaseDisplayId and CaseInvolvedIdentifyId.
+
+    Args:
+        case_display_id (str): e.g., "1308/25"
+        involved_identify_id (str or int): e.g., "21921986"
+        db: MongoDB database connection
+
+    Returns:
+        dict: The matching document if found, else None
+    """
+    try:
+        collection = db["vSearchCase"]
+        query = {
+            "CaseDisplayId": case_display_id,
+            "CaseInvolvedIdentifyId": involved_identify_id
+        }
+
+        log_and_print(f"Searching vSearchCase with: CaseDisplayId={case_display_id}, CaseInvolvedIdentifyId={involved_identify_id}")
+        document = collection.find_one(query)
+
+        if document:
+            log_and_print("Match found in vSearchCase.")
+        else:
+            log_and_print("No match found in vSearchCase.", ansi_format=BOLD_YELLOW)
+
+        return document
+
+    except Exception as e:
+        log_and_print(f"Error while fetching from vSearchCase: {str(e)}", ansi_format=BOLD_RED)
+        return None
