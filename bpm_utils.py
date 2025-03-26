@@ -602,7 +602,7 @@ def parse_requestsLog_by_case_id(case_id: str, db) -> None:
     except Exception as e:
         log_and_print(f"Error parsing Requests log for Case ID {case_id}: {e}", "error",  is_hebrew=True)
 
-
+# מקבל ת"ז ומספר תיק - ומחזיר האם נמצא הב"כ בטבלה שהאתר רואה ומשם הוא לוקח להציג מטלות
 def fetch_case_from_vsearchcase(case_display_id, involved_identify_id, db):
     """
     Fetch a case document from the vSearchCase collection using CaseDisplayId and CaseInvolvedIdentifyId.
