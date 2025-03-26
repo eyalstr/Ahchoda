@@ -84,7 +84,7 @@ def fetch_process_ids_and_request_type_by_case_id_sorted(case_id, db):
     process_dict = {}
     #court_id = 11
     court_id = int(os.getenv("COURT_ID", "0"))
-    log_and_print(f"court_id={court_id}")
+    #log_and_print(f"court_id={court_id}")
 
     try:
         collection = db["Case"]
