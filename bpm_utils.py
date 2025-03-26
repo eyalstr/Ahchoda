@@ -717,16 +717,8 @@ def parse_case_involved_representors_by_case_id(case_id: str, db) -> None:
         
 def get_case_involved_name_by_identify_id(case_id: str, identify_id, db) -> str:
     """
-    Search in CaseInvolveds and their nested Representors for a matching CaseInvolvedIdentifyId,
-    and return the associated CaseInvolvedName.
-
-    Args:
-        case_id (str): The case _id from the Case collection.
-        identify_id (str or int): The CaseInvolvedIdentifyId to search for.
-        db: The MongoDB database connection.
-
-    Returns:
-        str: The CaseInvolvedName if found, otherwise 'לא ידוע'
+    Search in CaseInvolveds and nested Representors for a matching CaseInvolvedIdentifyId
+    and return the CaseInvolvedName.
     """
     try:
         collection = db["Case"]
@@ -735,19 +727,24 @@ def get_case_involved_name_by_identify_id(case_id: str, identify_id, db) -> str:
         if not document:
             return "לא ידוע"
 
-        identify_id = str(identify_id)
-        case_involveds = document.get("CaseInvolveds", [])
+        try:
+            identify_id = int(identify_id)
+        except:
+            return "לא ידוע"
 
-        for involved in case_involveds:
-            # Check top-level CaseInvolved
-            if str(involved.get("CaseInvolvedIdentifyId")) == identify_id:
-                return involved.get("CaseInvolvedName", "לא ידוע")
+        for involved in document.get("CaseInvolveds", []):
+            try:
+                if int(involved.get("CaseInvolvedIdentifyId", -1)) == identify_id:
+                    return involved.get("CaseInvolvedName", "לא ידוע")
+            except:
+                pass
 
-            # Check nested Representors (inside this involved)
-            representors = involved.get("Representors", [])
-            for rep in representors:
-                if str(rep.get("CaseInvolvedIdentifyId")) == identify_id:
-                    return rep.get("CaseInvolvedName", "לא ידוע")
+            for rep in involved.get("Representors", []):
+                try:
+                    if int(rep.get("CaseInvolvedIdentifyId", -1)) == identify_id:
+                        return rep.get("CaseInvolvedName", "לא ידוע")
+                except:
+                    pass
 
         return "לא ידוע"
 
