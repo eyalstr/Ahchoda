@@ -4,6 +4,7 @@ from logging_utils import log_and_print, normalize_hebrew, logger
 from logging_utils import BOLD_YELLOW, BOLD_GREEN, BOLD_RED
 from doc_header_map import DOCUMENT_TYPE_MAPPING, DOCUMENT_CATEGORY_MAPPING
 from request_data_manager import get_requests_by_case_id,request_type_mapping
+from bpm_utils import get_case_involved_name_by_identify_id
 
 IsWatched = {
     "False": 'לא',
@@ -90,8 +91,17 @@ def fetch_documents_by_case_id(case_id, db, collection_name="Document"):
                         if len(views) > 0:
                             log_and_print(f"DocumentViews contains {len(views)} entries.")
                             for view in views:
-                                log_and_print(f" צפיות במסמך על-ידי: {view['UserIdentifyId']}", indent=2, ansi_format=BOLD_GREEN, is_hebrew=True)
-
+                                user_id = view.get("UserIdentifyId")
+                                if user_id is not None:
+                                    identifier_name = get_case_involved_name_by_identify_id(case_id, user_id, db)
+                                    log_and_print(
+                                        f"צפייה על-ידי: {identifier_name} (מזהה: {user_id})",
+                                        indent=2,
+                                        ansi_format=BOLD_GREEN,
+                                        is_hebrew=True
+                                    )
+                                else:
+                                    log_and_print("צפייה על-ידי: מזהה לא ידוע", indent=2, ansi_format=BOLD_YELLOW, is_hebrew=True)
                         else:
                             log_and_print(f"אין צפיות במסמך", indent=2, ansi_format=BOLD_GREEN, is_hebrew=True)
 
@@ -118,3 +128,5 @@ def fetch_documents_by_case_id(case_id, db, collection_name="Document"):
     except Exception as e:
         log_and_print(f"Error querying MongoDB: {e}", "error", ansi_format=BOLD_RED)
         return []
+
+

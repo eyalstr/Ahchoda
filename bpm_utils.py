@@ -622,16 +622,139 @@ def fetch_case_from_vsearchcase(case_display_id, involved_identify_id, db):
             "CaseInvolvedIdentifyId": involved_identify_id
         }
 
-        log_and_print(f"Searching vSearchCase with: CaseDisplayId={case_display_id}, CaseInvolvedIdentifyId={involved_identify_id}")
+        log_and_print(f"מחפש ב-vSearchCase עם: מספר תיק מוצג = {case_display_id}, מזהה מעורב = {involved_identify_id}", is_hebrew=True)
+
         document = collection.find_one(query)
 
         if document:
-            log_and_print("Match found in vSearchCase.")
+            log_and_print("נמצא תיעוד מתאים ב-vSearchCase.", is_hebrew=True)
+
         else:
-            log_and_print("No match found in vSearchCase.", ansi_format=BOLD_YELLOW)
+            log_and_print("לא נמצא תיעוד מתאים ב-vSearchCase.", ansi_format=BOLD_YELLOW, is_hebrew=True)
+
 
         return document
 
     except Exception as e:
         log_and_print(f"Error while fetching from vSearchCase: {str(e)}", ansi_format=BOLD_RED)
         return None
+
+def parse_case_involved_representors_by_case_id(case_id: str, db) -> None:
+    """
+    For a given case ID, retrieve the CaseInvolveds array and list all active representors
+    (with valid appointment period) who exist in the vSearchCase collection.
+
+    Args:
+        case_id (str): The Case ID to fetch data for.
+        db (Database): The MongoDB database connection.
+
+    Returns:
+        None
+    """
+    try:
+        collection = db["Case"]
+        document = collection.find_one(
+            {"_id": case_id},
+            {"CaseInvolveds": 1, "CaseDisplayId": 1, "_id": 0}
+        )
+
+        if not document:
+            log_and_print(f"לא נמצא מסמך עבור מספר תיק {case_id}.", "info", is_hebrew=True)
+            return
+
+        case_display_id = document.get("CaseDisplayId", "לא ידוע")
+        log_and_print(f"\n========= מספר תיק מוצג: {case_display_id} =========", "info", is_hebrew=True)
+
+        case_involveds = document.get("CaseInvolveds", [])
+        if not isinstance(case_involveds, list):
+            log_and_print(f"תבנית שגויה של השדה CaseInvolveds עבור תיק {case_id}.", "info", is_hebrew=True)
+            return
+
+        log_and_print(f"סה״כ מעורבים בתיק: {len(case_involveds)}", "info", is_hebrew=True)
+
+        for index, involved in enumerate(case_involveds):
+            if not involved.get("IsActive", False):
+                continue
+
+            involved_name = involved.get("CaseInvolvedName", "לא ידוע")
+            involved_id = involved.get("CaseInvolvedId", "N/A")
+            log_and_print(f"\n({index+1}) מעורב: {involved_name} (ID: {involved_id})", "info", is_hebrew=True)
+
+            representors = involved.get("Representors", [])
+            valid_representors = []
+
+            for rep in representors:
+                if not rep.get("IsActive", False):
+                    continue
+                if rep.get("AppointmentStartDate") is None or rep.get("AppointmentEndDate") is not None:
+                    continue
+
+                rep_identify_id = rep.get("CaseInvolvedIdentifyId")
+                if not rep_identify_id:
+                    continue
+
+                # Check in vSearchCase collection
+                result = fetch_case_from_vsearchcase(case_display_id, rep_identify_id, db)
+                if result:
+                    valid_representors.append(rep)
+
+            if valid_representors:
+                log_and_print(f"  מייצגים חוקיים בתיק ({len(valid_representors)}):", "info", indent=2, is_hebrew=True)
+                for rep_index, rep in enumerate(valid_representors):
+                    rep_name = rep.get("CaseInvolvedName", "לא ידוע")
+                    rep_id = rep.get("CaseInvolvedIdentifyId", "N/A")
+                    is_legal_aid = rep.get("IsLegalAid", False)
+                    log_and_print(
+                        f"{rep_index + 1}. שם: {rep_name}, מזהה: {rep_id}, סיוע משפטי: {'כן' if is_legal_aid else 'לא'}",
+                        indent=4,
+                        is_hebrew=True
+                    )
+            else:
+                log_and_print("אין מייצגים פעילים בתיק זה לאחר אימות מול vSearchCase.", indent=2, ansi_format=BOLD_GREEN, is_hebrew=True)
+
+    except Exception as e:
+        log_and_print(f"שגיאה בעת שליפת מידע לתיק {case_id}: {str(e)}", "error", is_hebrew=True)
+        
+def get_case_involved_name_by_identify_id(case_id: str, identify_id, db) -> str:
+    """
+    Search in CaseInvolveds and their nested Representors for a matching CaseInvolvedIdentifyId,
+    and return the associated CaseInvolvedName.
+
+    Args:
+        case_id (str): The case _id from the Case collection.
+        identify_id (str or int): The CaseInvolvedIdentifyId to search for.
+        db: The MongoDB database connection.
+
+    Returns:
+        str: The CaseInvolvedName if found, otherwise 'לא ידוע'
+    """
+    try:
+        collection = db["Case"]
+        document = collection.find_one({"_id": case_id}, {"CaseInvolveds": 1})
+
+        if not document:
+            return "לא ידוע"
+
+        identify_id = str(identify_id)
+        case_involveds = document.get("CaseInvolveds", [])
+
+        for involved in case_involveds:
+            # Check top-level CaseInvolved
+            if str(involved.get("CaseInvolvedIdentifyId")) == identify_id:
+                return involved.get("CaseInvolvedName", "לא ידוע")
+
+            # Check nested Representors (inside this involved)
+            representors = involved.get("Representors", [])
+            for rep in representors:
+                if str(rep.get("CaseInvolvedIdentifyId")) == identify_id:
+                    return rep.get("CaseInvolvedName", "לא ידוע")
+
+        return "לא ידוע"
+
+    except Exception as e:
+        log_and_print(
+            f"שגיאה בחיפוש שם משתמש לפי מזהה {identify_id}: {str(e)}",
+            ansi_format=BOLD_RED,
+            is_hebrew=True
+        )
+        return "לא ידוע"

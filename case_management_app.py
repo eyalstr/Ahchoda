@@ -19,7 +19,8 @@ from bpm_utils import (fetch_process_ids_and_request_type_by_case_id_sorted,
                        filter_population_process_status,
                        filter_internal_judge_task_process_status,
                        filter_internal_secretery_task_process_status,
-                       fetch_all_discussion_by_case,parse_requestsLog_by_case_id) 
+                       fetch_all_discussion_by_case,parse_requestsLog_by_case_id,
+                       parse_case_involved_representors_by_case_id) 
 
 import os
 
@@ -164,7 +165,8 @@ def display_menu():
     log_and_print("הפצות בתיק  - 8", "info", BOLD_GREEN, is_hebrew=True)
     log_and_print("יומן תיק  - 9", "info", BOLD_GREEN, is_hebrew=True)
     log_and_print("שינוי הרשאות - 10", "info", BOLD_GREEN, is_hebrew=True)
-    log_and_print("יציאה - 11", "info", BOLD_GREEN, is_hebrew=True)
+    log_and_print("מייצגים פעילים- שיקוף לאתר - 11", "info", BOLD_GREEN, is_hebrew=True)
+    log_and_print("יציאה - 12", "info", BOLD_GREEN, is_hebrew=True)
 
 
 
@@ -425,6 +427,9 @@ if __name__ == "__main__":
                 run_all_ntlm_requests()
 
             elif choice == 11:
+                parse_case_involved_representors_by_case_id(case_id, db)
+
+            elif choice == 12:
                 log_and_print("Exiting application.", "info")
                 break
             
