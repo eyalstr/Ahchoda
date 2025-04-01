@@ -394,7 +394,9 @@ if __name__ == "__main__":
                 process_dic = fetch_process_ids_and_request_type_by_case_id_sorted(case_id, db)
                 processes_dic = bpm_collect_all_processes_steps_and_status(server_name, database_name, user_name, password, process_dic)
                 waiting_task_process = filter_process_info_by_waiting_for_task_status(processes_dic)
+                
                 valid_waiting_process = check_process_assignment_is_valid(waiting_task_process,server_name, database_name, user_name, password)
+                log_and_print(f"valid_waiting_process={valid_waiting_process}")
                 print_process_info(valid_waiting_process)
                  
             elif choice == 6:

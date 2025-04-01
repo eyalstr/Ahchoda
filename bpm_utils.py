@@ -309,22 +309,22 @@ def print_process_info(process_dict):
 
 
 #############################  מטלות #########################
-def filter_process_info_by_waiting_for_task_status(process_dict, status_to_filter=6):
-    """Filter process info and return a list of items where process_step_status equals status_to_filter."""
-    filtered_items = []  # List to store items that match the filter condition
-
+def filter_process_info_by_waiting_for_task_status(process_dict, statuses_to_filter=[6, 7]):
+    """Filter process info and return a list of items where process_step_status is in the provided list."""
+    # 6= בהמתנה (עבור מטלה)
+    # 7= סיום טיפול/בוצע
+    filtered_items = []
+  
     try:
-        # Check if process_dict is a dictionary
+        # Ensure input is a list or dict
         if isinstance(process_dict, dict):
-            # Iterate over the dictionary values
             for process_info in process_dict.values():
-                if 'process_step_status' in process_info and process_info['process_step_status'] == status_to_filter:
+                if 'process_step_status' in process_info and process_info['process_step_status'] in statuses_to_filter:
                     filtered_items.append(process_info)
 
-        # Check if process_dict is a list
         elif isinstance(process_dict, list):
             for process_info in process_dict:
-                if 'process_step_status' in process_info and process_info['process_step_status'] == status_to_filter:
+                if 'process_step_status' in process_info and process_info['process_step_status'] in statuses_to_filter:
                     filtered_items.append(process_info)
 
         else:
@@ -333,8 +333,8 @@ def filter_process_info_by_waiting_for_task_status(process_dict, status_to_filte
     except Exception as e:
         log_and_print(f"Error filtering process info: {e}", "error")
 
-    # Return the filtered list
     return filtered_items
+
 
 
 #############################  הפצה #########################
@@ -511,15 +511,23 @@ def check_process_assignment_is_valid(all_waiting_tasks, server_name, database_n
         sql_query = """
         SELECT 1
         FROM [Responses].[dbo].[Assignments]
-        WHERE Process_Id = ? AND Assignment_Status_Id = '1'
+        WHERE Process_Id = ? AND Assignment_Status_Id = ?
         """
 
         for task in all_waiting_tasks:
             process_id = task.get('process_id')  # Adjust the key based on your dictionary structure
             if process_id is not None:
-                cursor.execute(sql_query, process_id)
-                if cursor.fetchone():
+                for assign_id in [1,6]:
+                    cursor.execute(sql_query, process_id,assign_id)
+                    if cursor.fetchone():
+                        assignment_type_found = assign_id
+                        break
+                if assignment_type_found:
+                    task['valid_assignment_type'] = assignment_type_found
                     valid_tasks.append(task)
+                else:
+                    log_and_print(f"תהליך {process_id} - לא נמצאה הקצאה פעילה מסוג 1 או 6", "yellow", is_hebrew=True)
+
             else:
                 log_and_print(f"Process ID not found in task: {task}", "warning")
 
