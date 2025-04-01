@@ -763,3 +763,51 @@ def get_case_involved_name_by_identify_id(case_id: str, identify_id, db) -> str:
             is_hebrew=True
         )
         return "לא ידוע"
+
+
+def print_task_process_info(process_dict):
+    """Print all elements in the dictionary or list in a specific format, with assignment type prefix."""
+    try:
+        data_printed = False
+
+        def get_assignment_type_label(assignment_type):
+            if assignment_type == 1:
+                #log_and_print("נמצאה מטלה בטבלת-assignment",  "info", indent=4, is_hebrew=True)
+                return "נמצאה מטלה בטבלת-assignment"
+            elif assignment_type == 6:
+                return "נמצאה מטלה בחריגה בטבלת-assignment"
+            return ""
+
+        def print_process_line(process_info):
+            if 'process_activity_name' in process_info and 'process_step_status' in process_info and 'request_type' in process_info:
+                heb_process_step_status = normalize_hebrew(bpm_process_status_type.get(process_info['process_step_status'], "Unknown Status"))
+                heb_activity_type = normalize_hebrew(activity_type_mapping.get(process_info['process_activity_name'], "Unknown Status"))
+
+                prefix = ""
+                if 'valid_assignment_type' in process_info:
+                    prefix = get_assignment_type_label(process_info['valid_assignment_type']) + " - "
+
+                log_and_print(f"{heb_activity_type}={prefix}-{process_info['request_type']} - {process_info['process_id']}", "info", indent=4, is_hebrew=True)
+                return True
+            else:
+                log_and_print("Missing expected keys in process info.", "warning")
+                return False
+
+        if isinstance(process_dict, dict):
+            for process_info in process_dict.values():
+                if print_process_line(process_info):
+                    data_printed = True
+
+        elif isinstance(process_dict, list):
+            for process_info in process_dict:
+                if print_process_line(process_info):
+                    data_printed = True
+
+        else:
+            log_and_print("The provided data is neither a list nor a dictionary.", "error")
+
+        if not data_printed:
+            log_and_print("אין מידע מבוקש", "info", is_hebrew=True)
+
+    except Exception as e:
+        log_and_print(f"Error printing process info: {e}", "error")

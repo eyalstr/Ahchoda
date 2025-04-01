@@ -20,7 +20,7 @@ from bpm_utils import (fetch_process_ids_and_request_type_by_case_id_sorted,
                        filter_internal_judge_task_process_status,
                        filter_internal_secretery_task_process_status,
                        fetch_all_discussion_by_case,parse_requestsLog_by_case_id,
-                       parse_case_involved_representors_by_case_id) 
+                       parse_case_involved_representors_by_case_id,print_task_process_info) 
 
 import os
 
@@ -396,8 +396,8 @@ if __name__ == "__main__":
                 waiting_task_process = filter_process_info_by_waiting_for_task_status(processes_dic)
                 
                 valid_waiting_process = check_process_assignment_is_valid(waiting_task_process,server_name, database_name, user_name, password)
-                log_and_print(f"valid_waiting_process={valid_waiting_process}")
-                print_process_info(valid_waiting_process)
+                #log_and_print(f"valid_waiting_process={valid_waiting_process}")
+                print_task_process_info(valid_waiting_process)
                  
             elif choice == 6:
                 #1083/tasks= fetch_tasks_by_case(case_id)
