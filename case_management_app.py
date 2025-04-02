@@ -164,11 +164,9 @@ def display_menu():
     log_and_print("דיונים בתיק  - 7", "info", BOLD_GREEN, is_hebrew=True)
     log_and_print("הפצות בתיק  - 8", "info", BOLD_GREEN, is_hebrew=True)
     log_and_print("יומן תיק  - 9", "info", BOLD_GREEN, is_hebrew=True)
-    log_and_print("שינוי הרשאות - 10", "info", BOLD_GREEN, is_hebrew=True)
-    log_and_print("מייצגים פעילים- שיקוף לאתר - 11", "info", BOLD_GREEN, is_hebrew=True)
+    log_and_print("מייצגים פעילים- שיקוף לאתר - 10", "info", BOLD_GREEN, is_hebrew=True)
+    log_and_print("שינוי הרשאות - 11", "info", BOLD_GREEN, is_hebrew=True)
     log_and_print("יציאה - 12", "info", BOLD_GREEN, is_hebrew=True)
-
-
 
     try:
         choice = int(input(f"Enter your choice: "))
@@ -424,12 +422,12 @@ if __name__ == "__main__":
             
             elif choice == 9:
                 parse_requestsLog_by_case_id(case_id, db)
-            
+                        
             elif choice == 10:
-                run_all_ntlm_requests()
+                parse_case_involved_representors_by_case_id(case_id, db)
 
             elif choice == 11:
-                parse_case_involved_representors_by_case_id(case_id, db)
+                run_all_ntlm_requests()
 
             elif choice == 12:
                 log_and_print("Exiting application.", "info")

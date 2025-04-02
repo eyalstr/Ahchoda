@@ -494,7 +494,7 @@ def fetch_all_discussion_by_case(case_id, server_name, database_name, user_name,
 def check_process_assignment_is_valid(all_waiting_tasks, server_name, database_name, user_name, password):
     """Filter tasks by checking each Process_Id against the database for active assignments."""
     valid_tasks = []  # List to store tasks with valid assignments
-
+    assignment_type_found = 0
     try:
         # Establish connection to SQL Server
         connection = pyodbc.connect(
@@ -514,22 +514,28 @@ def check_process_assignment_is_valid(all_waiting_tasks, server_name, database_n
         WHERE Process_Id = ? AND Assignment_Status_Id = ?
         """
 
+        
         for task in all_waiting_tasks:
-            process_id = task.get('process_id')  # Adjust the key based on your dictionary structure
+            process_id = task.get('process_id')
             if process_id is not None:
-                for assign_id in [1,6]:
-                    cursor.execute(sql_query, process_id,assign_id)
+                assignment_type_found = None  # ✅ reset for each task
+                for assign_id in [1, 6]:
+                    cursor.execute(sql_query, process_id, assign_id)
                     if cursor.fetchone():
                         assignment_type_found = assign_id
                         break
+
+                #log_and_print(f"assignment_type_found={assignment_type_found}")
+
                 if assignment_type_found:
                     task['valid_assignment_type'] = assignment_type_found
                     valid_tasks.append(task)
-                else:
-                    log_and_print(f"תהליך {process_id} - לא נמצאה הקצאה פעילה מסוג 1 או 6", "yellow", is_hebrew=True)
-
+                #else:
+                #    log_and_print(f"תהליך {process_id} - לא נמצאה הקצאה פעילה מסוג 1 או 6", "yellow", is_hebrew=True)
             else:
                 log_and_print(f"Process ID not found in task: {task}", "warning")
+
+
 
     except Exception as e:
         log_and_print(f"Error querying SQL Server: {e}", "error")
@@ -772,10 +778,10 @@ def print_task_process_info(process_dict):
 
         def get_assignment_type_label(assignment_type):
             if assignment_type == 1:
-                #log_and_print("נמצאה מטלה בטבלת-assignment",  "info", indent=4, is_hebrew=True)
+                #log_and_print("נמצאה מטלה בטבלת assignment",  "info", indent=4, is_hebrew=True)
                 return "נמצאה מטלה בטבלת-assignment"
             elif assignment_type == 6:
-                return "נמצאה מטלה בחריגה בטבלת-assignment"
+                return "נמצאה מטלה בחריגה בטבלת assignment"
             return ""
 
         def print_process_line(process_info):
