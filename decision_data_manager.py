@@ -6,12 +6,68 @@ from logging_utils import BOLD_YELLOW, BOLD_GREEN, BOLD_RED
 from doc_header_map import DOCUMENT_TYPE_MAPPING, DOCUMENT_CATEGORY_MAPPING # Import the mapping table
 from rtl_task_mappings import decision_type_mapping
 from request_data_manager import get_request_description
+from config import load_configuration
+import os
+import pyodbc
 
 # Decision status descriptions
 DECISION_STATUS_DESCRIPTIONS = {
     1: "טיוטת החלטה",
     3: "החלטה מאושרת"
 }
+
+
+
+
+def getDecisionHebDesc(DecTypeToCourtId):
+   
+      
+    decision_desc = ''
+    # MongoDB connection string
+    mongo_connection_string = os.getenv("MONGO_CONNECTION_STRING", "")
+
+    # SQL Server connection parameters
+    server_name = os.getenv("DB_SERVER")
+    database_name = os.getenv("DB_NAME")
+    user_name = os.getenv("DB_USER")
+    password = os.getenv("DB_PASS")
+
+    try:
+        # Establish connection to SQL Server
+        connection = pyodbc.connect(
+            f"DRIVER={{ODBC Driver 17 for SQL Server}};"
+            f"SERVER={server_name};"
+            f"DATABASE={database_name};"
+            f"UID={user_name};"
+            f"PWD={password};"
+            f"Trusted_Connection=yes;"
+        )
+
+        cursor = connection.cursor()
+      
+        # SQL Query 1: Get ProcessID and ProcessTypeName
+        sql_query = """
+        select * from CaseManagement_BO.dbo.lt_decision_type_to_court l 
+        join CaseManagement_BO..CT_Decision_Types dc on dc.Decision_Type_Id = l.Decision_Type_Id
+        where  l.Decision_Type_To_Court_ID = ?;
+        """
+        
+        cursor.execute(sql_query, (DecTypeToCourtId,))  # Use a tuple for parameters
+        row = cursor.fetchall()
+
+        if row:
+            decision_desc =row[0][2]
+            
+    except Exception as e:
+        log_and_print(f"Error querying SQL Server: {e}", "error", BOLD_RED)
+
+    finally:
+        # Close the SQL Server connection
+        if 'connection' in locals():
+            connection.close()
+            #log_and_print("\nSQL Server connection closed.", "info", BOLD_GREEN)    
+
+    return decision_desc
 
 def get_decision_status_description(status_id: Optional[int]) -> str:
     """Fetch the description for a given DecisionStatusTypeId."""
@@ -99,7 +155,8 @@ def fetch_decisions_and_documents_by_case_id(case_id: str, db) -> List[Dict[str,
                                             log_and_print(f"החלטה בבקשה :{description} ({request_id})", is_hebrew=True)
 
                                         elif sub_key == "DecisionTypeToCourtId":
-                                            des_status_heb = normalize_hebrew(decision_type_mapping.get(sub_val, "Unknown Status"))
+                                            des_status_heb = getDecisionHebDesc(sub_val)
+                                            #des_status_heb = normalize_hebrew(decision_type_mapping.get(sub_val, "Unknown Status"))
                                             log_and_print(f"תוכן ההחלטה : ({sub_val}){des_status_heb}", "info", BOLD_GREEN, is_hebrew=True, indent=4)
                                         #else:
                                         #    log_and_print(f"    {sub_key}: {sub_val}", indent=12, is_hebrew=True)
