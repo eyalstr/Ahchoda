@@ -119,7 +119,7 @@ def fetch_documents_by_case_id(case_id, db, collection_name="Document"):
                     #     watched = IsWatched.get(str(value), f"לא ידוע ({value})")
                     #     log_and_print(f"{desc}: {value}", indent=2, ansi_format=BOLD_GREEN, is_hebrew=True)
                     
-                    elif key in ["MojId", "FileName"]:                   
+                    elif key in ["MojId", "FileName","CreateDate"]:                   
                         log_and_print(f"{key}: {value}", indent=2,  is_hebrew=True)
 
                 
