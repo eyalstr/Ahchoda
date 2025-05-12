@@ -5,12 +5,69 @@ from logging_utils import BOLD_YELLOW, BOLD_GREEN, BOLD_RED
 from doc_header_map import DOCUMENT_TYPE_MAPPING, DOCUMENT_CATEGORY_MAPPING
 from request_data_manager import get_requests_by_case_id,request_type_mapping
 from bpm_utils import get_case_involved_name_by_identify_id
+import pyodbc
+import os
 
 IsWatched = {
     "False": 'לא',
     "True": 'כן',
     "None": 'None'
 }
+
+
+
+
+def getDocHebDesc(DocType):
+   
+      
+    doc_desc = 'לא ידוע'
+    # MongoDB connection string
+    mongo_connection_string = os.getenv("MONGO_CONNECTION_STRING", "")
+
+    # SQL Server connection parameters
+    server_name = os.getenv("DB_SERVER")
+    database_name = os.getenv("DB_NAME")
+    user_name = os.getenv("DB_USER")
+    password = os.getenv("DB_PASS")
+
+    try:
+        # Establish connection to SQL Server
+        connection = pyodbc.connect(
+            f"DRIVER={{ODBC Driver 17 for SQL Server}};"
+            f"SERVER={server_name};"
+            f"DATABASE={database_name};"
+            f"UID={user_name};"
+            f"PWD={password};"
+            f"Trusted_Connection=yes;"
+        )
+
+        cursor = connection.cursor()
+      
+        # SQL Query 1: Get ProcessID and ProcessTypeName
+        sql_query = """
+        SELECT TOP (1000) [Document_Type_Id]      
+      ,[Description_Heb]      
+       FROM [CaseManagement_BO].[dbo].[CT_Document_Types]
+        where Document_Type_Id = ?;
+        """
+        
+        cursor.execute(sql_query, (DocType,))  # Use a tuple for parameters
+        row = cursor.fetchall()
+
+        if row:
+            doc_desc =row[0][1]
+            
+    except Exception as e:
+        log_and_print(f"Error querying SQL Server: {e}", "error", BOLD_RED)
+
+    finally:
+        # Close the SQL Server connection
+        if 'connection' in locals():
+            connection.close()
+            #log_and_print("\nSQL Server connection closed.", "info", BOLD_GREEN)    
+
+    return doc_desc
+
 def fetch_documents_by_case_id(case_id, db, collection_name="Document"):
     """
     Fetch all documents from MongoDB where Entities array contains an object 
@@ -77,7 +134,8 @@ def fetch_documents_by_case_id(case_id, db, collection_name="Document"):
                # Iterate through document fields
                 for key, value in document.items():
                     if key == "DocumentTypeId" and isinstance(value, int):
-                        description = normalize_hebrew(DOCUMENT_TYPE_MAPPING.get(value, f"לא ידוע ({value})"))
+                        description = getDocHebDesc(value)
+                        #description = normalize_hebrew(DOCUMENT_TYPE_MAPPING.get(value, f"לא ידוע ({value})"))
                         log_and_print(f"סוג המסמך: {description} ({value})", indent=2, ansi_format=BOLD_GREEN, is_hebrew=True)
                     
                     elif key == "DocumentCategoryId":
