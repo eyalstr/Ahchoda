@@ -20,9 +20,11 @@ from bpm_utils import (fetch_process_ids_and_request_type_by_case_id_sorted,
                        filter_internal_judge_task_process_status,
                        filter_internal_secretery_task_process_status,
                        fetch_all_discussion_by_case,parse_requestsLog_by_case_id,
-                       parse_case_involved_representors_by_case_id,print_task_process_info) 
+                       parse_case_involved_representors_by_case_id,print_task_process_info,
+                       getAllAssignmentsTasks) 
 
 import os
+from decision_data_manager import getDecisionHebDesc
 
 # Initialize colorama
 init(autoreset=True)
@@ -201,7 +203,7 @@ def get_case_id_by_displayed_id(db):
             case_id = None
 
             # Determine the input type (CaseDisplayId or SiteActionId)
-            if "/" in user_input:
+            if "-" in user_input:
                 # Handle CaseDisplayId
                 #log_and_print(f"Identified input as Case Displayed ID: {user_input}", "info")
                 case_id = get_case_id_from_displayed(user_input, db)
@@ -389,13 +391,14 @@ if __name__ == "__main__":
             elif choice == 5:
                 log_and_print(f"\n##########-- מטלות בתיק  --##########", BOLD_YELLOW, indent=4,is_hebrew=True)
 
-                process_dic = fetch_process_ids_and_request_type_by_case_id_sorted(case_id, db)
-                processes_dic = bpm_collect_all_processes_steps_and_status(server_name, database_name, user_name, password, process_dic)
-                waiting_task_process = filter_process_info_by_waiting_for_task_status(processes_dic)
+                #process_dic = fetch_process_ids_and_request_type_by_case_id_sorted(case_id, db)
+                #processes_dic = bpm_collect_all_processes_steps_and_status(server_name, database_name, user_name, password, process_dic)
+                #waiting_task_process = filter_process_info_by_waiting_for_task_status(processes_dic)
                 
-                valid_waiting_process = check_process_assignment_is_valid(waiting_task_process,server_name, database_name, user_name, password)
+                #valid_waiting_process = check_process_assignment_is_valid(waiting_task_process,server_name, database_name, user_name, password)
                 #log_and_print(f"valid_waiting_process={valid_waiting_process}")
-                print_task_process_info(valid_waiting_process)
+                #print_task_process_info(valid_waiting_process)
+                getAllAssignmentsTasks(case_id)
                  
             elif choice == 6:
                 #1083/tasks= fetch_tasks_by_case(case_id)

@@ -322,11 +322,13 @@ def filter_process_info_by_waiting_for_task_status(process_dict, statuses_to_fil
     try:
         # Ensure input is a list or dict
         if isinstance(process_dict, dict):
+            log_and_print(f"process_dict={process_dict}")
             for process_info in process_dict.values():
                 if 'process_step_status' in process_info and process_info['process_step_status'] in statuses_to_filter:
                     filtered_items.append(process_info)
 
         elif isinstance(process_dict, list):
+            log_and_print(f"pprocess_dict={process_dict}")
             for process_info in process_dict:
                 if 'process_step_status' in process_info and process_info['process_step_status'] in statuses_to_filter:
                     filtered_items.append(process_info)
@@ -821,3 +823,75 @@ def print_task_process_info(process_dict):
 
     except Exception as e:
         log_and_print(f"Error printing process info: {e}", "error")
+
+
+
+def getAllAssignmentsTasks(Case_Id):
+   
+      
+    doc_desc = 'לא ידוע'
+    # MongoDB connection string
+    mongo_connection_string = os.getenv("MONGO_CONNECTION_STRING", "")
+
+    # SQL Server connection parameters
+    server_name = os.getenv("DB_SERVER")
+    database_name = os.getenv("DB_NAME")
+    user_name = os.getenv("DB_USER")
+    password = os.getenv("DB_PASS")
+
+    try:
+        # Establish connection to SQL Server
+        connection = pyodbc.connect(
+            f"DRIVER={{ODBC Driver 17 for SQL Server}};"
+            f"SERVER={server_name};"
+            f"DATABASE={database_name};"
+            f"UID={user_name};"
+            f"PWD={password};"
+            f"Trusted_Connection=yes;"
+        )
+
+        cursor = connection.cursor()
+      
+        # SQL Query 1: Get ProcessID and ProcessTypeName
+        sql_query = """
+            SELECT TOP (1000) asg.[Assignment_Id]
+            ,asg.[Case_Id]
+            ,asg.[Request_Id]
+            ,asg.[Decision_Id]
+            ,asg.[Decision_Moj_Id]
+            ,asg.[Assignment_Type_Id]
+            ,ast.[Description_Heb]
+            ,asg.[Due_Date]
+            ,asg.[Assignment_Status_Id]
+            ,ass.[Description_Heb]
+            ,asg.[Is_Active]
+            ,asg.[Site_Action_Id]
+            
+        FROM [Responses].[dbo].[Assignments] as asg
+        left join [Responses].[dbo].[CT_Assignment_Types] as ast 
+        on ast.[Assignment_Type_Id] = asg.[Assignment_Type_Id]
+        left join [Responses].[dbo].[CT_Assignment_Status_Types] as ass			
+        on ass.[Assignment_Status_Type_Id] = asg.[Assignment_Status_Id]
+        where asg.[Case_Id]= ?;
+        """
+        
+        cursor.execute(sql_query, (Case_Id,))  # Use a tuple for parameters
+        rows = cursor.fetchall()
+
+        if rows:
+            for row in rows:
+                log_and_print(
+                    f"מטלה {row[6]} בסטטוס:{row[9]}","info",BOLD_YELLOW,is_hebrew=True)
+        else:
+            log_and_print(f"אין מטלות בתיק","info",BOLD_YELLOW, is_hebrew=True)
+
+    except Exception as e:
+        log_and_print(f"Error querying SQL Server: {e}", "error", BOLD_RED)
+
+    finally:
+        # Close the SQL Server connection
+        if 'connection' in locals():
+            connection.close()
+            #log_and_print("\nSQL Server connection closed.", "info", BOLD_GREEN)    
+
+    
