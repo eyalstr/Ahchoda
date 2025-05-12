@@ -21,7 +21,7 @@ from bpm_utils import (fetch_process_ids_and_request_type_by_case_id_sorted,
                        filter_internal_secretery_task_process_status,
                        fetch_all_discussion_by_case,parse_requestsLog_by_case_id,
                        parse_case_involved_representors_by_case_id,print_task_process_info,
-                       getAllAssignmentsTasks) 
+                       getAllAssignmentsTasks,getBOActions) 
 
 import os
 from decision_data_manager import getDecisionHebDesc
@@ -167,8 +167,9 @@ def display_menu():
     log_and_print("הפצות בתיק  - 8", "info", BOLD_GREEN, is_hebrew=True)
     log_and_print("יומן תיק  - 9", "info", BOLD_GREEN, is_hebrew=True)
     log_and_print("מייצגים פעילים- שיקוף לאתר - 10", "info", BOLD_GREEN, is_hebrew=True)
-    log_and_print("שינוי הרשאות - 11", "info", BOLD_GREEN, is_hebrew=True)
-    log_and_print("יציאה - 12", "info", BOLD_GREEN, is_hebrew=True)
+    log_and_print("תור שינוי סיווג - 11", "info", BOLD_GREEN, is_hebrew=True)
+    log_and_print("שינוי הרשאות - 12", "info", BOLD_GREEN, is_hebrew=True)
+    log_and_print("יציאה - 13", "info", BOLD_GREEN, is_hebrew=True)
 
     try:
         choice = int(input(f"Enter your choice: "))
@@ -430,9 +431,12 @@ if __name__ == "__main__":
                 parse_case_involved_representors_by_case_id(case_id, db)
 
             elif choice == 11:
-                run_all_ntlm_requests()
+                getBOActions(case_id)
 
             elif choice == 12:
+                run_all_ntlm_requests()
+            
+            elif choice == 13:
                 log_and_print("Exiting application.", "info")
                 break
             

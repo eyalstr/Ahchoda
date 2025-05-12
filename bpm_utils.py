@@ -881,7 +881,7 @@ def getAllAssignmentsTasks(Case_Id):
         if rows:
             for row in rows:
                 log_and_print(
-                    f"מטלה {row[6]} בסטטוס:{row[9]}","info",BOLD_YELLOW,is_hebrew=True)
+                    f"מטלה {row[6]}-- בסטטוס:{row[9]}","info",BOLD_YELLOW,is_hebrew=True)
         else:
             log_and_print(f"אין מטלות בתיק","info",BOLD_YELLOW, is_hebrew=True)
 
@@ -894,4 +894,82 @@ def getAllAssignmentsTasks(Case_Id):
             connection.close()
             #log_and_print("\nSQL Server connection closed.", "info", BOLD_GREEN)    
 
+
+def getBOActions(Case_Id):
+   
+      
+    bo_actions = 'לא ידוע'
+    # MongoDB connection string
+    mongo_connection_string = os.getenv("MONGO_CONNECTION_STRING", "")
+
+    # SQL Server connection parameters
+    server_name = os.getenv("DB_SERVER")
+    database_name = os.getenv("DB_NAME")
+    user_name = os.getenv("DB_USER")
+    password = os.getenv("DB_PASS")
+
+    try:
+        # Establish connection to SQL Server
+        connection = pyodbc.connect(
+            f"DRIVER={{ODBC Driver 17 for SQL Server}};"
+            f"SERVER={server_name};"
+            f"DATABASE={database_name};"
+            f"UID={user_name};"
+            f"PWD={password};"
+            f"Trusted_Connection=yes;"
+        )
+
+        cursor = connection.cursor()
+      
+        # SQL Query 1: Get ProcessID and ProcessTypeName
+        sql_query = """
+            SELECT TOP (1000)
+            bo_a.[BO_Actions_Id],
+            at.[Description_Heb] AS Bo_Action_Description,
+            bo_a.[Action_Description],
+        --   bo_a.[Request_Type_Id],
+            bo_a.[Case_ID],
+            bo_a.[Request_Id],
+            bo_a.[Action_Create_User],
+            bo_a.[Involved_Category_Type_Id],
+            bo_a.[Action_Time],
+        --    bo_a.[Entity_Type_Id],
+            en_main.EntityName AS Entity_Type_Description,
+            bo_a.[Entity_value],
+            bo_a.[Source_Description],
+        --  bo_a.[Source_Entity_Type_Id],
+            en_source.EntityName AS Source_Entity_Type_Description,
+            bo_a.[Source_Entity_Value],
+            bo_a.[Source_Create_Date]
+        FROM [CaseManagement_BO].[dbo].[BO_Actions] AS bo_a
+        -- Join to get Hebrew description of Bo_Action_Type_Id
+        JOIN [CaseManagement_BO].[dbo].[CT_BO_Action_Types] AS at
+            ON bo_a.[Bo_Action_Type_Id] = at.[BO_Action_Type_Id]
+        -- Join for Entity_Type_Id
+        JOIN [CaseManagement_BO].[doc].[Entity] AS en_main
+            ON en_main.EntityID = bo_a.[Entity_Type_Id]
+        -- Join for Source_Entity_Type_Id
+        LEFT JOIN [CaseManagement_BO].[doc].[Entity] AS en_source
+            ON en_source.EntityID = bo_a.[Source_Entity_Type_Id]
+        where bo_a.[Case_ID] = ?;
+        """
+        
+        cursor.execute(sql_query, (Case_Id,))  # Use a tuple for parameters
+        rows = cursor.fetchall()
+
+        if rows:
+            for row in rows:
+                log_and_print(
+                    f"{row[1]}- מקור: {row[10]},יעד: {row[2]}","info",BOLD_YELLOW,is_hebrew=True)
+        else:
+            log_and_print(f"אין מידע רלוונטי","info",BOLD_YELLOW, is_hebrew=True)
+
+    except Exception as e:
+        log_and_print(f"Error querying SQL Server: {e}", "error", BOLD_RED)
+
+    finally:
+        # Close the SQL Server connection
+        if 'connection' in locals():
+            connection.close()
+            #log_and_print("\nSQL Server connection closed.", "info", BOLD_GREEN)    
     
