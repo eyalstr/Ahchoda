@@ -73,7 +73,11 @@ activity_type_mapping = {
     45: normalize_hebrew("שליחת זימון ב-OUTLOOK"),
     46: normalize_hebrew("עדכון זימון ב-OUTLOOK"),
     47: normalize_hebrew("ביטול דיון ב-OUTLOOK"),
-    48: normalize_hebrew("הפצה לצד שכנגד")
+    48: normalize_hebrew("הפצה לצד שכנגד"),
+    49: normalize_hebrew("המתנה עד להחלטה מהותית / סגירת תיק מחדש"),
+    51: normalize_hebrew("הפצת שינוי סיווג"),
+    52: normalize_hebrew("סגירת בקשה (בעקבות שינוי סיווג)"),
+    53: normalize_hebrew("שינוי סיווג")
 }
 
 def fetch_process_ids_and_request_type_by_case_id_sorted(case_id, db):
@@ -268,17 +272,17 @@ def print_process_info(process_dict):
     try:
         # Initialize a flag to check if any data is printed
         data_printed = False
-
+        #log_and_print(f"process_dict = {process_dict}")
         # Check if process_dict is a dictionary
         if isinstance(process_dict, dict):
             # Iterate over the dictionary items
             for process_info in process_dict.values():
                 # Ensure the keys exist before accessing to avoid KeyError
-                if 'process_activity_name' in process_info and 'process_step_status' in process_info and 'request_type' in process_info:
+                if 'process_activity_name' in process_info and 'process_step_status' in process_info and 'process_type_name' in process_info:
                     # Print the information in the required format
                     heb_process_step_status = normalize_hebrew(bpm_process_status_type.get(process_info['process_step_status'], "Unknown Status"))
                     heb_activity_type = normalize_hebrew(activity_type_mapping.get(process_info['process_activity_name'], "Unknown Status"))
-                    log_and_print(f"{heb_activity_type}={heb_process_step_status}-{process_info['request_type']} - {process_info['process_id']}", "info", indent=4,is_hebrew=True)
+                    log_and_print(f"{heb_activity_type}={heb_process_step_status}-{process_info['request_type']}--{process_info['process_type_name']}", "info", indent=4,is_hebrew=True)
                     data_printed = True
                 else:
                     log_and_print("Missing expected keys in process info.", "warning")
@@ -287,12 +291,12 @@ def print_process_info(process_dict):
         elif isinstance(process_dict, list):
             for process_info in process_dict:
                 # Ensure the keys exist before accessing to avoid KeyError
-                if 'process_activity_name' in process_info and 'process_step_status' in process_info and 'request_type' in process_info:
+                if 'process_activity_name' in process_info and 'process_step_status' in process_info and 'process_type_name' in process_info and 'process_id' in process_info:
                     # Print the information in the required format
                     heb_process_step_status = normalize_hebrew(bpm_process_status_type.get(process_info['process_step_status'], "Unknown Status"))
                     heb_activity_type = normalize_hebrew(activity_type_mapping.get(process_info['process_activity_name'], "Unknown Status"))
                     
-                    log_and_print(f"{heb_activity_type}={heb_process_step_status}-{process_info['request_type']} - {process_info['process_id']}", "info",  indent=4,is_hebrew=True)
+                    log_and_print(f"{process_info['request_type'][:15]}--{process_info['process_type_name']}---{heb_activity_type}[{heb_process_step_status}]-{process_info['process_id']}", "info", indent=4,is_hebrew=True)
                     data_printed = True
                 else:
                     log_and_print("Missing expected keys in process info.", "warning")
