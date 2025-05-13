@@ -880,8 +880,11 @@ def getAllAssignmentsTasks(Case_Id):
 
         if rows:
             for row in rows:
+                
+                due_date = row[7].strftime("%Y-%m-%d %H:%M:%S") if row[7] else "אין תאריך יעד"
+              
                 log_and_print(
-                    f"מטלה {row[6]}-- בסטטוס:{row[9]}","info",BOLD_YELLOW,is_hebrew=True)
+                    f"מטלה {row[6]}-- בסטטוס: {row[9]}, תאריך יעד: {due_date}","info",BOLD_YELLOW,is_hebrew=True)
         else:
             log_and_print(f"אין מטלות בתיק","info",BOLD_YELLOW, is_hebrew=True)
 
