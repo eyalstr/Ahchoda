@@ -959,8 +959,9 @@ def getBOActions(Case_Id):
 
         if rows:
             for row in rows:
+                action_date = row[7].strftime("%Y-%m-%d %H:%M:%S") if row[7] else "אין תאריך"
                 log_and_print(
-                    f"{row[1]}- מקור: {row[10]},יעד: {row[2]}","info",BOLD_YELLOW,is_hebrew=True)
+                    f"{row[1]}- מקור: {row[10]}, יעד: {row[2]}, בתאריך: {action_date}","info",BOLD_YELLOW,is_hebrew=True)
         else:
             log_and_print(f"אין מידע רלוונטי","info",BOLD_YELLOW, is_hebrew=True)
 
