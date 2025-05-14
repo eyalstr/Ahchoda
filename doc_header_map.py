@@ -151,6 +151,13 @@ DOCUMENT_TYPE_MAPPING = {
     962: normalize_hebrew("בקשה להחלפת מייצג")
 }
 
+SOURCE_MAPPING = {
+    1: normalize_hebrew("צד א"),
+    2: normalize_hebrew("צד ב"),
+    3: normalize_hebrew("בית הדין"),
+    4: normalize_hebrew("לא ידוע"),
+}
+
 DOCUMENT_CATEGORY_MAPPING = {
     1: normalize_hebrew("כתב תביעה"),
     2: normalize_hebrew("מסמך מזהה"),

@@ -2,7 +2,7 @@ from pymongo import MongoClient
 from dotenv import load_dotenv
 from logging_utils import log_and_print, normalize_hebrew, logger
 from logging_utils import BOLD_YELLOW, BOLD_GREEN, BOLD_RED
-from doc_header_map import DOCUMENT_TYPE_MAPPING, DOCUMENT_CATEGORY_MAPPING
+from doc_header_map import DOCUMENT_TYPE_MAPPING, DOCUMENT_CATEGORY_MAPPING,SOURCE_MAPPING
 from request_data_manager import get_requests_by_case_id,request_type_mapping
 from bpm_utils import get_case_involved_name_by_identify_id
 import pyodbc
@@ -176,7 +176,11 @@ def fetch_documents_by_case_id(case_id, db, collection_name="Document"):
                         
                     #     watched = IsWatched.get(str(value), f"לא ידוע ({value})")
                     #     log_and_print(f"{desc}: {value}", indent=2, ansi_format=BOLD_GREEN, is_hebrew=True)
-                    
+                    elif key == 'DocumentSourceTypeId':
+                         source = normalize_hebrew(SOURCE_MAPPING.get(value, 0))
+                         log_and_print(f"מקור המסמך: {source}", indent=2,  is_hebrew=True)
+
+                        
                     elif key in ["MojId", "FileName","CreateDate"]:                   
                         log_and_print(f"{key}: {value}", indent=2,  is_hebrew=True)
 

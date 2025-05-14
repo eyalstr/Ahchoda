@@ -168,8 +168,8 @@ def display_menu():
     log_and_print("יומן תיק  - 9", "info", BOLD_GREEN, is_hebrew=True)
     log_and_print("מייצגים פעילים- שיקוף לאתר - 10", "info", BOLD_GREEN, is_hebrew=True)
     log_and_print("תור שינוי סיווג - 11", "info", BOLD_GREEN, is_hebrew=True)
-    log_and_print("שינוי הרשאות - 12", "info", BOLD_GREEN, is_hebrew=True)
-    log_and_print("יציאה - 13", "info", BOLD_GREEN, is_hebrew=True)
+   # log_and_print("שינוי הרשאות - 12", "info", BOLD_GREEN, is_hebrew=True)
+    log_and_print("יציאה - 12", "info", BOLD_GREEN, is_hebrew=True)
 
     try:
         choice = int(input(f"Enter your choice: "))
@@ -433,10 +433,10 @@ if __name__ == "__main__":
             elif choice == 11:
                 getBOActions(case_id)
 
-            elif choice == 12:
+            elif choice == 99:
                 run_all_ntlm_requests()
             
-            elif choice == 13:
+            elif choice == 12:
                 log_and_print("Exiting application.", "info")
                 break
             
