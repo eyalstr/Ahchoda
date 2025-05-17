@@ -158,8 +158,11 @@ def fetch_decisions_and_documents_by_case_id(case_id: str, db) -> List[Dict[str,
                                             des_status_heb = getDecisionHebDesc(sub_val)
                                             #des_status_heb = normalize_hebrew(decision_type_mapping.get(sub_val, "Unknown Status"))
                                             log_and_print(f"תוכן ההחלטה : ({sub_val}){des_status_heb}", "info", BOLD_GREEN, is_hebrew=True, indent=4)
-                                        #else:
-                                        #    log_and_print(f"    {sub_key}: {sub_val}", indent=12, is_hebrew=True)
+                                        # else:
+                                        #     log_and_print(f"    {sub_key}: {sub_val}", indent=12, is_hebrew=True)
+                                        elif sub_key == "ContinuedProcessId":
+                                            log_and_print(f"    {sub_key}: {sub_val}", indent=12, is_hebrew=True)
+
                             else:
                                 log_and_print(f"Unexpected format for 'SubDecisions', expected a list, got: {type(val)}", "warning", BOLD_RED, indent=8, is_hebrew=True)
                         #else:            
