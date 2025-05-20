@@ -623,7 +623,7 @@ def parse_requestsLog_by_case_id(case_id: str, db) -> None:
         log_and_print(f"Error parsing Requests log for Case ID {case_id}: {e}", "error",  is_hebrew=True)
 
 # מקבל ת"ז ומספר תיק - ומחזיר האם נמצא הב"כ בטבלה שהאתר רואה ומשם הוא לוקח להציג מטלות
-def fetch_case_from_vsearchcase(case_display_id, involved_identify_id, db):
+def fetch_case_from_vsearchcase(case_id, involved_identify_id, db):
     """
     Fetch a case document from the vSearchCase collection using CaseDisplayId and CaseInvolvedIdentifyId.
 
@@ -638,19 +638,19 @@ def fetch_case_from_vsearchcase(case_display_id, involved_identify_id, db):
     try:
         collection = db["vSearchCase"]
         query = {
-            "CaseDisplayId": case_display_id,
+            "_id": case_id,
             "CaseInvolvedIdentifyId": involved_identify_id
         }
 
-        log_and_print(f"מחפש ב-vSearchCase עם: מספר תיק מוצג = {case_display_id}, מזהה מעורב = {involved_identify_id}", is_hebrew=True)
-
+       
         document = collection.find_one(query)
 
         if document:
-            log_and_print("נמצא תיעוד מתאים ב-vSearchCase.", is_hebrew=True)
+            #log_and_print(f"מחפש ב-vSearchCase עם: מספר תיק מוצג = {case_id}, מזהה מעורב = {involved_identify_id}", is_hebrew=True)
+            log_and_print(f"נמצא תיעוד מתאים ב-vSearchCase. עם: מספר תיק מוצג = {case_id}, מזהה מעורב = {involved_identify_id}", ansi_format=BOLD_YELLOW,is_hebrew=True)
 
         else:
-            log_and_print("לא נמצא תיעוד מתאים ב-vSearchCase.", ansi_format=BOLD_YELLOW, is_hebrew=True)
+            log_and_print(f"לא נמצא תיעוד מתאים ב-vSearchCase. עם: מספר תיק מוצג = {case_id}, מזהה מעורב = {involved_identify_id}", ansi_format=BOLD_YELLOW, is_hebrew=True)
 
 
         return document
@@ -714,7 +714,8 @@ def parse_case_involved_representors_by_case_id(case_id: str, db) -> None:
                     continue
 
                 # Check in vSearchCase collection
-                result = fetch_case_from_vsearchcase(case_display_id, rep_identify_id, db)
+                
+                result = fetch_case_from_vsearchcase(case_id, rep_identify_id, db)
                 if result:
                     valid_representors.append(rep)
 
